@@ -3,13 +3,14 @@ import { getTaxonomy, getNearbyNotableObservations } from 'data/ebirdService';
 
 export default class App extends LightningElement {
     taxonomy;
+    sightings;
 
     connectedCallback() {
         this.getSpecies();
 
         let opts = { lat: 38.31, long: -77.46, daysBack: 2 };
         getNearbyNotableObservations(opts).then((result) => {
-            console.log(result);
+            this.sightings = result;
         });
     }
 
