@@ -22,7 +22,7 @@
         "npm": ">=6.4.1",
         "yarn": ">=1.9.4"
     },
-    "homepage": "https://ewcbyrd.github.io/birds",
+    "homepage": "https://birds.github.io",
     "husky": {
         "hooks": {
             "pre-commit": "lint-staged"
