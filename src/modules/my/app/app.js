@@ -10,6 +10,9 @@ export default class App extends LightningElement {
 
         let opts = { lat: 38.31, long: -77.46, daysBack: 2 };
         getNearbyNotableObservations(opts).then((result) => {
+            result.forEach((item) => {
+                result.locationUrl = `https://ebird.org/hotspot/${item.locId}`;
+            });
             this.sightings = result;
             console.log(this.sightings);
         });

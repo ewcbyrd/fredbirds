@@ -9,7 +9,9 @@
             <template for:each={sightings} for:item="sighting">
                 <tr key={sighting.subId}>
                     <td>{sighting.comName}</td>
-                    <td>{sighting.locName}</td>
+                    <td>
+                        <a href={sighting.locationUrl}>{sighting.locName}</a>
+                    </td>
                     <td>{sighting.obsDt}</td>
                 </tr>
             </template>
