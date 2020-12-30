@@ -7,7 +7,7 @@
                 <th>Date</th>
             </tr>
             <template for:each={sightings} for:item="sighting">
-                <tr key={sighting.subId}>
+                <tr key={sighting.obsId}>
                     <td>{sighting.comName}</td>
                     <td>
                         <a href={sighting.locationUrl}>{sighting.locName}</a>
