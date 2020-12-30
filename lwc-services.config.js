@@ -6,6 +6,10 @@ module.exports = {
         {
             from: 'node_modules/@salesforce-ux/design-system/assets',
             to: 'srs/SLDS'
+        },
+        {
+            from: 'node_modules/@salesforce-ux/design-system/assets',
+            to: 'dist/SLDS'
         }
     ]
 };

@@ -1,5 +1,6 @@
 <template>
     <template if:true={sightings}>
+        <div class="slds-text-heading_large">Notable Sightings</div>
         <table>
             <tr>
                 <th>Species</th>
@@ -10,7 +11,9 @@
                 <tr key={sighting.obsId}>
                     <td>{sighting.comName}</td>
                     <td>
-                        <a href={sighting.locationUrl}>{sighting.locName}</a>
+                        <a href={sighting.locationUrl} target="_top"
+                            >{sighting.locName}</a
+                        >
                     </td>
                     <td>{sighting.obsDt}</td>
                 </tr>

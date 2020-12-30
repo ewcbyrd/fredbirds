@@ -4,11 +4,12 @@ import { getTaxonomy, getNearbyNotableObservations } from 'data/ebirdService';
 export default class App extends LightningElement {
     taxonomy;
     sightings;
+    daysBack = 14;
 
     connectedCallback() {
         this.getSpecies();
 
-        let opts = { lat: 38.31, long: -77.46, daysBack: 14 };
+        let opts = { lat: 38.31, long: -77.46, daysBack: this.daysBack };
         getNearbyNotableObservations(opts).then((result) => {
             result.forEach((item) => {
                 result.locationUrl = `https://ebird.org/hotspot/${item.locId}`;
