@@ -49,7 +49,7 @@ export const getNearbyNotableObservations = ({
     dist = 25,
     daysBack = 7
 }) => {
-    const url = `${root}data/obs/geo/recent/notable?lat=${lat}&lng=${long}&dist=${dist}&back=${daysBack}`;
+    const url = `${root}data/obs/geo/recent/notable?lat=${lat}&lng=${long}&dist=${dist}&back=${daysBack}&detail=full`;
     return new Promise((resolve, reject) => {
         fetch(url, {
             method: 'GET',
