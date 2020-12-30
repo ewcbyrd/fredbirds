@@ -1,21 +1,21 @@
 <template>
     <template if:true={sightings}>
-        <h1>Notable Sightings</h1>
+        <h1>Notable Sightings in past {daysBack} days</h1>
         <table>
             <tr>
                 <th>Species</th>
                 <th>Location</th>
+                <th>City/County</th>
                 <th>Date</th>
+                <th>Seen By</th>
             </tr>
             <template for:each={sightings} for:item="sighting">
                 <tr key={sighting.obsId}>
                     <td>{sighting.comName}</td>
-                    <td>
-                        <a href={sighting.locationUrl} target="_top"
-                            >{sighting.locName}</a
-                        >
-                    </td>
+                    <td>{sighting.locName}</td>
+                    <td>{sighting.subnational2Name}</td>
                     <td>{sighting.obsDt}</td>
+                    <td>{sighting.userDisplayName}</td>
                 </tr>
             </template>
         </table>
