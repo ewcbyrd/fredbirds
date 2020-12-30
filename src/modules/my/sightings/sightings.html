@@ -1,0 +1,18 @@
+<template>
+    <template if:true={sightings}>
+        <table>
+            <tr>
+                <th>Species</th>
+                <th>Location</th>
+                <th>Date</th>
+            </tr>
+            <template for:each={sightings} for:item="sighting">
+                <tr key={sighting.subId}>
+                    <td>{sighting.comName}</td>
+                    <td>{sighting.locName}</td>
+                    <td>{sighting.obsDt}</td>
+                </tr>
+            </template>
+        </table>
+    </template>
+</template>

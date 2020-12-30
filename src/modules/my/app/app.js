@@ -11,6 +11,7 @@ export default class App extends LightningElement {
         let opts = { lat: 38.31, long: -77.46, daysBack: 2 };
         getNearbyNotableObservations(opts).then((result) => {
             this.sightings = result;
+            console.log(this.sightings);
         });
     }
 
