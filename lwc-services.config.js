@@ -9,7 +9,7 @@ module.exports = {
         },
         {
             from: 'node_modules/@salesforce-ux/design-system/assets',
-            to: 'dist/SLDS'
+            to: 'dist/resources/SLDS'
         }
     ]
 };

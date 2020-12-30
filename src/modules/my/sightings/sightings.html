@@ -1,14 +1,20 @@
 <template>
     <template if:true={sightings}>
-        <h1>Notable Sightings in past {daysBack} days</h1>
-        <table>
-            <tr>
-                <th>Species</th>
-                <th>Location</th>
-                <th>City/County</th>
-                <th>Date</th>
-                <th>Seen By</th>
-            </tr>
+        <div class="slds-text-heading_large slds-p-bottom_small">
+            Notable Sightings in past {daysBack} days
+        </div>
+        <table class="slds-table slds-table--bordered">
+            <thead>
+                <tr class="slds-text-heading--label">
+                    <th scope="col">
+                        <span class="slds-truncate">Species</span>
+                    </th>
+                    <th>Location</th>
+                    <th>City/County</th>
+                    <th>Date</th>
+                    <th>Seen By</th>
+                </tr>
+            </thead>
             <template for:each={sightings} for:item="sighting">
                 <tr key={sighting.obsId}>
                     <td>{sighting.comName}</td>
