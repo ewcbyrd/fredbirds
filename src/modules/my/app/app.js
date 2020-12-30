@@ -8,7 +8,7 @@ export default class App extends LightningElement {
     connectedCallback() {
         this.getSpecies();
 
-        let opts = { lat: 38.31, long: -77.46, daysBack: 7 };
+        let opts = { lat: 38.31, long: -77.46, daysBack: 14 };
         getNearbyNotableObservations(opts).then((result) => {
             result.forEach((item) => {
                 result.locationUrl = `https://ebird.org/hotspot/${item.locId}`;
