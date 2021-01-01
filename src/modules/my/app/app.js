@@ -4,7 +4,7 @@ import { getTaxonomy, getNearbyNotableObservations } from 'data/ebirdService';
 export default class App extends LightningElement {
     taxonomy;
     sightings;
-    daysBack = 14;
+    daysBack = 7;
 
     connectedCallback() {
         this.getSpecies();

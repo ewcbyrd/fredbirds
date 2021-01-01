@@ -1,3 +1,84 @@
 <template>
-    <my-sightings sightings={sightings} days-back={daysBack}></my-sightings>
+    <div class="slds-context-bar">
+        <div class="slds-context-bar__primary">
+            <div
+                class="slds-context-bar__item slds-context-bar__dropdown-trigger slds-dropdown-trigger slds-dropdown-trigger_click slds-no-hover"
+            >
+                <div class="slds-context-bar__icon-action">
+                    <button
+                        class="slds-button slds-icon-waffle_container slds-context-bar__button"
+                        title="Description of the icon when needed"
+                    >
+                        <span class="slds-icon-waffle">
+                            <span class="slds-r1"></span>
+                            <span class="slds-r2"></span>
+                            <span class="slds-r3"></span>
+                            <span class="slds-r4"></span>
+                            <span class="slds-r5"></span>
+                            <span class="slds-r6"></span>
+                            <span class="slds-r7"></span>
+                            <span class="slds-r8"></span>
+                            <span class="slds-r9"></span>
+                        </span>
+                        <span class="slds-assistive-text"
+                            >Open App Launcher</span
+                        >
+                    </button>
+                </div>
+                <span
+                    class="slds-context-bar__label-action slds-context-bar__app-name"
+                >
+                    <span title="App Name">FBC</span>
+                </span>
+            </div>
+        </div>
+        <nav class="slds-context-bar__secondary" role="navigation">
+            <ul class="slds-grid">
+                <li class="slds-context-bar__item slds-is-active">
+                    <a
+                        href="javascript:void(0);"
+                        class="slds-context-bar__label-action"
+                        title="Home"
+                    >
+                        <span class="slds-assistive-text">Current Page:</span>
+                        <span class="slds-truncate" title="Home">Home</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div
+        class="slds-grid slds-wrap slds-p-left_xx-large slds-p-right_xx-large main slds-p-bottom_xx-large"
+    >
+        <!--<div class="slds-size_1-of-1">
+            <div class="slds-box header">
+                <div class="center header1">Fredericksburg Birding Club</div>
+                <div class="center header2">A Local Chapter of the Virginia Society of Ornithology</div>
+            </div>
+        </div>-->
+        <div class="slds-size_1-of-1 slds-p-top_large">
+            <div class="slds-text-heading_medium">
+                <strong>Welcome!</strong>
+            </div>
+            <div>
+                Welcome to the webpage for the Fredericksburg Birding Club
+                (FBC). Our members are bird enthusiasts of all skill levels –
+                from beginning to advanced birders – who reside in the greater
+                Fredericksburg, Virginia area. We have been brought together
+                because of our interest in birds and our love of birding.
+            </div>
+            <div>
+                We welcome anyone to join us on one of our upcoming trips – even
+                if you have never birded before – and hope you will consider
+                becoming a member. For more information about our club, click
+                here.
+            </div>
+        </div>
+        <div class="slds-size_1-of-1">
+            <my-sightings
+                sightings={sightings}
+                days-back={daysBack}
+            ></my-sightings>
+        </div>
+    </div>
 </template>
