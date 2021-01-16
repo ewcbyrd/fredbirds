@@ -46,7 +46,7 @@ export const getTaxonomy = () => {
 export const getNearbyNotableObservations = ({
     lat,
     long,
-    dist = 25,
+    dist = 50,
     daysBack = 7
 }) => {
     const url = `${root}data/obs/geo/recent/notable?lat=${lat}&lng=${long}&dist=${dist}&back=${daysBack}&detail=full`;

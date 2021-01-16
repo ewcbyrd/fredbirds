@@ -48,33 +48,42 @@
         </nav>
     </div>
     <div
-        class="slds-grid slds-wrap slds-p-left_xx-large slds-p-right_xx-large main slds-p-bottom_xx-large"
+        class="slds-grid slds-wrap slds-p-left_xx-large slds-p-right_xx-large main slds-p-bottom_xx-large slds-p-top_large"
     >
-        <!--<div class="slds-size_1-of-1">
-            <div class="slds-box header">
-                <div class="center header1">Fredericksburg Birding Club</div>
-                <div class="center header2">A Local Chapter of the Virginia Society of Ornithology</div>
-            </div>
-        </div>-->
-        <div class="slds-size_1-of-1 slds-p-top_large">
-            <div class="slds-text-heading_medium">
-                <strong>Welcome!</strong>
-            </div>
-            <div>
-                Welcome to the webpage for the Fredericksburg Birding Club
-                (FBC). Our members are bird enthusiasts of all skill levels –
-                from beginning to advanced birders – who reside in the greater
-                Fredericksburg, Virginia area. We have been brought together
-                because of our interest in birds and our love of birding.
-            </div>
-            <div>
-                We welcome anyone to join us on one of our upcoming trips – even
-                if you have never birded before – and hope you will consider
-                becoming a member. For more information about our club, click
-                here.
+        <div
+            class="slds-large-size_3-of-4 slds-small-size_1-of-1 slds-p-left_small slds-p-right_x-large"
+        >
+            <div class="slds-size_1-of-1">
+                <!--<div class="slds-box header ">
+                    <div class="center header1">Fredericksburg Birding Club</div>
+                    <div class="center header2">A Local Chapter of the Virginia Society of Ornithology</div>
+                </div>-->
+                <div class="slds-text-heading_medium slds-p-top_small">
+                    <strong>Welcome!</strong>
+                </div>
+                <div class="slds-text-body_regular">
+                    Welcome to the webpage for the Fredericksburg Birding Club
+                    (FBC). Our members are bird enthusiasts of all skill levels
+                    – from beginning to advanced birders – who reside in the
+                    greater Fredericksburg, Virginia area. We have been brought
+                    together because of our interest in birds and our love of
+                    birding.
+                </div>
+                <div class="slds-text-body_regular slds-p-top_x-small">
+                    We welcome anyone to join us on one of our upcoming trips –
+                    even if you have never birded before – and hope you will
+                    consider becoming a member. For more information about our
+                    club, click here.
+                </div>
             </div>
         </div>
-        <div class="slds-size_1-of-1">
+        <div class="slds-large-size_1-of-4 slds-small-size_1-of-1">
+            <my-events></my-events>
+        </div>
+        <div
+            class="slds-large-size_3-of-4 slds-small-size_1-of-1 slds-p-left_small"
+        ></div>
+        <div class="slds-large-size_1-of-4 slds-small-size_1-of-1">
             <my-sightings
                 sightings={sightings}
                 days-back={daysBack}

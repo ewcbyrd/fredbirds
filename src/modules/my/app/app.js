@@ -7,8 +7,6 @@ export default class App extends LightningElement {
     daysBack = 7;
 
     connectedCallback() {
-        this.getSpecies();
-
         let opts = { lat: 38.31, long: -77.46, daysBack: this.daysBack };
         getNearbyNotableObservations(opts).then((result) => {
             result.forEach((item) => {

@@ -25,7 +25,9 @@
                 </div>
                 <div class="slds-card__body">
                     <div class="slds-scrollable--x">
-                        <table class="slds-table slds-table--bordered">
+                        <table
+                            class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
+                        >
                             <thead>
                                 <tr class="slds-text-heading--label">
                                     <th scope="col">
@@ -38,31 +40,19 @@
                                             >Location</span
                                         >
                                     </th>
-                                    <th>
-                                        <span class="slds-truncate"
-                                            >City/County</span
-                                        >
-                                    </th>
-                                    <th>
-                                        <span class="slds-truncate">Date</span>
-                                    </th>
-                                    <th>Seen By</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <template
-                                    for:each={sightings}
+                                    for:each={sightingList}
                                     for:item="sighting"
                                 >
                                     <tr
                                         class="slds-hint-parent"
-                                        key={sighting.obsId}
+                                        key={sighting.comName}
                                     >
                                         <td>{sighting.comName}</td>
                                         <td>{sighting.locName}</td>
-                                        <td>{sighting.subnational2Name}</td>
-                                        <td>{sighting.obsDt}</td>
-                                        <td>{sighting.userDisplayName}</td>
                                     </tr>
                                 </template>
                             </tbody>

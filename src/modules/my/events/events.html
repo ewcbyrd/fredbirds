@@ -1,0 +1,89 @@
+<template>
+    <!--<div class="slds-form-element">
+        <label class="slds-form-element__label" for="combobox-id-1">Year</label>
+        <div class="slds-form-element__control">
+            <div class="slds-combobox_container">
+                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                    <input type="text" class="slds-input slds-combobox__input" id="combobox-id-1" aria-controls="listbox-id-1" auto-complete="off" role="textbox" value={year} />
+                    <span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right">
+                        <svg class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
+                          <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>
+                        </svg>
+                    </span>
+                </div>
+                <div id="listbox-id-1" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid" role="listbox">
+                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                        <template for:each={options} for:item="option">
+                            <li key={option} role="presentation" class="slds-listbox__item">
+                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option">
+                                  <span class="slds-media__figure slds-listbox__option-icon"></span>
+                                  <span class="slds-media__body">
+                                    <span class="slds-truncate" title={option}>{option}</span>
+                                  </span>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>-->
+    <template if:true={yearEvents}>
+        <div class="slds-p-top_small">
+            <div class="slds-card">
+                <div class="slds-card__header">
+                    <div
+                        class="slds-media slds-media--center slds-has-flexi-truncate"
+                    >
+                        <div class="slds-media__figure">
+                            <svg
+                                aria-hidden="true"
+                                class="slds-icon slds-icon-standard-contact slds-icon--small"
+                            >
+                                <use
+                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#contact"
+                                ></use>
+                            </svg>
+                        </div>
+                        <div class="slds-media__body">
+                            <h2 class="slds-text-heading--small slds-truncate">
+                                {year} Calendar of Events
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-card__body">
+                    <div class="slds-scrollable--x">
+                        <table
+                            class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
+                        >
+                            <thead>
+                                <tr class="slds-text-heading--label">
+                                    <th scope="col">
+                                        <span class="slds-truncate"
+                                            >Date(s)</span
+                                        >
+                                    </th>
+                                    <th scope="col">
+                                        <span class="slds-truncate">Event</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template
+                                    for:each={yearEvents}
+                                    for:item="event"
+                                >
+                                    <tr class="slds-hint-parent" key={event.id}>
+                                        <td>{event.date}</td>
+                                        <td>{event.event}</td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+</template>
