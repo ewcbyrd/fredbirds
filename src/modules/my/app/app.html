@@ -1,4 +1,10 @@
 <template>
+    <div class="slds-box header slds-size-large_1-of-1 slds-size-small_1-of-1">
+        <div class="center header1">Fredericksburg Birding Club</div>
+        <div class="center header2">
+            A Local Chapter of the Virginia Society of Ornithology
+        </div>
+    </div>
     <div class="slds-context-bar">
         <div class="slds-context-bar__primary">
             <div
@@ -32,62 +38,64 @@
                 </span>
             </div>
         </div>
-        <nav class="slds-context-bar__secondary" role="navigation">
+        <nav
+            class="slds-context-bar__secondary slds-p-top_x-small"
+            role="navigation"
+        >
             <ul class="slds-grid">
-                <li class="slds-context-bar__item slds-is-active">
+                <li class={homeStyle}>
                     <a
                         href="javascript:void(0);"
                         class="slds-context-bar__label-action"
                         title="Home"
+                        onclick={handleHomeClick}
                     >
-                        <span class="slds-assistive-text">Current Page:</span>
                         <span class="slds-truncate" title="Home">Home</span>
+                    </a>
+                </li>
+                <li class={sightingsStyle}>
+                    <a
+                        href="javascript:void(0);"
+                        class="slds-context-bar__label-action"
+                        title="Home"
+                        onclick={handleResourcesClick}
+                    >
+                        <span class="slds-truncate" title="Sightings"
+                            >Sightings</span
+                        >
+                    </a>
+                </li>
+                <li class={hotspotsStyle}>
+                    <a
+                        href="javascript:void(0);"
+                        class="slds-context-bar__label-action"
+                        title="Home"
+                        onclick={handleHotspotsClick}
+                    >
+                        <span class="slds-truncate" title="Hotspots"
+                            >Hotspots</span
+                        >
+                    </a>
+                </li>
+                <li class={membershipStyle}>
+                    <a
+                        href="javascript:void(0);"
+                        class="slds-context-bar__label-action"
+                        title="Membership"
+                        onclick={handleMembershipClick}
+                    >
+                        <span class="slds-truncate" title="Membership"
+                            >Membership</span
+                        >
                     </a>
                 </li>
             </ul>
         </nav>
     </div>
-    <div
-        class="slds-grid slds-wrap slds-p-left_xx-large slds-p-right_xx-large main slds-p-bottom_xx-large slds-p-top_large"
-    >
-        <div
-            class="slds-large-size_3-of-4 slds-small-size_1-of-1 slds-p-left_small slds-p-right_x-large"
-        >
-            <div class="slds-size_1-of-1">
-                <!--<div class="slds-box header ">
-                    <div class="center header1">Fredericksburg Birding Club</div>
-                    <div class="center header2">A Local Chapter of the Virginia Society of Ornithology</div>
-                </div>-->
-                <div class="slds-text-heading_medium slds-p-top_small">
-                    <strong>Welcome!</strong>
-                </div>
-                <div class="slds-text-body_regular">
-                    Welcome to the webpage for the Fredericksburg Birding Club
-                    (FBC). Our members are bird enthusiasts of all skill levels
-                    – from beginning to advanced birders – who reside in the
-                    greater Fredericksburg, Virginia area. We have been brought
-                    together because of our interest in birds and our love of
-                    birding.
-                </div>
-                <div class="slds-text-body_regular slds-p-top_x-small">
-                    We welcome anyone to join us on one of our upcoming trips –
-                    even if you have never birded before – and hope you will
-                    consider becoming a member. For more information about our
-                    club, click here.
-                </div>
-            </div>
-        </div>
-        <div class="slds-large-size_1-of-4 slds-small-size_1-of-1">
-            <my-events></my-events>
-        </div>
-        <div
-            class="slds-large-size_3-of-4 slds-small-size_1-of-1 slds-p-left_small"
-        ></div>
-        <div class="slds-large-size_1-of-4 slds-small-size_1-of-1">
-            <my-sightings
-                sightings={sightings}
-                days-back={daysBack}
-            ></my-sightings>
-        </div>
-    </div>
+    <template if:true={homeSelected}>
+        <my-home></my-home>
+    </template>
+    <template if:true={sightingsSelected}>
+        <my-resources></my-resources>
+    </template>
 </template>

@@ -1,0 +1,27 @@
+<template>
+    <div
+        class="slds-grid slds-wrap slds-gutters slds-p-left_medium slds-p-right_medium main slds-p-bottom_xx-large slds-p-top_medium"
+    >
+        <div
+            class="slds-col slds-large-size_1-of-3 slds-small-size_1-of-1 slds-p-left_x-small"
+        >
+            <div>
+                <my-sightings
+                    sightings={localSightings}
+                    header={localSightingsHeader}
+                ></my-sightings>
+            </div>
+        </div>
+        <div class="slds-col slds-large-size_1-of-3 slds-small-size_1-of-1">
+            <div>
+                <my-sightings
+                    sightings={vaSightings}
+                    header={vaSightingHeader}
+                ></my-sightings>
+            </div>
+        </div>
+        <div
+            class="slds-col slds-large-size_1-of-3 slds-small-size_1-of-1"
+        ></div>
+    </div>
+</template>

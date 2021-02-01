@@ -1,33 +1,4 @@
 <template>
-    <!--<div class="slds-form-element">
-        <label class="slds-form-element__label" for="combobox-id-1">Year</label>
-        <div class="slds-form-element__control">
-            <div class="slds-combobox_container">
-                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-                    <input type="text" class="slds-input slds-combobox__input" id="combobox-id-1" aria-controls="listbox-id-1" auto-complete="off" role="textbox" value={year} />
-                    <span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right">
-                        <svg class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
-                          <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>
-                        </svg>
-                    </span>
-                </div>
-                <div id="listbox-id-1" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid" role="listbox">
-                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
-                        <template for:each={options} for:item="option">
-                            <li key={option} role="presentation" class="slds-listbox__item">
-                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option">
-                                  <span class="slds-media__figure slds-listbox__option-icon"></span>
-                                  <span class="slds-media__body">
-                                    <span class="slds-truncate" title={option}>{option}</span>
-                                  </span>
-                                </div>
-                            </li>
-                        </template>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>-->
     <template if:true={yearEvents}>
         <div class="slds-p-top_small">
             <div class="slds-card">
@@ -35,19 +6,29 @@
                     <div
                         class="slds-media slds-media--center slds-has-flexi-truncate"
                     >
-                        <div class="slds-media__figure">
-                            <svg
-                                aria-hidden="true"
-                                class="slds-icon slds-icon-standard-contact slds-icon--small"
-                            >
+                        <span
+                            class="slds-icon_container slds-icon_container slds-icon-standard-event"
+                            title="Description of icon when needed"
+                        >
+                            <svg class="slds-icon" aria-hidden="true">
                                 <use
-                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#contact"
+                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#event"
                                 ></use>
                             </svg>
-                        </div>
+                            <span class="slds-assistive-text"
+                                >Description of icon when needed</span
+                            >
+                        </span>
                         <div class="slds-media__body">
-                            <h2 class="slds-text-heading--small slds-truncate">
-                                {year} Calendar of Events
+                            <h2
+                                class="slds-p-left_small slds-text-heading--small slds-truncate"
+                            >
+                                <select onchange={handleYearChange}>
+                                    <option value="2021">2021</option>
+                                    <option value="2020">2020</option>
+                                    <option value="2019">2019</option>
+                                </select>
+                                Calendar of Events
                             </h2>
                         </div>
                     </div>
@@ -74,9 +55,18 @@
                                     for:each={yearEvents}
                                     for:item="event"
                                 >
-                                    <tr class="slds-hint-parent" key={event.id}>
-                                        <td>{event.date}</td>
-                                        <td>{event.event}</td>
+                                    <tr
+                                        class="slds-hint-parent"
+                                        key={event.id}
+                                        onclick={handleEventClick}
+                                        data-item={event.id}
+                                    >
+                                        <td class="slds-cell-wrap">
+                                            {event.date}
+                                        </td>
+                                        <td class="slds-cell-wrap">
+                                            {event.event}
+                                        </td>
                                     </tr>
                                 </template>
                             </tbody>
@@ -85,5 +75,159 @@
                 </div>
             </div>
         </div>
+        <template if:true={showModal}>
+            <section
+                role="dialog"
+                tabindex="-1"
+                aria-labelledby="modal-heading-01"
+                aria-modal="true"
+                aria-describedby="modal-content-id-1"
+                class="slds-modal slds-fade-in-open"
+            >
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <template if:true={selectedEvent.event}>
+                            <div
+                                class="slds-text-heading_medium slds-hyphenate header-string"
+                            >
+                                {selectedEvent.event}
+                            </div>
+                            <div class="slds-text-heading_small">
+                                {selectedEvent.date}
+                            </div>
+                        </template>
+                    </header>
+                    <div
+                        class="slds-modal__content slds-p-around_medium"
+                        id="modal-content-id-1"
+                    >
+                        <template if:true={noEvents}>
+                            <div
+                                class="slds-scoped-notification slds-media slds-media_center slds-theme_error"
+                                role="status"
+                            >
+                                <div class="slds-media__figure">
+                                    <span
+                                        class="slds-icon_container slds-icon-utility-error"
+                                        title="error"
+                                    >
+                                        <svg
+                                            class="slds-icon slds-icon_small"
+                                            aria-hidden="true"
+                                        >
+                                            <use
+                                                xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#error"
+                                            ></use>
+                                        </svg>
+                                        <span class="slds-assistive-text"
+                                            >error</span
+                                        >
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>
+                                        There are no events scheduled for
+                                        {year}. Please check back for updates.
+                                    </p>
+                                </div>
+                            </div>
+                        </template>
+                        <template if:true={showDetails}>
+                            <pre class="slds-text-body_small">
+{selectedEvent.details}</pre
+                            >
+                        </template>
+                        <template if:false={showDetails}>
+                            <div class="slds-text-body_small">
+                                <template if:true={selectedEvent.tripReport}>
+                                    <pre>{selectedEvent.tripReport}</pre>
+                                </template>
+                                <template if:false={selectedEvent.tripReport}>
+                                    <div
+                                        class="slds-scoped-notification slds-media slds-media_center slds-theme_warning"
+                                        role="status"
+                                    >
+                                        <div class="slds-media__figure">
+                                            <span
+                                                class="slds-icon_container slds-icon-utility-warning"
+                                                title="warning"
+                                            >
+                                                <svg
+                                                    class="slds-icon slds-icon_small"
+                                                    aria-hidden="true"
+                                                >
+                                                    <use
+                                                        xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#warning"
+                                                    ></use>
+                                                </svg>
+                                                <span
+                                                    class="slds-assistive-text"
+                                                    >warning</span
+                                                >
+                                            </span>
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <p>
+                                                A trip report has not been
+                                                posted for this event
+                                            </p>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                            <template if:true={participants}>
+                                <div
+                                    class="slds-grid slds-wrap slds-p-left_small slds-p-right_small"
+                                >
+                                    <div
+                                        class="slds-size_1-of-1 slds-p-top_small slds-text-align_center slds-text-heading_small"
+                                    >
+                                        Participants
+                                    </div>
+
+                                    <div
+                                        class="slds-size_1-of-1 slds-cell-wrap slds-p-left_x-small slds-p-right_x-small"
+                                    >
+                                        {participantString}
+                                    </div>
+                                </div>
+                            </template>
+                            <template if:true={sightings}>
+                                <div
+                                    class="slds-grid slds-wrap slds-p-left_small slds-p-right_small"
+                                    style="width: 90%; margin: 0 auto"
+                                >
+                                    <div
+                                        class="slds-size_1-of-1 slds-p-top_large slds-text-align_center slds-text-heading_small"
+                                    >
+                                        Species Sighted
+                                    </div>
+                                    <template
+                                        for:each={selectedEvent.sightings}
+                                        for:item="sighting"
+                                    >
+                                        <div
+                                            class="slds-size_1-of-2 slds-cell-wrap slds-p-left_x-small slds-p-right_x-small"
+                                            key={sighting._id}
+                                        >
+                                            {sighting.common}
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                    <footer class="slds-modal__footer modal-hidden">
+                        <button
+                            class="slds-button slds-button_outline-brand"
+                            onclick={handleCloseClick}
+                        >
+                            Close
+                        </button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
     </template>
 </template>

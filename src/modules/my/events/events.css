@@ -1,0 +1,10 @@
+pre {
+    white-space: pre-wrap;
+    font-size: 0.8125rem;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+table {
+    table-layout: fixed;
+    width: 100%;
+}

@@ -1,24 +1,29 @@
 <template>
     <template if:true={sightings}>
-        <div class="slds-p-top_small">
+        <div class="slds-p-top_small slds-size_1-of-1">
             <div class="slds-card">
                 <div class="slds-card__header">
                     <div
                         class="slds-media slds-media--center slds-has-flexi-truncate"
                     >
-                        <div class="slds-media__figure">
-                            <svg
-                                aria-hidden="true"
-                                class="slds-icon slds-icon-standard-contact slds-icon--small"
-                            >
+                        <span
+                            class="slds-icon_container slds-icon_container slds-icon-standard-forecasts"
+                            title="Description of icon when needed"
+                        >
+                            <svg class="slds-icon" aria-hidden="true">
                                 <use
-                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#contact"
+                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#forecasts"
                                 ></use>
                             </svg>
-                        </div>
+                            <span class="slds-assistive-text"
+                                >Description of icon when needed</span
+                            >
+                        </span>
                         <div class="slds-media__body">
-                            <h2 class="slds-text-heading--small slds-truncate">
-                                Notable Sightings in past {daysBack} days
+                            <h2
+                                class="slds-p-left_small slds-text-heading--small slds-wrap"
+                            >
+                                {header}
                             </h2>
                         </div>
                     </div>
@@ -49,10 +54,14 @@
                                 >
                                     <tr
                                         class="slds-hint-parent"
-                                        key={sighting.comName}
+                                        key={sighting.obsId}
                                     >
-                                        <td>{sighting.comName}</td>
-                                        <td>{sighting.locName}</td>
+                                        <td class="slds-cell-wrap">
+                                            {sighting.comName}
+                                        </td>
+                                        <td class="slds-cell-wrap">
+                                            {sighting.locName}
+                                        </td>
                                     </tr>
                                 </template>
                             </tbody>

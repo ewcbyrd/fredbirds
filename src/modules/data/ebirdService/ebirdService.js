@@ -68,3 +68,28 @@ export const getNearbyNotableObservations = ({
             });
     });
 };
+
+export const getNotableSightingsByLocation = ({
+    regionCode,
+    daysBack = 14
+}) => {
+    const url =
+        root + 'data/obs/' + regionCode + '/recent/notable?back=' + daysBack;
+    return new Promise((resolve, reject) => {
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'X-eBirdApiToken': key
+            }
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((result) => {
+                resolve(result);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+};

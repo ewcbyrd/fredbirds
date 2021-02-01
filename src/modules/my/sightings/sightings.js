@@ -2,7 +2,7 @@ import { LightningElement, api } from 'lwc';
 
 export default class Sightings extends LightningElement {
     @api sightings;
-    @api daysBack;
+    @api header;
 
     get sightingList() {
         let filteredList = [];
@@ -16,7 +16,8 @@ export default class Sightings extends LightningElement {
             ) {
                 filteredList.push({
                     comName: item.comName,
-                    locName: item.locName
+                    locName: item.locName,
+                    obsId: item.obsId
                 });
             }
         });

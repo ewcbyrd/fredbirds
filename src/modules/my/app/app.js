@@ -1,31 +1,57 @@
 import { LightningElement } from 'lwc';
-import { getTaxonomy, getNearbyNotableObservations } from 'data/ebirdService';
 
 export default class App extends LightningElement {
-    taxonomy;
-    sightings;
-    daysBack = 7;
+    homeSelected = true;
+    sightingsSelected = false;
+    hotspotsSelected = false;
+    membershipSelected;
 
-    connectedCallback() {
-        let opts = { lat: 38.31, long: -77.46, daysBack: this.daysBack };
-        getNearbyNotableObservations(opts).then((result) => {
-            result.forEach((item) => {
-                result.locationUrl = `https://ebird.org/hotspot/${item.locId}`;
-            });
-            this.sightings = result;
-            console.log(this.sightings);
-        });
+    handleHomeClick() {
+        this.homeSelected = true;
+        this.sightingsSelected = false;
+        this.hotspotsSelected = false;
+        this.membershipSelected = false;
     }
 
-    getSpecies() {
-        let taxonomy = JSON.parse(localStorage.getItem('taxonomy'));
-        if (!taxonomy) {
-            getTaxonomy().then((result) => {
-                this.taxonomy = result;
-                localStorage.setItem('taxonomy', JSON.stringify(result));
-            });
-        } else {
-            this.taxonomy = taxonomy;
-        }
+    handleResourcesClick() {
+        this.homeSelected = false;
+        this.sightingsSelected = true;
+        this.hotspotsSelected = false;
+        this.membershipSelected = false;
+    }
+
+    handleHotspotsClick() {
+        this.homeSelected = false;
+        this.sightingsSelected = false;
+        this.hotspotsSelected = true;
+        this.membershipSelected = false;
+    }
+
+    handleMembershipClick() {
+        this.homeSelected = false;
+        this.sightingsSelected = false;
+        this.hotspotsSelected = false;
+        this.membershipSelected = true;
+    }
+
+    get homeStyle() {
+        return this.getMenuStyle(this.homeSelected);
+    }
+
+    get sightingsStyle() {
+        return this.getMenuStyle(this.sightingsSelected);
+    }
+
+    get hotspotsStyle() {
+        return this.getMenuStyle(this.hotspotsSelected);
+    }
+    get membershipStyle() {
+        return this.getMenuStyle(this.membershipSelected);
+    }
+
+    getMenuStyle(selected) {
+        return selected
+            ? 'slds-context-bar__item slds-is-active'
+            : 'slds-context-bar__item';
     }
 }
