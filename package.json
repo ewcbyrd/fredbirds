@@ -1,6 +1,6 @@
 {
     "name": "birds",
-    "description": "My amazing LWC app",
+    "description": "Fredericksburg Birding Club App",
     "version": "0.0.1",
     "bugs": "https://github.com/birds/issues",
     "dependencies": {
