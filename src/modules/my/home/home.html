@@ -1,23 +1,30 @@
 <template>
     <div
-        class="slds-grid slds-wrap slds-p-left_medium slds-p-right_medium main slds-p-bottom_xx-large slds-p-top_medium"
+        class="slds-grid slds-wrap slds-p-left_large slds-p-right_large main slds-p-bottom_xx-large slds-p-top_medium slds-gutters"
     >
-        <div class="slds-large-size_2-of-3 slds-small-size_1-of-1">
-            <div class="slds-text-heading_medium slds-p-top_small">
-                <strong>Welcome!</strong>
+        <div class="slds-large-size_2-of-3 slds-small-size_1-of-1 slds-col">
+            <div class="">
+                <div class="slds-text-heading_large slds-p-top_small">
+                    <strong>Welcome!</strong>
+                </div>
+                <div class="opening">
+                    Welcome to the new and improved webpage for the Fredericksburg Birding Club
+                    (FBC). Our members are bird enthusiasts of all skill levels –
+                    from beginning to advanced birders – who reside in the greater
+                    Fredericksburg, Virginia area. We have been brought together
+                    because of our interest in birds and our love of birding. We
+                    welcome anyone to join us on one of our upcoming trips – even if
+                    you have never birded before – and hope you will consider
+                    becoming a member.    
+                </div>
             </div>
-            <div class="slds-text-body_regular">
-                Welcome to the webpage for the Fredericksburg Birding Club
-                (FBC). Our members are bird enthusiasts of all skill levels –
-                from beginning to advanced birders – who reside in the greater
-                Fredericksburg, Virginia area. We have been brought together
-                because of our interest in birds and our love of birding. We
-                welcome anyone to join us on one of our upcoming trips – even if
-                you have never birded before – and hope you will consider
-                becoming a member.
+            <div class="slds-p-top_medium">
+                <div class="carousel-container">
+                    <c-carousel-component items={items} options={options}></c-carousel-component>
+                </div>
             </div>
         </div>
-        <div class="slds-large-size_1-of-3 slds-small-size_1-of-1">
+        <div class="slds-large-size_1-of-3 slds-small-size_1-of-1 slds-col">
             <my-events></my-events>
         </div>
     </div>

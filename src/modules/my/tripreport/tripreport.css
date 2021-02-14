@@ -1,0 +1,18 @@
+pre {
+    white-space: pre-wrap;
+    font-size: 0.8125rem;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.slds-carousel__panel.panel-hide{
+    display: none;
+}
+
+.slds-carousel__panel img{
+    max-height: 60vh !important;
+}
+
+.carousel-container{
+    width: 80%;
+    margin: 0 auto;
+}

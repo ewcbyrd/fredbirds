@@ -25,15 +25,10 @@ export default class Resources extends LightningElement {
             long: -77.46,
             daysBack: this.localSightingsDaysBack
         };
-        const sightings = sessionStorage.getItem('sightings');
-        if (sightings) {
-            this.localSightings = JSON.parse(sightings);
-        } else {
-            getNearbyNotableObservations(opts).then((result) => {
-                sessionStorage.setItem('sightings', JSON.stringify(result));
-                this.localSightings = result;
-            });
-        }
+        getNearbyNotableObservations(opts).then((result) => {
+            sessionStorage.setItem('sightings', JSON.stringify(result));
+            this.localSightings = result;
+        });
     }
 
     getVirginiaNotableSightings() {
@@ -41,15 +36,10 @@ export default class Resources extends LightningElement {
             regionCode: 'US-VA',
             daysBack: this.vaSightingsDaysBack
         };
-        const sightings = sessionStorage.getItem('vasightings');
-        if (sightings) {
-            this.vaSightings = JSON.parse(sightings);
-        } else {
-            getNotableSightingsByLocation(opts).then((result) => {
-                sessionStorage.setItem('vasightings', JSON.stringify(result));
-                this.vaSightings = result;
-            });
-        }
+        getNotableSightingsByLocation(opts).then((result) => {
+            sessionStorage.setItem('vasightings', JSON.stringify(result));
+            this.vaSightings = result;
+        });
     }
 
     get vaSightingHeader() {

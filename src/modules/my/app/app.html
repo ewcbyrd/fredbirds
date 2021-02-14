@@ -47,49 +47,80 @@
                     <a
                         href="javascript:void(0);"
                         class="slds-context-bar__label-action"
-                        title="Home"
-                        onclick={handleHomeClick}
+                        title="home"
+                        onclick={handleMenuClick}
                     >
-                        <span class="slds-truncate" title="Home">Home</span>
+                        <span class="slds-truncate" title="home">Home</span>
                     </a>
                 </li>
-                <li class={sightingsStyle}>
-                    <a
-                        href="javascript:void(0);"
-                        class="slds-context-bar__label-action"
-                        title="Home"
-                        onclick={handleResourcesClick}
-                    >
-                        <span class="slds-truncate" title="Sightings"
-                            >Sightings</span
-                        >
+                <li class="birds slds-context-bar__item slds-context-bar__dropdown-trigger slds-dropdown-trigger slds-dropdown-trigger_click">
+                    <a href="#" class="slds-context-bar__label-action" title="Birds" onclick={handleBirdsClick}>
+                        <span class="slds-truncate" title="Birds">Birds</span>
                     </a>
+                    <!--<div class="slds-context-bar__icon-action slds-p-left_none">
+                        <button class="slds-button slds-button_icon slds-button_icon slds-context-bar__button" aria-haspopup="true" title="Open menu item submenu" onclick={handleBirdsClick}>
+                          <svg class="slds-button__icon" aria-hidden="true">
+                            <use xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#chevrondown"></use>
+                          </svg>
+                        </button>
+                    </div>-->
+                    <div class="slds-dropdown slds-dropdown_right">
+                        <ul class="slds-dropdown__list" role="menu">
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="#" role="menuitem" tabindex="-1">
+                                  <span class="slds-truncate" title="sightings" onclick={handleMenuClick}>Sightings</span>
+                                </a>
+                            </li>
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="#" role="menuitem" tabindex="-1">
+                                  <span class="slds-truncate" title="hotspots" onclick={handleMenuClick}>Hotspots</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
-                <li class={hotspotsStyle}>
-                    <a
-                        href="javascript:void(0);"
-                        class="slds-context-bar__label-action"
-                        title="Home"
-                        onclick={handleHotspotsClick}
-                    >
-                        <span class="slds-truncate" title="Hotspots"
-                            >Hotspots</span
-                        >
+                <li class="club slds-context-bar__item slds-context-bar__dropdown-trigger slds-dropdown-trigger slds-dropdown-trigger_click">
+                    <a href="#" class="slds-context-bar__label-action" title="Birds" onclick={handleClubClick}>
+                        <span class="slds-truncate" title="Club">Club</span>
                     </a>
+                    <!--<div class="slds-context-bar__icon-action slds-p-left_none">
+                        <button class="slds-button slds-button_icon slds-button_icon slds-context-bar__button" aria-haspopup="true" title="Open menu item submenu" onclick={handleClubClick}>
+                          <svg class="slds-button__icon" aria-hidden="true">
+                            <use xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#chevrondown"></use>
+                          </svg>
+                        </button>
+                    </div>-->
+                    <div class="slds-dropdown slds-dropdown_right">
+                        <ul class="slds-dropdown__list" role="menu">
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="#" role="menuitem" tabindex="-1">
+                                  <span class="slds-truncate" title="About" onclick={handleHotspotsClick}>About</span>
+                                </a>
+                            </li>
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="#" role="menuitem" tabindex="-1">
+                                  <span class="slds-truncate" title="Membersip" onclick={handleMembershipClick}>Membership</span>
+                                </a>
+                            </li>
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="#" role="menuitem" tabindex="-1">
+                                  <span class="slds-truncate" title="Officers" onclick={handleOfficersClick}>Club Officers</span>
+                                </a>
+                            </li>
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="#" role="menuitem" tabindex="-1">
+                                  <span class="slds-truncate" title="Trip Reports" onclick={handleTripReportsClick}>Trip Reports</span>
+                                </a>
+                            </li>
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="#" role="menuitem" tabindex="-1">
+                                  <span class="slds-truncate" title="Newsletters" onclick={handleNewslettersClick}>Newsletters</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
-                <li class={membershipStyle}>
-                    <a
-                        href="javascript:void(0);"
-                        class="slds-context-bar__label-action"
-                        title="Membership"
-                        onclick={handleMembershipClick}
-                    >
-                        <span class="slds-truncate" title="Membership"
-                            >Membership</span
-                        >
-                    </a>
-                </li>
-            </ul>
+                </ul>
         </nav>
     </div>
     <template if:true={homeSelected}>

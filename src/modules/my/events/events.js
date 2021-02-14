@@ -9,41 +9,14 @@ export default class Events extends LightningElement {
     selectedEvent;
 
     noEvents = false;
+    loading = false;
+
+    opts = { autoScroll: false, autoScrollTime: 7 };
 
     connectedCallback() {
-        const events = sessionStorage.getItem('events');
-        if (events) {
-            this.createEvents(JSON.parse(events));
-        } else {
-            fetch('https://fredbirds-098f.restdb.io/rest/events', {
-                method: 'GET',
-                headers: {
-                    'cache-control': 'no-cache',
-                    'x-apikey': '5ff9ea16823229477922c93f'
-                }
-            })
-                .then((response) => {
-                    return response.json();
-                })
-                .then((result) => {
-                    sessionStorage.setItem('events', JSON.stringify(result));
-                    this.createEvents(result);
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-        }
-    }
-
-    setEvents(year) {
+        const year = new Date().getFullYear();
         this.year = year;
-        if (this.events[year] === undefined) {
-            this.yearEvents = [{ _id: '0', event: 'No Events Scheduled' }];
-            this.noEvents = true;
-        } else {
-            this.yearEvents = this.events[year];
-            this.noEvents = false;
-        }
+        this.fetchEventsByYear(year);
     }
 
     get options() {
@@ -62,59 +35,53 @@ export default class Events extends LightningElement {
 
     handleYearChange(event) {
         const year = event.currentTarget.value;
-        this.setEvents(year);
+        this.year = year;
+        this.fetchEventsByYear(year);
     }
 
-    get sightings() {
-        return (
-            this.selectedEvent.sightings !== undefined &&
-            this.selectedEvent.sightings.length > 0
-        );
+    get eventCancelled() {
+        return this.selectedEvent.cancelled;
     }
 
-    get participants() {
-        return (
-            this.selectedEvent.participants !== undefined &&
-            this.selectedEvent.participants.length > 0
-        );
-    }
-
-    get participantString() {
-        if (this.selectedEvent.participants === undefined) return '';
-        let partString = '';
-        for (let i = 0; i < this.selectedEvent.participants.length; i++) {
-            partString += this.selectedEvent.participants[i].name;
-            if (i < this.selectedEvent.participants.length - 1)
-                partString += ', ';
-        }
-        return partString;
+    get tripReport() {
+        return this.selectedEvent.tripReport;
     }
 
     createEvents(result) {
+        this.yearEvents = [];
+        if (result.length === 0) {
+            this.yearEvents = [{ _id: '0', event: 'No Events Scheduled' }];
+            this.noEvents = true;
+            return;
+        }
+        this.noEvents = false;
         result.sort((a, b) => (a.start > b.start ? 1 : -1));
         result.forEach((item) => {
-            if (this.events[item.year] === undefined)
-                this.events[item.year] = [];
+            let photos = [];
+            if (item.photos) {
+                item.photos.forEach((photo) => {
+                    photos.push({header: photo.caption, image: `https://fredbirds-098f.restdb.io/media/${photo.photo}`, href: "#"});
+                });
+            }
             if (item.species_sighted)
                 item.species_sighted.sort((a, b) =>
-                    a.common > b.common ? 1 : -1
+                    (a.common > b.common ? 1 : -1)
                 );
             if (item.participants)
                 item.participants.sort((a, b) => (a.name > b.name ? 1 : -1));
-            this.events[item.year].push({
+            this.yearEvents.push({
                 id: item._id,
-                date: item.date,
+                date: this.getEventDate(new Date(item.start), item.end ? new Date(item.end) : null),
                 event: item.event,
                 sightings: item.species_sighted,
                 details: item.details,
                 tripReport: item.tripreport,
                 participants: item.participants,
-                photos: item.photos,
-                start: item.start
+                start: item.start,
+                cancelled: item.cancelled,
+                photos: photos
             });
         });
-        console.log(this.events);
-        this.setEvents(new Date().getFullYear());
     }
 
     get showDetails() {
@@ -126,5 +93,50 @@ export default class Events extends LightningElement {
             new Date() < this.selectedEvent.start ||
             this.yearEvents[0]._id === '0'
         );
+    }
+
+    fetchEventsByYear(year) {
+        this.loading = true;
+        const events = sessionStorage.getItem(`${year}events`);
+        const query = `{"start":{"$gt":{"$date":"${year}-01-01"},"$lt":{"$date":"${year}-12-31"}}}`
+        if (events) {
+            this.createEvents(JSON.parse(events));
+            this.loading = false;
+        } else {
+            fetch('https://fredbirds-098f.restdb.io/rest/events?q=' + query, {
+                method: 'GET',
+                headers: {
+                    'cache-control': 'no-cache',
+                    'x-apikey': '5ff9ea16823229477922c93f'
+                }
+            })
+            .then((response) => {
+                return response.json();
+            })
+            .then((result) => {
+                sessionStorage.setItem(`${year}events`, JSON.stringify(result));
+                this.createEvents(result);
+                this.loading = false;
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        }
+        
+    }
+
+    getEventDate(startDate, endDate) {
+        let dateText = '';
+        const startMonth = startDate.toLocaleString('default', {month: 'long'});
+        dateText =  `${startMonth} ${startDate.getDate() + 1}`;
+        if (endDate) {
+            const endMonth = endDate.toLocaleString('default', {month: 'long'});
+            if (startMonth === endMonth) {
+                dateText += ` - ${endDate.getDate() + 1}`;
+            } else {
+                dateText += ` - ${endMonth} ${endDate.getDate() + 1}`;
+            }
+        }
+        return dateText;
     }
 }

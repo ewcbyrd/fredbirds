@@ -28,13 +28,22 @@
                                     <option value="2020">2020</option>
                                     <option value="2019">2019</option>
                                 </select>
-                                Calendar of Events
+                                &nbsp; Calendar of Events
                             </h2>
                         </div>
                     </div>
                 </div>
                 <div class="slds-card__body">
-                    <div class="slds-scrollable--y" style="height: 350px">
+                    <div class="slds-scrollable--y slds-is-relative">
+                        <template if:true={loading}>
+                            <div class="slds-spinner_container">
+                                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                                <span class="slds-assistive-text">Loading</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                                </div>
+                            </div>
+                        </template>
                         <table
                             class="fixed_header slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
                         >
@@ -133,89 +142,81 @@
                             </div>
                         </template>
                         <template if:true={showDetails}>
-                            <pre class="slds-text-body_small">
-{selectedEvent.details}</pre
+                            <pre class="slds-text-body_small">{selectedEvent.details}</pre
                             >
+                        </template>
+                        <template if:true={eventCancelled}>
+                            <div
+                                class="slds-scoped-notification slds-media slds-media_center slds-theme_error"
+                                role="status"
+                            >
+                                <div class="slds-media__figure">
+                                    <span
+                                        class="slds-icon_container slds-icon-utility-error"
+                                        title="error"
+                                    >
+                                        <svg
+                                            class="slds-icon slds-icon_small"
+                                            aria-hidden="true"
+                                        >
+                                            <use
+                                                xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#error"
+                                            ></use>
+                                        </svg>
+                                        <span class="slds-assistive-text"
+                                            >error</span
+                                        >
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>
+                                        This event was cancelled
+                                    </p>
+                                </div>
+                            </div>
                         </template>
                         <template if:false={showDetails}>
                             <div class="slds-text-body_small">
-                                <template if:true={selectedEvent.tripReport}>
-                                    <pre>{selectedEvent.tripReport}</pre>
-                                </template>
-                                <template if:false={selectedEvent.tripReport}>
-                                    <div
-                                        class="slds-scoped-notification slds-media slds-media_center slds-theme_warning"
-                                        role="status"
-                                    >
-                                        <div class="slds-media__figure">
-                                            <span
-                                                class="slds-icon_container slds-icon-utility-warning"
-                                                title="warning"
-                                            >
-                                                <svg
-                                                    class="slds-icon slds-icon_small"
-                                                    aria-hidden="true"
-                                                >
-                                                    <use
-                                                        xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#warning"
-                                                    ></use>
-                                                </svg>
-                                                <span
-                                                    class="slds-assistive-text"
-                                                    >warning</span
-                                                >
-                                            </span>
-                                        </div>
-                                        <div class="slds-media__body">
-                                            <p>
-                                                A trip report has not been
-                                                posted for this event
-                                            </p>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
-                            <template if:true={participants}>
-                                <div
-                                    class="slds-grid slds-wrap slds-p-left_small slds-p-right_small"
-                                >
-                                    <div
-                                        class="slds-size_1-of-1 slds-p-top_small slds-text-align_center slds-text-heading_small"
-                                    >
-                                        Participants
-                                    </div>
-
-                                    <div
-                                        class="slds-size_1-of-1 slds-cell-wrap slds-p-left_x-small slds-p-right_x-small"
-                                    >
-                                        {participantString}
-                                    </div>
-                                </div>
-                            </template>
-                            <template if:true={sightings}>
-                                <div
-                                    class="slds-grid slds-wrap slds-p-left_small slds-p-right_small"
-                                    style="width: 90%; margin: 0 auto"
-                                >
-                                    <div
-                                        class="slds-size_1-of-1 slds-p-top_large slds-text-align_center slds-text-heading_small"
-                                    >
-                                        Species Sighted
-                                    </div>
-                                    <template
-                                        for:each={selectedEvent.sightings}
-                                        for:item="sighting"
-                                    >
+                                <template if:false={eventCancelled}>
+                                    <template if:true={tripReport}>
+                                        <my-tripreport selected-event={selectedEvent}></my-tripreport>
+                                        <!--<pre>{selectedEvent.tripReport}</pre>-->
+                                    </template>
+                                    <template if:false={tripReport}>
                                         <div
-                                            class="slds-size_1-of-2 slds-cell-wrap slds-p-left_x-small slds-p-right_x-small"
-                                            key={sighting._id}
+                                            class="slds-scoped-notification slds-media slds-media_center slds-theme_warning"
+                                            role="status"
                                         >
-                                            {sighting.common}
+                                            <div class="slds-media__figure">
+                                                <span
+                                                    class="slds-icon_container slds-icon-utility-warning"
+                                                    title="warning"
+                                                >
+                                                    <svg
+                                                        class="slds-icon slds-icon_small"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <use
+                                                            xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#warning"
+                                                        ></use>
+                                                    </svg>
+                                                    <span
+                                                        class="slds-assistive-text"
+                                                        >warning</span
+                                                    >
+                                                </span>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <p>
+                                                    A trip report has not been
+                                                    posted for this event
+                                                </p>
+                                            </div>
                                         </div>
                                     </template>
-                                </div>
-                            </template>
-                        </template>
+                                </template>
+                            </div>
+                    </template>
                     </div>
                     <footer class="slds-modal__footer modal-hidden">
                         <button
