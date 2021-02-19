@@ -3,6 +3,7 @@ import { LightningElement, api } from 'lwc';
 export default class TripReport extends LightningElement {
 
     @api selectedEvent;
+    opts = { autoScroll: false, autoScrollTime: 7 };
 
     get sightings() {
         return (

@@ -1,6 +1,6 @@
 <template>
     <template if:true={sightings}>
-        <div class="slds-p-top_small slds-size_1-of-1">
+        <div class="slds-size_1-of-1">
             <div class="slds-card">
                 <div class="slds-card__header">
                     <div
@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 <div class="slds-card__body">
-                    <div class="slds-scrollable--y" style="height: 350px">
+                    <div class="slds-scrollable--y" style="max-height: 450px">
                         <table
                             class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
                         >
@@ -54,13 +54,15 @@
                                 >
                                     <tr
                                         class="slds-hint-parent"
-                                        key={sighting.obsId}
+                                        key={sighting.id}
+                                        onclick={handleSightingClick}
+                                        data-id={sighting.id}
                                     >
                                         <td class="slds-cell-wrap">
-                                            {sighting.comName}
+                                            {sighting.name}
                                         </td>
                                         <td class="slds-cell-wrap">
-                                            {sighting.locName}
+                                            {sighting.locations}
                                         </td>
                                     </tr>
                                 </template>

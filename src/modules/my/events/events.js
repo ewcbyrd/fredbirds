@@ -1,4 +1,4 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, api } from 'lwc';
 
 export default class Events extends LightningElement {
     year;
@@ -13,7 +13,12 @@ export default class Events extends LightningElement {
 
     opts = { autoScroll: false, autoScrollTime: 7 };
 
+    @api home;
+
+    @api readOnly = false;
+
     connectedCallback() {
+        console.log(this.home);
         const year = new Date().getFullYear();
         this.year = year;
         this.fetchEventsByYear(year);
@@ -26,7 +31,8 @@ export default class Events extends LightningElement {
     handleEventClick(event) {
         const id = event.currentTarget.dataset.item;
         this.selectedEvent = this.yearEvents.find((item) => item.id === id);
-        this.showModal = true;
+        if (id === '0') return;
+        this.dispatchEvent(new CustomEvent('eventclick', {detail: this.selectedEvent}));
     }
 
     handleCloseClick() {
@@ -37,6 +43,7 @@ export default class Events extends LightningElement {
         const year = event.currentTarget.value;
         this.year = year;
         this.fetchEventsByYear(year);
+        this.dispatchEvent(new CustomEvent('eventyearchange'));
     }
 
     get eventCancelled() {
@@ -50,7 +57,7 @@ export default class Events extends LightningElement {
     createEvents(result) {
         this.yearEvents = [];
         if (result.length === 0) {
-            this.yearEvents = [{ _id: '0', event: 'No Events Scheduled' }];
+            this.yearEvents = [{ id: '0', date: 'No Events Scheduled' }];
             this.noEvents = true;
             return;
         }
@@ -60,7 +67,7 @@ export default class Events extends LightningElement {
             let photos = [];
             if (item.photos) {
                 item.photos.forEach((photo) => {
-                    photos.push({header: photo.caption, image: `https://fredbirds-098f.restdb.io/media/${photo.photo}`, href: "#"});
+                    photos.push({header: `${photo.caption}`, image: `https://fredbirds-098f.restdb.io/media/${photo.photo}`, href: "#"});
                 });
             }
             if (item.species_sighted)
@@ -79,7 +86,8 @@ export default class Events extends LightningElement {
                 participants: item.participants,
                 start: item.start,
                 cancelled: item.cancelled,
-                photos: photos
+                photos: photos,
+                pdfFile: item.pdfFile
             });
         });
     }
@@ -138,5 +146,14 @@ export default class Events extends LightningElement {
             }
         }
         return dateText;
+
+    }
+
+    get isHome() {
+        return this.home === "true";
+    }
+
+    handleViewAllEventsClick() {
+        this.dispatchEvent(new CustomEvent('viewall', {detail: 'events', bubbles: true, composed: true}));
     }
 }

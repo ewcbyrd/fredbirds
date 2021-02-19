@@ -6,7 +6,7 @@ export default class App extends LightningElement {
     hotspotsSelected = false;
     birdsOpen = false;
     clubOpen = false;
-    properties = {home: true, sightings: false, hotspots: false};
+    properties = {home: true, sightings: false, hotspots: false, events: false};
 
     handleBirdsClick() {
         if (this.clubOpen) this.handleClubClick();
@@ -50,13 +50,19 @@ export default class App extends LightningElement {
     handleMenuClick(event) {
         if (this.birdsOpen) this.handleBirdsClick();
         if (this.clubOpen) this.handleClubClick();
-        const source = event.target.title;
+        this.displayComponent(event.target.title);
+    }
+
+    handleViewAll(event) {
+        this.displayComponent(event.detail);
+    }
+
+    displayComponent(source) {
         for (const prop in this.properties) {
             this.properties[prop] = false;
             this[`${prop}Selected`] = false;
         }
         this.properties[source] = true;
         this[`${source}Selected`] = true;
-        console.log(this.homeSelected, this.sightingsSelected, this.hotspotsSelected);
     }
 }

@@ -34,5 +34,9 @@ export default class Home extends LightningElement {
             href: "#"
         }
     ];
+
+    connectedCallback() {
+        
+    }
     
 }

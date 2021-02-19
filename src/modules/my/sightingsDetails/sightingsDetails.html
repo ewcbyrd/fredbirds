@@ -1,0 +1,99 @@
+<template>
+    <template if:true={showSightings}>
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <!--<div class="slds-media__figure">
+                <span class="slds-icon_container slds-icon-standard-account" title="account">
+                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                    <use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#account"></use>
+                    </svg>
+                    <span class="slds-assistive-text">account</span>
+                </span>
+                </div>-->
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <a href="#" class="slds-card__header-link slds-truncate" title="Accounts">
+                        <span>{header}</span>
+                        </a>
+                    </h2>
+                </div>
+            </header>
+            </div>
+            <div class="slds-card__body slds-card__body_inner">
+                <table
+                            class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
+                        >
+                            <thead>
+                                <tr class="slds-text-heading--label">
+                                    <th scope="col">
+                                        <span class="slds-truncate"
+                                            >Date/Time</span
+                                        >
+                                    </th>
+                                    <th scope="col" style="width: 20rem">
+                                        <span class="slds-truncate"
+                                            >Site Name</span
+                                        >
+                                    </th>
+                                    <th scope="col">
+                                        <span class="slds-truncate"
+                                            >Location</span
+                                        >
+                                    </th>
+                                    <th scope="col">
+                                        <span class="slds-truncate"
+                                            >Sighted By</span
+                                        >
+                                    </th>
+                                    <th scope="col">
+                                        <span class="slds-truncate"
+                                            >Quanitity</span
+                                        >
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template
+                                    for:each={sightingList}
+                                    for:item="sighting"
+                                >
+                                    <tr
+                                        class="slds-hint-parent"
+                                        key={sighting.id}
+                                        onclick={handleSightingClick}
+                                        data-id={sighting.id}
+                                    >
+                                        <td class="slds-cell-wrap">
+                                            {sighting.date}
+                                        </td>
+                                        <td class="slds-cell-wrap">
+                                            {sighting.location}
+                                        </td>
+                                        <td class="slds-cell-wrap">
+                                            {sighting.locality}
+                                        </td>
+                                        <td class="slds-cell-wrap">
+                                            {sighting.by}
+                                        </td>
+                                        <td class="slds-cell-wrap">
+                                            {sighting.quantity}
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+            </div>
+                <footer class="slds-card__footer"> 
+                    <template if:true={showMap}>
+                        <iframe
+                        width="100%"
+                        height="100%"
+                        frameborder="0" style="border:0"
+                        src={mapUrl} allowfullscreen>
+                        </iframe>
+                    </template>      
+                </footer>
+        </article>
+    </template>
+</template>

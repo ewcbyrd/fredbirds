@@ -1,6 +1,6 @@
 <template>
     <template if:true={yearEvents}>
-        <div class="slds-p-top_small">
+        <div>
             <div class="slds-card">
                 <div class="slds-card__header">
                     <div
@@ -23,12 +23,17 @@
                             <h2
                                 class="slds-p-left_small slds-text-heading--small slds-truncate"
                             >
-                                <select onchange={handleYearChange}>
-                                    <option value="2021">2021</option>
-                                    <option value="2020">2020</option>
-                                    <option value="2019">2019</option>
-                                </select>
-                                &nbsp; Calendar of Events
+                                <template if:true={isHome}>
+                                    Upcoming Events
+                                </template>
+                                <template if:false={isHome}>
+                                    <select onchange={handleYearChange}>
+                                        <option value="2021">2021</option>
+                                        <option value="2020">2020</option>
+                                        <option value="2019">2019</option>
+                                    </select>
+                                    &nbsp; Calendar of Events
+                                </template>
                             </h2>
                         </div>
                     </div>
@@ -82,10 +87,16 @@
                         </table>
                     </div>
                 </div>
+                <template if:true={isHome}>
+                    <footer class="slds-card__footer">
+                        <a class="slds-card__footer-action" href="#" onclick={handleViewAllEventsClick}>View All Events
+                        </a>
+                    </footer>
+                </template>
             </div>
         </div>
         <template if:true={showModal}>
-            <section
+            <!--<section
                 role="dialog"
                 tabindex="-1"
                 aria-labelledby="modal-heading-01"
@@ -180,7 +191,6 @@
                                 <template if:false={eventCancelled}>
                                     <template if:true={tripReport}>
                                         <my-tripreport selected-event={selectedEvent}></my-tripreport>
-                                        <!--<pre>{selectedEvent.tripReport}</pre>-->
                                     </template>
                                     <template if:false={tripReport}>
                                         <div
@@ -216,7 +226,7 @@
                                     </template>
                                 </template>
                             </div>
-                    </template>
+                        </template>
                     </div>
                     <footer class="slds-modal__footer modal-hidden">
                         <button
@@ -228,7 +238,7 @@
                     </footer>
                 </div>
             </section>
-            <div class="slds-backdrop slds-backdrop_open"></div>
+            <div class="slds-backdrop slds-backdrop_open"></div>-->
         </template>
     </template>
 </template>

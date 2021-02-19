@@ -73,8 +73,7 @@ export const getNotableSightingsByLocation = ({
     regionCode,
     daysBack = 14
 }) => {
-    const url =
-        root + 'data/obs/' + regionCode + '/recent/notable?back=' + daysBack;
+    const url = `${root}data/obs/${regionCode}/recent/notable?back=${daysBack}&detail=full`;
     return new Promise((resolve, reject) => {
         fetch(url, {
             method: 'GET',

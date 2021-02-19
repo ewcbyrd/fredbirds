@@ -54,8 +54,8 @@
                     </a>
                 </li>
                 <li class="birds slds-context-bar__item slds-context-bar__dropdown-trigger slds-dropdown-trigger slds-dropdown-trigger_click">
-                    <a href="#" class="slds-context-bar__label-action" title="Birds" onclick={handleBirdsClick}>
-                        <span class="slds-truncate" title="Birds">Birds</span>
+                    <a href="#" class="slds-context-bar__label-action" title="Birding Resources" onclick={handleBirdsClick}>
+                        <span class="slds-truncate" title="Birds">Birding Resources</span>
                     </a>
                     <!--<div class="slds-context-bar__icon-action slds-p-left_none">
                         <button class="slds-button slds-button_icon slds-button_icon slds-context-bar__button" aria-haspopup="true" title="Open menu item submenu" onclick={handleBirdsClick}>
@@ -76,6 +76,11 @@
                                   <span class="slds-truncate" title="hotspots" onclick={handleMenuClick}>Hotspots</span>
                                 </a>
                             </li>
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="#" role="menuitem" tabindex="-1">
+                                  <span class="slds-truncate" title="birds" onclick={handleMenuClick}>Birds</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
@@ -94,7 +99,7 @@
                         <ul class="slds-dropdown__list" role="menu">
                             <li class="slds-dropdown__item" role="presentation">
                                 <a href="#" role="menuitem" tabindex="-1">
-                                  <span class="slds-truncate" title="About" onclick={handleHotspotsClick}>About</span>
+                                  <span class="slds-truncate" title="About" onclick={handleAboutClick}>About</span>
                                 </a>
                             </li>
                             <li class="slds-dropdown__item" role="presentation">
@@ -105,6 +110,11 @@
                             <li class="slds-dropdown__item" role="presentation">
                                 <a href="#" role="menuitem" tabindex="-1">
                                   <span class="slds-truncate" title="Officers" onclick={handleOfficersClick}>Club Officers</span>
+                                </a>
+                            </li>
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="#" role="menuitem" tabindex="-1">
+                                  <span class="slds-truncate" title="events" onclick={handleMenuClick}>Events</span>
                                 </a>
                             </li>
                             <li class="slds-dropdown__item" role="presentation">
@@ -124,9 +134,12 @@
         </nav>
     </div>
     <template if:true={homeSelected}>
-        <my-home></my-home>
+        <my-home onviewall={handleViewAll}></my-home>
     </template>
     <template if:true={sightingsSelected}>
         <my-resources></my-resources>
+    </template>
+    <template if:true={eventsSelected}>
+        <my-event-parent></my-event-parent>
     </template>
 </template>

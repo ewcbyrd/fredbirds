@@ -1,0 +1,83 @@
+<template>
+
+    <template if:true={showDetails}>
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-account" title="account">
+                            <svg class="slds-icon slds-icon_medium" aria-hidden="true">
+                                <use xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#knowledge"></use>
+                            </svg>
+                            <span class="slds-assistive-text">event</span>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            {selectedEvent.event}
+                        </h2>
+                    </div>
+                    <div class="slds-no-flex">
+                        <button class="slds-button slds-button_neutral" disabled={showPDFDiabled}
+                            onclick={handleViewPdfClick}>View PDF</button>
+                    </div>
+                </header>
+            </div>
+            <div class="slds-card__body slds-card__body_inner">
+                <div class="slds-scrollable--y" style="max-height: 650px">
+                    <template if:true={eventCancelled}>
+                        <div class="slds-scoped-notification slds-media slds-media_center slds-theme_error"
+                            role="status">
+                            <div class="slds-media__figure">
+                                <span class="slds-icon_container slds-icon-utility-error" title="error">
+                                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                        <use xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#error">
+                                        </use>
+                                    </svg>
+                                    <span class="slds-assistive-text">error</span>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>
+                                    This event was cancelled
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+                    <div class="slds-text-body_small">
+                        <template if:false={eventCancelled}>
+                            <template if:true={tripReport}>
+                                <my-tripreport selected-event={selectedEvent}></my-tripreport>
+                            </template>
+                            <template if:false={tripReport}>
+                                <div class="slds-scoped-notification slds-media slds-media_center slds-theme_warning"
+                                    role="status">
+                                    <div class="slds-media__figure">
+                                        <span class="slds-icon_container slds-icon-utility-warning" title="warning">
+                                            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                                <use
+                                                    xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#warning">
+                                                </use>
+                                            </svg>
+                                            <span class="slds-assistive-text">warning</span>
+                                        </span>
+                                    </div>
+                                    <div class="slds-media__body">
+                                        <p>
+                                            A trip report has not been
+                                            posted for this event
+                                        </p>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <template if:true={showModal}>
+            <my-pdf-modal pdf-file={selectedEvent.pdfFile} onclosepdfmodal={handleClosePdfModal}></my-pdf-modal>
+        </template>
+
+    </template>
+</template>

@@ -6,9 +6,15 @@ import {
 
 export default class Resources extends LightningElement {
     localSightings;
-    localSightingsDaysBack = 7;
-    vaSightings;
+    localSightingsDaysBack = 3;
+    stateSightings;
     vaSightingsDaysBack = 1;
+    selectedSightings = [];
+    nearbySelected = false;
+    localSelected = true;
+    stateSelected = false;
+    customSelected = false;
+    view = 'local';
 
     connectedCallback() {
         this.getLocalSightings();
@@ -26,7 +32,6 @@ export default class Resources extends LightningElement {
             daysBack: this.localSightingsDaysBack
         };
         getNearbyNotableObservations(opts).then((result) => {
-            sessionStorage.setItem('sightings', JSON.stringify(result));
             this.localSightings = result;
         });
     }
@@ -37,12 +42,33 @@ export default class Resources extends LightningElement {
             daysBack: this.vaSightingsDaysBack
         };
         getNotableSightingsByLocation(opts).then((result) => {
-            sessionStorage.setItem('vasightings', JSON.stringify(result));
-            this.vaSightings = result;
+            this.stateSightings = result;
         });
     }
 
-    get vaSightingHeader() {
+    get stateSightingsHeader() {
         return `Notable Virginia Sightings for the past day`;
+    }
+
+    handleSightingsSelected(event) {
+        this.selectedSightings = event.detail;
+        const details = this.template.querySelector('my-sightings-details');
+        details.lat = undefined;
+        details.lon = undefined;
+    }
+
+    handleSightingsChange(event) {        
+        this.view = event.target.value;
+        this.selectedSightings = undefined;
+        ['nearby', 'local', 'state'].forEach((item) => {this[`${item}Selected`] = false});
+        this[`${this.view}Selected`] = event.target.checked;
+    }
+    
+    get sightings() {
+        return this[`${this.view}Sightings`];
+    }
+
+    get sightingsHeader() {
+        return this[`${this.view}SightingsHeader`];
     }
 }
