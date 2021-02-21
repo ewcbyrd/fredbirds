@@ -1,4 +1,5 @@
 import { LightningElement } from 'lwc';
+import {getRegions, getTaxonomy} from "data/ebirdService"
 
 export default class App extends LightningElement {
     homeSelected = true;
@@ -7,6 +8,19 @@ export default class App extends LightningElement {
     birdsOpen = false;
     clubOpen = false;
     properties = {home: true, sightings: false, hotspots: false, events: false};
+
+    connectedCallback() {
+        const opts = {};
+        if (!localStorage.getItem('regions')) {
+            getRegions(opts).then((result) => {
+                localStorage.setItem('regions', JSON.stringify(result));
+            });
+        }
+
+        if (!localStorage.getItem('taxonomy')) {
+            getTaxonomy().then(results => localStorage.setItem('taxonomy', JSON.stringify(results)));
+        }
+    }
 
     handleBirdsClick() {
         if (this.clubOpen) this.handleClubClick();

@@ -18,7 +18,6 @@ export default class Events extends LightningElement {
     @api readOnly = false;
 
     connectedCallback() {
-        console.log(this.home);
         const year = new Date().getFullYear();
         this.year = year;
         this.fetchEventsByYear(year);
@@ -32,7 +31,7 @@ export default class Events extends LightningElement {
         const id = event.currentTarget.dataset.item;
         this.selectedEvent = this.yearEvents.find((item) => item.id === id);
         if (id === '0') return;
-        this.dispatchEvent(new CustomEvent('eventclick', {detail: this.selectedEvent}));
+        this.dispatchEvent(new CustomEvent('eventclick', { detail: this.selectedEvent }));
     }
 
     handleCloseClick() {
@@ -67,7 +66,7 @@ export default class Events extends LightningElement {
             let photos = [];
             if (item.photos) {
                 item.photos.forEach((photo) => {
-                    photos.push({header: `${photo.caption}`, image: `https://fredbirds-098f.restdb.io/media/${photo.photo}`, href: "#"});
+                    photos.push({ header: `${photo.caption}`, image: `https://fredbirds-098f.restdb.io/media/${photo.photo}`, href: "#" });
                 });
             }
             if (item.species_sighted)
@@ -95,7 +94,7 @@ export default class Events extends LightningElement {
     get showDetails() {
         console.log(
             new Date() < this.selectedEvent.start ||
-                this.yearEvents[0]._id === '0'
+            this.yearEvents[0]._id === '0'
         );
         return (
             new Date() < this.selectedEvent.start ||
@@ -104,9 +103,10 @@ export default class Events extends LightningElement {
     }
 
     fetchEventsByYear(year) {
+        const currentDate = new Date();
         this.loading = true;
-        const events = sessionStorage.getItem(`${year}events`);
-        const query = `{"start":{"$gt":{"$date":"${year}-01-01"},"$lt":{"$date":"${year}-12-31"}}}`
+        const events = this.home === 'false' ? sessionStorage.getItem(`${year}events`) : sessionStorage.getItem('upcomingevents');
+        const query = this.home === 'false' ? `{"start":{"$gt":{"$date":"${year}-01-01"},"$lt":{"$date":"${year}-12-31"}}}` : `{"start":{"$gt":{"$date":"${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}"},"$lt":{"$date":"${currentDate.getFullYear()}-${currentDate.getMonth() + 4}-${currentDate.getDate()}"}}}`;
         if (events) {
             this.createEvents(JSON.parse(events));
             this.loading = false;
@@ -118,27 +118,28 @@ export default class Events extends LightningElement {
                     'x-apikey': '5ff9ea16823229477922c93f'
                 }
             })
-            .then((response) => {
-                return response.json();
-            })
-            .then((result) => {
-                sessionStorage.setItem(`${year}events`, JSON.stringify(result));
-                this.createEvents(result);
-                this.loading = false;
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+                .then((response) => {
+                    return response.json();
+                })
+                .then((result) => {
+                    const storage = this.home === 'false' ? `${year}events` : 'upcomingevents';
+                    sessionStorage.setItem(storage, JSON.stringify(result));
+                    this.createEvents(result);
+                    this.loading = false;
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
         }
-        
+
     }
 
     getEventDate(startDate, endDate) {
         let dateText = '';
-        const startMonth = startDate.toLocaleString('default', {month: 'long'});
-        dateText =  `${startMonth} ${startDate.getDate() + 1}`;
+        const startMonth = startDate.toLocaleString('default', { month: 'long' });
+        dateText = `${startMonth} ${startDate.getDate() + 1}`;
         if (endDate) {
-            const endMonth = endDate.toLocaleString('default', {month: 'long'});
+            const endMonth = endDate.toLocaleString('default', { month: 'long' });
             if (startMonth === endMonth) {
                 dateText += ` - ${endDate.getDate() + 1}`;
             } else {
@@ -154,6 +155,6 @@ export default class Events extends LightningElement {
     }
 
     handleViewAllEventsClick() {
-        this.dispatchEvent(new CustomEvent('viewall', {detail: 'events', bubbles: true, composed: true}));
+        this.dispatchEvent(new CustomEvent('viewall', { detail: 'events', bubbles: true, composed: true }));
     }
 }

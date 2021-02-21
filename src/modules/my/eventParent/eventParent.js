@@ -6,6 +6,7 @@ export default class EventParent extends LightningElement {
 
     handleEventClick(event) {
         this.selectedEvent = event.detail;
+        this.template.querySelector('my-event-details').resetSelected(this.selectedEvent.tripReport !== '' && this.selectedEvent.tripReport !== undefined, this.selectedEvent.pdfFile !== undefined && this.selectedEvent.pdfFile !== '');
     }
 
     handleYearChange() {
