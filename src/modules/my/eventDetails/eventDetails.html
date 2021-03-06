@@ -8,7 +8,6 @@
                             <svg class="slds-icon slds-icon_medium" aria-hidden="true">
                                 <use xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#knowledge"></use>
                             </svg>
-                            <span class="slds-assistive-text">event</span>
                         </span>
                     </div>
                     <div class="slds-media__body">
@@ -40,43 +39,35 @@
                             </div>
                         </div>
                     </template>
+                    <template if:true={showButtons}>
+                        <div class="slds-p-top_small slds-p-bottom_small">
+                            <fieldset class="slds-form-element">
+                                <div class="slds-form-element__control">
+                                    <div class="slds-radio_button-group">
+                                        <span class="slds-button slds-radio_button">
+                                            <input type="radio" name="event" id="details"
+                                                value="details" onchange={handleTypeChange} checked={detailsSelected}
+                                                disabled={detailsDisabled} />
+                                            <label class="slds-radio_button__label" for="details">
+                                                <span class="slds-radio_faux">Details</span>
+                                            </label>
+                                        </span>
+                                        <span class="slds-button slds-radio_button">
+                                            <input type="radio" name="event" id="tripReport"
+                                                value="tripReport" onchange={handleTypeChange}
+                                                checked={tripReportSelected} disabled={tripReportDisabled} />
+                                            <label class="slds-radio_button__label" for="tripReport">
+                                                <span class="slds-radio_faux">Trip Report</span>
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </template>
                     <div class="slds-text-body_small">
                         <template if:false={eventCancelled}>
-                            <template if:true={tripReport}>
-                                <div class="slds-p-top_small slds-p-bottom_small">
-                                    <fieldset class="slds-form-element">
-                                        <div class="slds-form-element__control">
-                                            <div class="slds-radio_button-group">
-                                                <span class="slds-button slds-radio_button">
-                                                    <input class="text" type="radio" name="event" id="text" value="text"
-                                                        onchange={handleTypeChange} checked={textSelected}
-                                                        disabled={textDisabled} />
-                                                    <label class="slds-radio_button__label" for="text">
-                                                        <span class="slds-radio_faux">Text</span>
-                                                    </label>
-                                                </span>
-                                                <span class="slds-button slds-radio_button">
-                                                    <input class="pdf" type="radio" name="event" id="pdf" value="pdf"
-                                                        onchange={handleTypeChange} checked={pdfSelected}
-                                                        disabled={pdfDisabled} />
-                                                    <label class="slds-radio_button__label" for="pdf">
-                                                        <span class="slds-radio_faux">PDF</span>
-                                                    </label>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                </div>
-                            </template>
-                            <template if:true={textSelected}>
-                                <template if:true={tripReport}>
-                                    <my-tripreport selected-event={selectedEvent}></my-tripreport>
-                                </template>
-                            </template>
-                            <template if:true={pdfSelected}>
-                                <iframe src={pdfFileLocation} width="100%" height="600px"></iframe>
-                            </template>
-                            <template if:false={tripReport}>
+                            <template if:false={showButtons}>
                                 <div class="slds-scoped-notification slds-media slds-media_center slds-theme_warning"
                                     role="status">
                                     <div class="slds-media__figure">
@@ -91,10 +82,17 @@
                                     </div>
                                     <div class="slds-media__body">
                                         <p>
-                                            A trip report has not been
-                                            posted for this event
+                                            There are no event details or a trip report for this event
                                         </p>
                                     </div>
+                                </div>
+                            </template>
+                            <template if:true={detailsSelected}>
+                                <pre>{selectedEvent.details}</pre>
+                            </template>
+                            <template if:true={tripReportSelected}>
+                                <div style="overflow: auto!important; -webkit-overflow-scrolling: touch!important;">
+                                    <iframe src={pdfFileLocation} width="100%" height="600px"></iframe>
                                 </div>
                             </template>
                         </template>

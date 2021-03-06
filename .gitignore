@@ -31,3 +31,5 @@ $RECYCLE.BIN/
 srs/SLDS/*
 
 src/resources/pdf/*
+
+src/modules/data/*

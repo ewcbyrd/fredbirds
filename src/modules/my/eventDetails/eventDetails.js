@@ -1,72 +1,60 @@
 import { LightningElement, api } from 'lwc';
-import AWS from "aws-sdk";
 
 export default class EventDetails extends LightningElement {
 
     @api selectedEvent;
-    textSelected;
-    pdfSelected;
-
-    connectedCallback() {
-    }
+    detailsSelected;
+    tripReportSelected;
 
     get eventCancelled() {
         return this.selectedEvent.cancelled;
     }
 
     get tripReport() {
-        return this.selectedEvent.tripReport || this.selectedEvent.pdfFile;
+        return this.selectedEvent.pdfFile;
     }
 
     get showDetails() {
-        return this.selectedEvent;
+        return this.selectedEvent !== undefined;
     }
 
-    get showPDFDiabled() {
-        return this.selectedEvent.pdfFile === undefined;
+    get detailsDisabled() {
+        return this.selectedEvent.details === undefined || this.selectedEvent.details === '';
     }
 
-    handleViewPdfClick() {
-        this.showModal = true;
+    get tripReportDisabled() {
+        return this.selectedEvent.pdfFile === undefined || this.selectedEvent.pdfFile === '';
     }
 
-    handleClosePdfModal() {
-        this.showModal = false;
+    get showButtons() {
+        return (this.selectedEvent.pdfFile !== undefined && this.selectedEvent.pdfFile !== '') || (this.selectedEvent.details !== '' && this.selectedEvent.details !== undefined);
     }
 
-    get textDisabled() {
-        return this.selectedEvent.tripReport === undefined || this.selectedEvent.tripReport === '';
-    }
-
-    get pdfDisabled() {
-        return this.selectedEvent.pdfFile === undefined;
-    }
-
-    @api resetSelected(tripReport, pdfFile) {
-        if (tripReport) {
-            this.textSelected = true;
-            this.pdfSelected = false;
-        } else if (pdfFile) {
-            this.textSelected = false;
-            this.pdfSelected = true;
+    @api resetSelected(details, tripReport) {
+        if (details) {
+            this.detailsSelected = true;
+            this.tripReportSelected = false;
+        } else if (tripReport) {
+            this.detailsSelected = false;
+            this.tripReportSelected = true;
         } else {
-            this.textSelected = false;
-            this.pdfSelected = false;
+            this.detailsSelected = false;
+            this.tripReportSelected = false;
         }
     }
 
     get pdfFileLocation() {
-        return `resources/pdf/${this.selectedEvent.pdfFile}.pdf`;
+        return `https://drive.google.com/file/d/${this.selectedEvent.pdfFile}/preview?usp=sharing`;
     }
 
     handleTypeChange(event) {
         const type = event.target.value;
-        if (type === 'text') {
-            this.textSelected = true;
-            this.pdfSelected = false;
+        if (type === 'details') {
+            this.detailsSelected = true;
+            this.tripReportSelected = false;
         } else {
-            this.textSelected = false;
-            this.pdfSelected = true;
+            this.detailsSelected = false;
+            this.tripReportSelected = true;
         }
     }
 }

@@ -5,9 +5,12 @@ export default class App extends LightningElement {
     homeSelected = true;
     sightingsSelected = false;
     hotspotsSelected = false;
+    officersSelected = false;
+    newsSelected = false;
+    aboutSelected = false;
     birdsOpen = false;
     clubOpen = false;
-    properties = {home: true, sightings: false, hotspots: false, events: false};
+    properties = {home: true, sightings: false, hotspots: false, events: false, officers: false, news: false, about: false};
 
     connectedCallback() {
         const opts = {};

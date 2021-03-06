@@ -5,6 +5,7 @@
     "bugs": "https://github.com/birds/issues",
     "dependencies": {
         "@lwc/synthetic-shadow": "^1.9.7",
+        "@salesforce/design-system-react": "^0.10.30",
         "aws-sdk": "^2.848.0",
         "bootstrap": "^4.6.0",
         "compression": "^1.7.4",
@@ -59,6 +60,6 @@
         "test:unit:watch": "lwc-services test:unit --watch",
         "watch": "lwc-services watch",
         "predeploy": "npm run build",
-        "deploy": "aws s3 sync dist/ s3://fredbirds.com"
+        "deploy": "gh-pages -d dist"
     }
 }

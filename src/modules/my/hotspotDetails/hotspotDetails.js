@@ -1,5 +1,4 @@
 import { LightningElement, api } from 'lwc';
-import {getSpeciesList} from 'data/ebirdService';
 
 export default class HotspotDetails extends LightningElement {
 
@@ -16,6 +15,10 @@ export default class HotspotDetails extends LightningElement {
 
     get ebirdLink() {
         return `https://ebird.org/hotspot/${this.hotspot.locId}`;
+    }
+
+    get showSpeciesList() {
+        return this.sightings !== undefined && this.sightings !== null;
     }
 
 }

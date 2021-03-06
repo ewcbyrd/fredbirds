@@ -13,3 +13,8 @@
 .slds-carousel__panel img{
     max-height: 60vh !important;
 }
+
+.ebird {
+    width: 178px;
+    height: 85px;
+}

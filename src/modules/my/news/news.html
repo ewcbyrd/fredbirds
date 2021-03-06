@@ -1,0 +1,42 @@
+<template>
+    <template if:true={news}>
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+              <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                  <span class="slds-icon_container slds-icon-standard-news" title="news">
+                    <svg class="slds-icon slds-icon_medium" aria-hidden="true">
+                      <use xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#news"></use>
+                    </svg>
+                  </span>
+                </div>
+                <div class="slds-media__body">
+                  <h2 class="slds-card__header-title">
+                    Birding News
+                  </h2>
+                </div>
+              </header>
+            </div>
+            <div class="slds-card__body slds-card__body_inner">
+                <template for:each={birdNews} for:item="item">
+                    <div key={item._id} class="slds-p-bottom_small">
+                        <template if:true={item.isLink}>
+                            <a href={item.link} target="_blank">
+                                <div class="slds-text-heading_medium">
+                                    {item.headline}
+                                </div>
+                            </a>
+                            <div>{item.text}</div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+            <template if:true={showFooter}>
+                <footer class="slds-card__footer">
+                    <a class="slds-card__footer-action" href="javascript:void(0);" onclick={handleViewAllClick}>View All News
+                    </a>
+                  </footer>
+            </template>
+          </article>
+    </template>
+</template>

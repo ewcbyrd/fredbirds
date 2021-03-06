@@ -1,4 +1,8 @@
 import { LightningElement, api } from 'lwc';
+import {
+    getEventsByYear,
+    getFutureEvents
+} from 'data/restdbService';
 
 export default class Events extends LightningElement {
     year;
@@ -103,35 +107,40 @@ export default class Events extends LightningElement {
     }
 
     fetchEventsByYear(year) {
-        const currentDate = new Date();
         this.loading = true;
         const events = this.home === 'false' ? sessionStorage.getItem(`${year}events`) : sessionStorage.getItem('upcomingevents');
-        const query = this.home === 'false' ? `{"start":{"$gt":{"$date":"${year}-01-01"},"$lt":{"$date":"${year}-12-31"}}}` : `{"start":{"$gt":{"$date":"${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}"},"$lt":{"$date":"${currentDate.getFullYear()}-${currentDate.getMonth() + 4}-${currentDate.getDate()}"}}}`;
         if (events) {
             this.createEvents(JSON.parse(events));
             this.loading = false;
         } else {
-            fetch('https://fredbirds-098f.restdb.io/rest/events?q=' + query, {
-                method: 'GET',
-                headers: {
-                    'cache-control': 'no-cache',
-                    'x-apikey': '5ff9ea16823229477922c93f'
-                }
-            })
-                .then((response) => {
-                    return response.json();
-                })
-                .then((result) => {
-                    const storage = this.home === 'false' ? `${year}events` : 'upcomingevents';
-                    sessionStorage.setItem(storage, JSON.stringify(result));
-                    this.createEvents(result);
-                    this.loading = false;
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+            // eslint-disable-next-line no-unused-expressions
+            this.home === 'false' ? this.fetchYearEvents(year) : this.fetchFutureEvents();
         }
+    }
 
+    fetchFutureEvents() {
+            const currentDate = new Date();
+            getFutureEvents(currentDate, 3)
+            .then((result) => {
+                sessionStorage.setItem('upcomingevents', JSON.stringify(result));
+                this.createEvents(result);
+                this.loading = false;
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    fetchYearEvents(year) {
+        getEventsByYear(year)
+        .then((result) => {
+            sessionStorage.setItem(`${year}events`, JSON.stringify(result));
+            this.createEvents(result);
+            this.loading = false;
+        })
+        .catch((error) => {
+            console.log(error);
+        });
     }
 
     getEventDate(startDate, endDate) {
