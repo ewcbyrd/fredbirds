@@ -24,7 +24,7 @@ export default class Events extends LightningElement {
     connectedCallback() {
         const year = new Date().getFullYear();
         this.year = year;
-        this.fetchEventsByYear(year);
+        this.fetchEvents(year);
     }
 
     get options() {
@@ -45,7 +45,7 @@ export default class Events extends LightningElement {
     handleYearChange(event) {
         const year = event.currentTarget.value;
         this.year = year;
-        this.fetchEventsByYear(year);
+        this.fetchEvents(year);
         this.dispatchEvent(new CustomEvent('eventyearchange'));
     }
 
@@ -106,7 +106,7 @@ export default class Events extends LightningElement {
         );
     }
 
-    fetchEventsByYear(year) {
+    fetchEvents(year) {
         this.loading = true;
         const events = this.home === 'false' ? sessionStorage.getItem(`${year}events`) : sessionStorage.getItem('upcomingevents');
         if (events) {
