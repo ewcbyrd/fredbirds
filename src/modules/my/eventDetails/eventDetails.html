@@ -88,6 +88,7 @@
                                 </div>
                             </template>
                             <template if:true={detailsSelected}>
+                                <lightning-formatted-rich-text value={selectedEvent.details}></lightning-formatted-rich-text>
                                 <pre>{selectedEvent.details}</pre>
                             </template>
                             <template if:true={tripReportSelected}>

@@ -1,3 +1,75 @@
 <template>
-    
+    <div class="slds-p-around_medium main">
+        <template if:true={showModal}>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close">
+                            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                <use xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#close"></use>
+                            </svg>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{modalDetail.header}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p>{modalDetail.message}</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_brand" onclick={handleOkClick}>OK</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+        <div class="slds-grid slds-wrap">
+            <div class="slds-small-size_1-of-1 slds-large-size_2-of-3 slds-p-left_large slds-p-right_large">
+                <div class="slds-text-heading_large slds-p-top_x-small">FBC Membership</div>
+                <div>
+                    Are you a new birder looking to gain exerpience? Are you a veteran birder looking for a group
+                    to share your love of birding with? Or, are you just looking to get outdoors with nice people?
+                    We have some great news! The Fredericksburg Birding Club delivers all of this and more.
+                </div>
+                <div class="slds-p-top_x-small">
+                    There are two levels of membership in the club, Basic and Full. Both allow full participation in
+                    field trips and access to the club web site.
+                </div>
+                <div class="slds-text-heading_medium slds-p-top_x-small">Basic Membership</div>
+                <div>
+                    Basic Membership is our free level. It is designed for individuals who will occasionally participate
+                    in
+                    club events. It provides for:
+                </div>
+                <ul class="slds-list_dotted">
+                    <li>Participation in a regular club field trips</li>
+                    <li>Access to basic web site features</li>
+                </ul>
+                <div class="slds-text-heading_medium slds-p-top_x-small">Full Membership</div>
+                <div>
+                    Full Membership is our paid level. It is designed for individuals who will be regular participants
+                    in
+                    club events. Annual membership dues are $20 for an individual or $25 for a family. It provides for:
+                </div>
+                <ul class="slds-list_dotted">
+                    <li>Participation in a regular and Full Member-only club field trips</li>
+                    <li>Access to all web site features</li>
+                    <li>Voting rights at club meetings</li>
+                    <li>Eligibility for club officer positions</li>
+                </ul>
+                <div class="slds-p-top_x-small">
+                    Our club is open to anyone who would like to join. Just fill in the simple form and click submit. If
+                    you desire to
+                    become a paid member, please check the "Please contact me about becoming a paid member" checkbox on
+                    the membership
+                    form.
+                </div>
+            </div>
+            <div class="slds-small-size_1-of-1 slds-large-size_1-of-3">
+                <my-membership-form onmemberevent={handleMemberEvent}></my-membership-form>
+            </div>
+        </div>
+    </div>
+
 </template>

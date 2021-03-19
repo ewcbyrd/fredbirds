@@ -1,5 +1,5 @@
 import { LightningElement } from 'lwc';
-import {getRegions, getTaxonomy} from "data/ebirdService"
+import {getRegions, getTaxonomy} from "data/ebirdService";
 
 export default class App extends LightningElement {
     homeSelected = true;
@@ -8,9 +8,19 @@ export default class App extends LightningElement {
     officersSelected = false;
     newsSelected = false;
     aboutSelected = false;
+    membershipSelected = false;
     birdsOpen = false;
     clubOpen = false;
-    properties = {home: true, sightings: false, hotspots: false, events: false, officers: false, news: false, about: false};
+    properties = {
+        home: true, 
+        sightings: false, 
+        hotspots: false, 
+        events: false, 
+        officers: false, 
+        news: false, 
+        about: false, 
+        membership: false
+    };
 
     connectedCallback() {
         const opts = {};

@@ -1,13 +1,9 @@
-const root = 'https://ebird.org/ws2.0/';
-const key = 'cjsr36ksmnsn';
+const root = 'https://fredbirds-api.herokuapp.com/';
 
 const callout = function(url) {
     return new Promise((resolve, reject) => {
         fetch(url, {
-            method: 'GET',
-            headers: {
-                'X-eBirdApiToken': key
-            }
+            method: 'GET'
         })
             .then((response) => {
                 return response.json();
@@ -22,12 +18,12 @@ const callout = function(url) {
 }
 
 export const getSightingsByLocation = ({ regionCode, daysBack = 14 }) => {
-    const url = root + 'data/obs/' + regionCode + '/recent?back=' + daysBack;
+    const url = `${root}sightings/location/${regionCode}?back=${daysBack}`;
     return callout(url);
 };
 
 export const getTaxonomy = () => {
-    const url = root + 'ref/taxonomy/ebird?fmt=json';
+    const url = `${root}taxonomy`;
     return callout(url);
 };
 
@@ -37,7 +33,7 @@ export const getNearbyNotableObservations = ({
     dist = 50,
     daysBack = 7
 }) => {
-    const url = `${root}data/obs/geo/recent/notable?lat=${lat}&lng=${long}&dist=${dist}&back=${daysBack}&detail=full`;
+    const url = `${root}sightings/nearby/notable?lat=${lat}&lng=${long}&dist=${dist}&back=${daysBack}&detail=full`;
     return callout(url);
 };
 
@@ -45,7 +41,7 @@ export const getNotableSightingsByLocation = ({
     regionCode,
     daysBack = 14
 }) => {
-    const url = `${root}data/obs/${regionCode}/recent/notable?back=${daysBack}&detail=full`;
+    const url = `${root}sightings/location/${regionCode}/notable?days=${daysBack}&detail=full`;
     return callout(url);
 };
 
@@ -54,22 +50,22 @@ export const getNearbyHotspots = ({
     long,
     dist = 50
 }) => {
-    const url = `${root}ref/hotspot/geo?lat=${lat}&lng=${long}&dist=${dist}&fmt=json`;
+    const url = `${root}hotspots/nearby?lat=${lat}&long=${long}&dist=${dist}`;
     return callout(url);
 };
 
 export const getRegions = ({region = 'US'}) => {
-    const url = `${root}ref/region/list/subnational2/${region}`;
+    const url = `${root}regions/${region}`;
     return callout(url);
 };
 
 export const getHotspotDetails = ({locId}) => {
-    const url = `${root}ref/hotspot/info/${locId}`;
+    const url = `${root}hotspots/${locId}/details`;
     return callout(url);
 };
 
 export const getSpeciesList = ({locId}) => {
-    const url = `${root}product/spplist/${locId}`;
+    const url = `${root}hotspots/${locId}/species`;
     return callout(url);
 };
 
