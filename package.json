@@ -1,7 +1,7 @@
 {
     "name": "birds",
     "description": "Fredericksburg Birding Club App",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "bugs": "https://github.com/birds/issues",
     "dependencies": {
         "@lwc/synthetic-shadow": "^1.9.7",
