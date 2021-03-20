@@ -1,5 +1,5 @@
 import { LightningElement } from 'lwc';
-import {getRegions, getTaxonomy} from "data/ebirdService";
+import { getRegions, getTaxonomy } from 'data/ebirdService';
 
 export default class App extends LightningElement {
     homeSelected = true;
@@ -12,13 +12,13 @@ export default class App extends LightningElement {
     birdsOpen = false;
     clubOpen = false;
     properties = {
-        home: true, 
-        sightings: false, 
-        hotspots: false, 
-        events: false, 
-        officers: false, 
-        news: false, 
-        about: false, 
+        home: true,
+        sightings: false,
+        hotspots: false,
+        events: false,
+        officers: false,
+        news: false,
+        about: false,
         membership: false
     };
 
@@ -31,7 +31,9 @@ export default class App extends LightningElement {
         }
 
         if (!localStorage.getItem('taxonomy')) {
-            getTaxonomy().then(results => localStorage.setItem('taxonomy', JSON.stringify(results)));
+            getTaxonomy().then((results) =>
+                localStorage.setItem('taxonomy', JSON.stringify(results))
+            );
         }
     }
 
@@ -45,7 +47,6 @@ export default class App extends LightningElement {
             classList.add('slds-is-open');
             this.birdsOpen = true;
         }
-
     }
 
     handleClubClick() {
@@ -65,13 +66,11 @@ export default class App extends LightningElement {
     }
 
     get birdsStyle() {
-        return this.sightingsSelected || this.hotspotsSelected ? '' : ''
+        return this.sightingsSelected || this.hotspotsSelected ? '' : '';
     }
 
     getMenuStyle(selected) {
-        return selected
-            ? 'slds-context-bar__item'
-            : 'slds-context-bar__item';
+        return selected ? 'slds-context-bar__item' : 'slds-context-bar__item';
     }
 
     handleMenuClick(event) {
@@ -85,6 +84,7 @@ export default class App extends LightningElement {
     }
 
     displayComponent(source) {
+        // eslint-disable-next-line guard-for-in
         for (const prop in this.properties) {
             this.properties[prop] = false;
             this[`${prop}Selected`] = false;
