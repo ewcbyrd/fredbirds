@@ -25,25 +25,32 @@ SOFTWARE.
 <template>
     <div class="slds-carousel">
         <div class="slds-carousel__stage">
-
             <!-- AUTO SCROLL BUTTON -->
             <template if:true={autoScroll}>
                 <span class="slds-carousel__autoplay">
                     <template if:false={showPlayIcon}>
                         <button
                             class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small"
-                            title="Stop auto-play" onclick={togglePlay}>
+                            title="Stop auto-play"
+                            onclick={togglePlay}
+                        >
                             <svg class="slds-button__icon" aria-hidden="true">
-                                <use xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#pause"></use>
+                                <use
+                                    xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#pause"
+                                ></use>
                             </svg>
                         </button>
                     </template>
                     <template if:true={showPlayIcon}>
                         <button
                             class="slds-button slds-button_icon slds-button_icon-border-filled slds-button_icon-x-small"
-                            title="resume auto-play" onclick={togglePlay}>
+                            title="resume auto-play"
+                            onclick={togglePlay}
+                        >
                             <svg class="slds-button__icon" aria-hidden="true">
-                                <use xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#play"></use>
+                                <use
+                                    xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#play"
+                                ></use>
                             </svg>
                         </button>
                     </template>
@@ -51,34 +58,63 @@ SOFTWARE.
             </template>
 
             <!-- MAIN CONTENT -->
-            <div class="slds-carousel__panels" style="transform:translateX(-0%)">
+            <div
+                class="slds-carousel__panels"
+                style="transform: translateX(-0%)"
+            >
                 <template if:true={components}>
                     <template for:each={components} for:item="component">
-                        <div id={component.contentId} class={component.contentClass} role="tabpanel"
-                            aria-hidden={component.hidden} aria-labelledby={component.indicatorId}
-                            key={component.contentId}>
+                        <div
+                            id={component.contentId}
+                            class={component.contentClass}
+                            role="tabpanel"
+                            aria-hidden={component.hidden}
+                            aria-labelledby={component.indicatorId}
+                            key={component.contentId}
+                        >
                             <template if:true={component.video}>
-                                <div class="slds-carousel__panel-action slds-text-link_reset"
-                                    tabindex={component.tabindex}>
+                                <div
+                                    class="slds-carousel__panel-action slds-text-link_reset"
+                                    tabindex={component.tabindex}
+                                >
                                     <div>
-                                        <iframe height="400px" width="100%" src={component.video} frameborder="0"
+                                        <iframe
+                                            height="400px"
+                                            width="100%"
+                                            src={component.video}
+                                            frameborder="0"
                                             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                            allowfullscreen></iframe>
+                                            allowfullscreen
+                                        ></iframe>
                                     </div>
                                     <div class="slds-carousel__content">
-                                        <h2 class="slds-carousel__content-title">{component.header}</h2>
+                                        <h2
+                                            class="slds-carousel__content-title"
+                                        >
+                                            {component.header}
+                                        </h2>
                                         <p>{component.description}</p>
                                     </div>
                                 </div>
                             </template>
                             <template if:false={component.video}>
-                                <a href={component.href} class="slds-carousel__panel-action slds-text-link_reset"
-                                    tabindex={component.tabindex}>
+                                <a
+                                    href={component.href}
+                                    class="slds-carousel__panel-action slds-text-link_reset"
+                                    tabindex={component.tabindex}
+                                >
                                     <div class="slds-carousel__image">
-                                        <img src={component.image} alt={component.header} />
+                                        <img
+                                            src={component.image}
+                                            alt={component.header}
+                                        />
                                     </div>
                                     <div class="slds-carousel__content">
-                                        <h2 class="slds-carousel__content-title">{component.header}</h2>
+                                        <h2
+                                            class="slds-carousel__content-title"
+                                        >
+                                            {component.header}
+                                        </h2>
                                         <p>{component.description}</p>
                                     </div>
                                 </a>
@@ -89,7 +125,7 @@ SOFTWARE.
             </div>
 
             <!--INDICATORS -->
-            <ul class="slds-carousel__indicators" role="tablist">
+            <!--<ul class="slds-carousel__indicators" role="tablist">
                 <template if:true={components}>
                     <template for:each={components} for:item="component">
                         <li class="slds-carousel__indicator" role="presentation" key={component.indicatorId}>
@@ -101,7 +137,7 @@ SOFTWARE.
                         </li>
                     </template>
                 </template>
-            </ul>
+            </ul>-->
         </div>
     </div>
 </template>

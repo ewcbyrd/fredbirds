@@ -8,10 +8,13 @@
     <div class="slds-context-bar">
         <div class="slds-context-bar__primary">
             <div
-                class="slds-context-bar__item slds-context-bar__dropdown-trigger slds-dropdown-trigger slds-dropdown-trigger_click slds-no-hover">
+                class="slds-context-bar__item slds-context-bar__dropdown-trigger slds-dropdown-trigger slds-dropdown-trigger_click slds-no-hover"
+            >
                 <div class="slds-context-bar__icon-action">
-                    <button class="slds-button slds-icon-waffle_container slds-context-bar__button"
-                        title="Description of the icon when needed">
+                    <button
+                        class="slds-button slds-icon-waffle_container slds-context-bar__button"
+                        title="Description of the icon when needed"
+                    >
                         <span class="slds-icon-waffle">
                             <span class="slds-r1"></span>
                             <span class="slds-r2"></span>
@@ -23,89 +26,152 @@
                             <span class="slds-r8"></span>
                             <span class="slds-r9"></span>
                         </span>
-                        <span class="slds-assistive-text">Open App Launcher</span>
+                        <span class="slds-assistive-text"
+                            >Open App Launcher</span
+                        >
                     </button>
                 </div>
-                <span class="slds-context-bar__label-action slds-context-bar__app-name">
+                <span
+                    class="slds-context-bar__label-action slds-context-bar__app-name"
+                >
                     <span title="App Name">FBC</span>
                 </span>
             </div>
         </div>
-        <nav class="slds-context-bar__secondary slds-p-top_x-small" role="navigation">
+        <nav
+            class="slds-context-bar__secondary slds-p-top_x-small"
+            role="navigation"
+        >
             <ul class="slds-grid">
                 <li class={homeStyle}>
-                    <a href="javascript:void(0);" class="slds-context-bar__label-action" title="home"
-                        onclick={handleMenuClick}>
+                    <a
+                        href="javascript:void(0);"
+                        class="slds-context-bar__label-action"
+                        title="home"
+                        onclick={handleMenuClick}
+                    >
                         <span class="slds-truncate" title="home">Home</span>
                     </a>
                 </li>
                 <li
-                    class="club slds-context-bar__item slds-context-bar__dropdown-trigger slds-dropdown-trigger slds-dropdown-trigger_click">
-                    <a href="#" class="slds-context-bar__label-action" title="club" onclick={handleClubClick}>
+                    class="club slds-context-bar__item slds-context-bar__dropdown-trigger slds-dropdown-trigger slds-dropdown-trigger_click"
+                >
+                    <a
+                        href="#"
+                        class="slds-context-bar__label-action"
+                        title="club"
+                        onclick={handleClubClick}
+                    >
                         <span class="slds-truncate" title="Club">Club</span>
                     </a>
                     <div class="slds-dropdown slds-dropdown_right">
                         <ul class="slds-dropdown__list" role="menu">
                             <li class="slds-dropdown__item" role="presentation">
                                 <a href="#" role="menuitem" tabindex="-1">
-                                    <span class="slds-truncate" title="about" onclick={handleMenuClick}>About</span>
+                                    <span
+                                        class="slds-truncate"
+                                        title="about"
+                                        onclick={handleMenuClick}
+                                        >About</span
+                                    >
                                 </a>
                             </li>
                             <li class="slds-dropdown__item" role="presentation">
                                 <a href="#" role="menuitem" tabindex="-1">
-                                    <span class="slds-truncate" title="announcements"
-                                        onclick={handleMenuClick}>Announcements</span>
+                                    <span
+                                        class="slds-truncate"
+                                        title="announcements"
+                                        onclick={handleMenuClick}
+                                        >Announcements</span
+                                    >
                                 </a>
                             </li>
                             <li class="slds-dropdown__item" role="presentation">
                                 <a href="#" role="menuitem" tabindex="-1">
-                                    <span class="slds-truncate" title="events" onclick={handleMenuClick}>Events</span>
+                                    <span
+                                        class="slds-truncate"
+                                        title="events"
+                                        onclick={handleMenuClick}
+                                        >Events</span
+                                    >
                                 </a>
                             </li>
                             <li class="slds-dropdown__item" role="presentation">
                                 <a href="#" role="menuitem" tabindex="-1">
-                                    <span class="slds-truncate" title="membership"
-                                        onclick={handleMenuClick}>Membership</span>
+                                    <span
+                                        class="slds-truncate"
+                                        title="membership"
+                                        onclick={handleMenuClick}
+                                        >Membership</span
+                                    >
                                 </a>
                             </li>
                             <li class="slds-dropdown__item" role="presentation">
                                 <a href="#" role="menuitem" tabindex="-1">
-                                    <span class="slds-truncate" title="newsletters"
-                                        onclick={handleMenuClick}>Newsletters</span>
+                                    <span
+                                        class="slds-truncate"
+                                        title="newsletters"
+                                        onclick={handleMenuClick}
+                                        >Newsletters</span
+                                    >
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </li>
                 <li
-                    class="birds slds-context-bar__item slds-context-bar__dropdown-trigger slds-dropdown-trigger slds-dropdown-trigger_click">
-                    <a href="#" class="slds-context-bar__label-action" title="Birding Resources"
-                        onclick={handleBirdsClick}>
-                        <span class="slds-truncate" title="Birds">Birding Resources</span>
+                    class="birds slds-context-bar__item slds-context-bar__dropdown-trigger slds-dropdown-trigger slds-dropdown-trigger_click"
+                >
+                    <a
+                        href="#"
+                        class="slds-context-bar__label-action"
+                        title="Birding Resources"
+                        onclick={handleBirdsClick}
+                    >
+                        <span class="slds-truncate" title="Birds"
+                            >Birding Resources</span
+                        >
                     </a>
                     <div class="slds-dropdown slds-dropdown_right">
                         <ul class="slds-dropdown__list" role="menu">
                             <li class="slds-dropdown__item" role="presentation">
                                 <a href="#" role="menuitem" tabindex="-1">
-                                    <span class="slds-truncate" title="sightings"
-                                        onclick={handleMenuClick}>Sightings</span>
+                                    <span
+                                        class="slds-truncate"
+                                        title="sightings"
+                                        onclick={handleMenuClick}
+                                        >Sightings</span
+                                    >
                                 </a>
                             </li>
                             <li class="slds-dropdown__item" role="presentation">
                                 <a href="#" role="menuitem" tabindex="-1">
-                                    <span class="slds-truncate" title="hotspots"
-                                        onclick={handleMenuClick}>Hotspots</span>
+                                    <span
+                                        class="slds-truncate"
+                                        title="hotspots"
+                                        onclick={handleMenuClick}
+                                        >Hotspots</span
+                                    >
                                 </a>
                             </li>
                             <li class="slds-dropdown__item" role="presentation">
                                 <a href="#" role="menuitem" tabindex="-1">
-                                    <span class="slds-truncate" title="birds" onclick={handleMenuClick}>Birds</span>
+                                    <span
+                                        class="slds-truncate"
+                                        title="birds"
+                                        onclick={handleMenuClick}
+                                        >Birds</span
+                                    >
                                 </a>
                             </li>
                             <li class="slds-dropdown__item" role="presentation">
                                 <a href="#" role="menuitem" tabindex="-1">
-                                    <span class="slds-truncate" title="news" onclick={handleMenuClick}>Birding
-                                        News</span>
+                                    <span
+                                        class="slds-truncate"
+                                        title="news"
+                                        onclick={handleMenuClick}
+                                        >Birding News</span
+                                    >
                                 </a>
                             </li>
                         </ul>
@@ -141,5 +207,8 @@
         <div class="slds-p-around_medium">
             <my-membership></my-membership>
         </div>
+    </template>
+    <template if:true={announcementsSelected}>
+        <my-announcements-parent></my-announcements-parent>
     </template>
 </template>

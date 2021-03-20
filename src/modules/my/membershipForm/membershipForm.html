@@ -1,76 +1,98 @@
 <template>
-    <div class="main slds-p-around_x-large">
-        <div
-            class="slds-text-heading_medium slds-text-align_center slds-p-bottom_x-large"
-        >
-            Become a Member
-        </div>
-        <div class="slds-form" role="list">
-            <lightning-input
-                name="first"
-                type="text"
-                variant="label-inline"
-                label="First Name"
-                value={first}
-                required
-                onchange={handleFormChange}
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header
+                class="slds-media slds-media_center slds-has-flexi-truncate"
             >
-            </lightning-input>
-            <lightning-input
-                name="last"
-                type="text"
-                variant="label-inline"
-                label="Last Name"
-                value={last}
-                required
-                onchange={handleFormChange}
-            >
-            </lightning-input>
-            <lightning-input
-                name="email"
-                type="email"
-                variant="label-inline"
-                label="Email"
-                value={email}
-                required
-                onchange={handleFormChange}
-            >
-            </lightning-input>
-            <lightning-input
-                name="phone"
-                type="tel"
-                variant="label-inline"
-                label="Phone"
-                value={phone}
-                onchange={handleFormChange}
-                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-                message-when-pattern-mismatch="Format must be ###-###-####"
-            >
-            </lightning-input>
-        </div>
-        <div class="slds-form-element slds-text-align_center">
-            <div class="slds-form-element__control">
-                <div class="slds-checkbox">
-                    <input type="checkbox" id="member" />
-                    <label class="slds-checkbox__label" for="member">
-                        <span class="slds-checkbox_faux"></span>
-                        <span class="slds-form-element__label"
-                            >Please contact me about becoming a paid
-                            member</span
+                <div class="slds-media__figure">
+                    <span
+                        class="slds-icon_container slds-icon-standard-task"
+                        title="account"
+                    >
+                        <svg
+                            class="slds-icon slds-icon_medium"
+                            aria-hidden="true"
                         >
-                    </label>
+                            <use
+                                xlink:href="resources/SLDS/icons/custom-sprite/svg/symbols.svg#custom83"
+                            ></use>
+                        </svg>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">Become a Member</h2>
+                </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <div>
+                <lightning-input
+                    name="first"
+                    type="text"
+                    variant="label-inline"
+                    label="First Name"
+                    value={first}
+                    required
+                    onchange={handleFormChange}
+                >
+                </lightning-input>
+                <lightning-input
+                    name="last"
+                    type="text"
+                    variant="label-inline"
+                    label="Last Name"
+                    value={last}
+                    required
+                    onchange={handleFormChange}
+                >
+                </lightning-input>
+                <lightning-input
+                    name="email"
+                    type="email"
+                    variant="label-inline"
+                    label="Email"
+                    value={email}
+                    required
+                    onchange={handleFormChange}
+                >
+                </lightning-input>
+                <lightning-input
+                    name="phone"
+                    type="tel"
+                    variant="label-inline"
+                    label="Phone"
+                    value={phone}
+                    onchange={handleFormChange}
+                    pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                    message-when-pattern-mismatch="Format must be ###-###-####"
+                >
+                </lightning-input>
+                <div
+                    class="slds-form-element slds-text-align_center slds-p-top_medium"
+                >
+                    <div class="slds-form-element__control">
+                        <div class="slds-checkbox">
+                            <input type="checkbox" id="member" />
+                            <label class="slds-checkbox__label" for="member">
+                                <span class="slds-checkbox_faux"></span>
+                                <span class="slds-form-element__label"
+                                    >Please contact me about becoming a paid
+                                    member</span
+                                >
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="slds-text-align_center slds-p-top_medium">
-            <button
-                type="submit"
-                id="submit"
-                class="slds-button slds-button_brand"
-                onclick={handleSubmit}
-            >
-                Submit
-            </button>
-        </div>
-    </div>
+        <footer class="slds-card__footer">
+            <div class="slds-text-align_center">
+                <lightning-button
+                    label="Submit"
+                    variant="brand"
+                    onclick={handleSubmit}
+                ></lightning-button>
+            </div>
+        </footer>
+    </article>
 </template>

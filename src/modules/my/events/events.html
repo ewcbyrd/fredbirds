@@ -3,16 +3,26 @@
         <div>
             <div class="slds-card">
                 <div class="slds-card__header">
-                    <div class="slds-media slds-media--center slds-has-flexi-truncate">
-                        <span class="slds-icon_container slds-icon_container slds-icon-standard-event"
-                            title="Description of icon when needed">
+                    <div
+                        class="slds-media slds-media--center slds-has-flexi-truncate"
+                    >
+                        <span
+                            class="slds-icon_container slds-icon_container slds-icon-standard-event"
+                            title="Description of icon when needed"
+                        >
                             <svg class="slds-icon" aria-hidden="true">
-                                <use xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#event"></use>
+                                <use
+                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#event"
+                                ></use>
                             </svg>
-                            <span class="slds-assistive-text">Description of icon when needed</span>
+                            <span class="slds-assistive-text"
+                                >Description of icon when needed</span
+                            >
                         </span>
                         <div class="slds-media__body">
-                            <h2 class="slds-p-left_small slds-text-heading--small slds-truncate">
+                            <h2
+                                class="slds-p-left_small slds-card__header-title"
+                            >
                                 <template if:true={isHome}>
                                     Upcoming Events
                                 </template>
@@ -35,19 +45,27 @@
                     <div class="slds-scrollable--y slds-is-relative">
                         <template if:true={loading}>
                             <div class="slds-spinner_container">
-                                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
-                                    <span class="slds-assistive-text">Loading</span>
+                                <div
+                                    role="status"
+                                    class="slds-spinner slds-spinner_medium slds-spinner_brand"
+                                >
+                                    <span class="slds-assistive-text"
+                                        >Loading</span
+                                    >
                                     <div class="slds-spinner__dot-a"></div>
                                     <div class="slds-spinner__dot-b"></div>
                                 </div>
                             </div>
                         </template>
                         <table
-                            class="fixed_header slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                            class="fixed_header slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
+                        >
                             <thead>
                                 <tr class="slds-text-heading--label">
                                     <th scope="col">
-                                        <span class="slds-truncate">Date(s)</span>
+                                        <span class="slds-truncate"
+                                            >Date(s)</span
+                                        >
                                     </th>
                                     <th scope="col">
                                         <span class="slds-truncate">Event</span>
@@ -55,48 +73,82 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <template for:each={yearEvents} for:item="event">
-                                    <tr class="slds-hint-parent" key={event.id} onclick={handleEventClick}
-                                        data-item={event.id}>
+                                <template
+                                    for:each={yearEvents}
+                                    for:item="event"
+                                >
+                                    <tr
+                                        class="slds-hint-parent"
+                                        key={event.id}
+                                        onclick={handleEventClick}
+                                        data-item={event.id}
+                                    >
                                         <td class="slds-cell-wrap">
                                             {event.date}
                                             <div class="slds-float_right">
-                                                <template if:true={event.cancelled}>
-                                                    <div class="slds-media__figure">
-                                                        <span class="slds-icon_container slds-icon-custom-custom60"
-                                                            title="Cancelled">
-                                                            <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                <template
+                                                    if:true={event.cancelled}
+                                                >
+                                                    <div
+                                                        class="slds-media__figure"
+                                                    >
+                                                        <span
+                                                            class="slds-icon_container slds-icon-custom-custom60"
+                                                            title="Cancelled"
+                                                        >
+                                                            <svg
+                                                                class="slds-icon slds-icon_x-small"
+                                                                aria-hidden="true"
+                                                            >
                                                                 <use
-                                                                    xlink:href="resources/SLDS/icons/custom-sprite/svg/symbols.svg#custom60">
-                                                                </use>
+                                                                    xlink:href="resources/SLDS/icons/custom-sprite/svg/symbols.svg#custom60"
+                                                                ></use>
                                                             </svg>
                                                         </span>
                                                     </div>
                                                 </template>
                                             </div>
                                             <div class="slds-float_right">
-                                                <template if:true={event.pdfFile}>
-                                                    <div class="slds-media__figure">
-                                                        <span class="slds-icon_container slds-icon-standard-knowledge"
-                                                            title="Trip Report">
-                                                            <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                <template
+                                                    if:true={event.pdfFile}
+                                                >
+                                                    <div
+                                                        class="slds-media__figure"
+                                                    >
+                                                        <span
+                                                            class="slds-icon_container slds-icon-standard-knowledge"
+                                                            title="Trip Report"
+                                                        >
+                                                            <svg
+                                                                class="slds-icon slds-icon_x-small"
+                                                                aria-hidden="true"
+                                                            >
                                                                 <use
-                                                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#knowledge">
-                                                                </use>
+                                                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#knowledge"
+                                                                ></use>
                                                             </svg>
                                                         </span>
                                                     </div>
                                                 </template>
                                             </div>
                                             <div class="slds-float_right">
-                                                <template if:true={event.details}>
-                                                    <div class="slds-media__figure">
-                                                        <span class="slds-icon_container slds-icon-standard-address"
-                                                            title="Details">
-                                                            <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                <template
+                                                    if:true={event.details}
+                                                >
+                                                    <div
+                                                        class="slds-media__figure"
+                                                    >
+                                                        <span
+                                                            class="slds-icon_container slds-icon-standard-address"
+                                                            title="Details"
+                                                        >
+                                                            <svg
+                                                                class="slds-icon slds-icon_x-small"
+                                                                aria-hidden="true"
+                                                            >
                                                                 <use
-                                                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#address">
-                                                                </use>
+                                                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#address"
+                                                                ></use>
                                                             </svg>
                                                         </span>
                                                     </div>
@@ -114,12 +166,15 @@
                 </div>
                 <template if:true={isHome}>
                     <footer class="slds-card__footer">
-                        <a class="slds-card__footer-action" href="#" onclick={handleViewAllEventsClick}>View All Events
+                        <a
+                            class="slds-card__footer-action"
+                            href="#"
+                            onclick={handleViewAllEventsClick}
+                            >View All Events
                         </a>
                     </footer>
                 </template>
             </div>
         </div>
-
     </template>
 </template>
