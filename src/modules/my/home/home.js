@@ -7,33 +7,28 @@ export default class Home extends LightningElement {
 
     items = [
         {
-            image:
-                'https://fredbirds-098f.restdb.io/media/60283a54b0bc995a0001f177',
+            image: 'resources/photos/CBBT.jpg',
             header: 'Chesapeake Bay Bridge Tunnel',
             href: '#'
         },
         {
-            image:
-                'https://fredbirds-098f.restdb.io/media/60283a58b0bc995a0001f178',
+            image: 'resources/photos/Group.jpg',
             header: 'George Washington Birthplace National Monument',
             description: 'November 10, 2018',
             href: '#'
         },
         {
-            image:
-                'https://fredbirds-098f.restdb.io/media/60283a5bb0bc995a0001f17a',
+            image: 'resources/photos/Group1.jpg',
             header: 'Occoquan Bay National Wildlife Refuge',
             description: 'March 11, 2017',
             href: '#'
         },
         {
-            image:
-                'https://fredbirds-098f.restdb.io/media/60283a5db0bc995a0001f17b',
+            image: 'resources/photos/P1020092.jpg',
             href: '#'
         },
         {
-            image:
-                'https://fredbirds-098f.restdb.io/media/60283a5fb0bc995a0001f17d',
+            image: 'resources/photos/Photo-Op.jpg',
             header: 'Mattamuskeet National Wildlife Refuge',
             href: '#'
         }
