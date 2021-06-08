@@ -1,5 +1,5 @@
 import { LightningElement } from 'lwc';
-import {getNearbyHotspots} from 'data/ebirdService';
+import { getNearbyHotspots } from 'data/ebirdService';
 
 export default class Hotspots extends LightningElement {
     hotspots = [];
@@ -8,7 +8,8 @@ export default class Hotspots extends LightningElement {
     selectedId = '';
     connectedCallback() {
         const hotspots = sessionStorage.getItem('hotspots');
-        this.regions = JSON.parse(localStorage.getItem('regions'));
+        this.regions = JSON.parse(sessionStorage.getItem('regions'));
+
         if (hotspots) {
             this.hotspots = JSON.parse(hotspots);
             this.locations = this.setLocations();
@@ -33,14 +34,16 @@ export default class Hotspots extends LightningElement {
         codes.delete(undefined);
         codes.forEach((item) => {
             let label = this.regions.find((region) => item === region.code);
-            options.push({value: item, label: label.name});
+            options.push({ value: item, label: label.name });
         });
-    
-        return options.sort((a, b) => (a.label > b.label ? 1 : -1));        
+
+        return options.sort((a, b) => (a.label > b.label ? 1 : -1));
     }
 
     get filteredHotspots() {
-        return this.hotspots.filter((item) => item.subnational2Code === this.selectedId);
+        return this.hotspots.filter(
+            (item) => item.subnational2Code === this.selectedId
+        );
     }
 
     handleLocationChange(event) {
@@ -49,6 +52,16 @@ export default class Hotspots extends LightningElement {
     }
 
     handleHotspotClick(event) {
-        this.dispatchEvent(new CustomEvent('hotspotclick', {bubbles: true, composed: true, detail: event.currentTarget.dataset.item}));
+        this.dispatchEvent(
+            new CustomEvent('hotspotclick', {
+                bubbles: true,
+                composed: true,
+                detail: event.currentTarget.dataset.item
+            })
+        );
+    }
+
+    get showHotspots() {
+        return this.hotspots.length > 0;
     }
 }

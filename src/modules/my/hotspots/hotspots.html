@@ -1,22 +1,40 @@
 <template>
-    <template if:true={hotspots}>
+    <template if:true={showHotspots}>
         <div>
             <div class="slds-card">
                 <div class="slds-card__header">
-                    <div class="slds-media slds-media--center slds-has-flexi-truncate">
-                        <span class="slds-icon_container slds-icon_container slds-icon-standard-event"
-                            title="Description of icon when needed">
+                    <div
+                        class="slds-media slds-media--center slds-has-flexi-truncate"
+                    >
+                        <span
+                            class="slds-icon_container slds-icon_container slds-icon-standard-event"
+                            title="Description of icon when needed"
+                        >
                             <svg class="slds-icon" aria-hidden="true">
-                                <use xlink:href="resources/SLDS/icons/custom-sprite/svg/symbols.svg#custom3"></use>
+                                <use
+                                    xlink:href="resources/SLDS/icons/custom-sprite/svg/symbols.svg#custom3"
+                                ></use>
                             </svg>
-                            <span class="slds-assistive-text">Description of icon when needed</span>
+                            <span class="slds-assistive-text"
+                                >Description of icon when needed</span
+                            >
                         </span>
                         <div class="slds-media__body">
-                            <h2 class="slds-p-left_small slds-text-heading--small slds-truncate">
+                            <h2
+                                class="slds-p-left_small slds-text-heading--small slds-truncate"
+                            >
                                 Hotspots for &nbsp;
                                 <select onchange={handleLocationChange}>
-                                    <template for:each={locations} for:item="location">
-                                        <option key={location.value} value={location.value}>{location.label}</option>
+                                    <template
+                                        for:each={locations}
+                                        for:item="location"
+                                    >
+                                        <option
+                                            key={location.value}
+                                            value={location.value}
+                                        >
+                                            {location.label}
+                                        </option>
                                     </template>
                                 </select>
                             </h2>
@@ -26,31 +44,48 @@
                 <div class="slds-card__body">
                     <div class="slds-scrollable--y slds-is-relative body">
                         <table
-                            class="fixed_header slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                            class="fixed_header slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
+                        >
                             <thead>
                                 <tr class="slds-text-heading--label">
                                     <th scope="col">
-                                        <span class="slds-truncate">Location</span>
+                                        <span class="slds-truncate"
+                                            >Location</span
+                                        >
                                     </th>
                                     <th scope="col">
-                                        <span class="slds-truncate">Last Visited</span>
+                                        <span class="slds-truncate"
+                                            >Last Visited</span
+                                        >
                                     </th>
                                     <th scope="col">
-                                        <span class="slds-truncate slds-text-align_center">Species</span>
+                                        <span
+                                            class="slds-truncate slds-text-align_center"
+                                            >Species</span
+                                        >
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <template for:each={filteredHotspots} for:item="hotspot">
-                                    <tr class="slds-hint-parent" key={hotspot.locId} onclick={handleHotspotClick}
-                                        data-item={hotspot.locId}>
+                                <template
+                                    for:each={filteredHotspots}
+                                    for:item="hotspot"
+                                >
+                                    <tr
+                                        class="slds-hint-parent"
+                                        key={hotspot.locId}
+                                        onclick={handleHotspotClick}
+                                        data-item={hotspot.locId}
+                                    >
                                         <td class="slds-cell-wrap">
                                             {hotspot.locName}
                                         </td>
                                         <td class="slds-cell-wrap">
                                             {hotspot.latestObsDt}
                                         </td>
-                                        <td class="slds-cell-wrap slds-text-align_center">
+                                        <td
+                                            class="slds-cell-wrap slds-text-align_center"
+                                        >
                                             {hotspot.numSpeciesAllTime}
                                         </td>
                                     </tr>
