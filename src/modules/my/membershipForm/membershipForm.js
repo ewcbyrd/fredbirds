@@ -46,10 +46,28 @@ export default class MembershipForm extends LightningElement {
                 })
                 .then(() => {
                     const body = JSON.stringify({
-                        to: this.email,
-                        subject: 'Welcome to the Fredericksburg Birding Club',
-                        sendername: 'Fredericksburg Birding Club',
-                        html: '<h1>This is a test</h1>'
+                        to: [
+                            {
+                                email: this.email,
+                                name: `${this.first} ${this.last}`
+                            }
+                        ],
+                        from: {
+                            email: 'admin@fredbirds.com',
+                            name: 'Fredericksburg Birding Club'
+                        },
+                        cc: [
+                            {
+                                email: 'membership@fredbirds.com',
+                                name: 'FBC Membership'
+                            }
+                        ],
+                        templateId: 'd-41856bbce48b405e9455299a6a239ccb',
+                        dynamic_template_data: {
+                            first: this.first,
+                            subject:
+                                'Welcome to the Fredericksburg Birding Club'
+                        }
                     });
                     return sendEmail(body);
                 })
