@@ -1,0 +1,26 @@
+<template>
+    <div
+        class="slds-grid slds-wrap slds-gutters slds-p-left_medium slds-p-right_medium main slds-p-bottom_xx-large slds-p-top_medium">
+        <div class="slds-col slds-large-size_1-of-4 slds-small-size_1-of-1 slds-p-left_x-small">
+            <div class="slds-text-align_center">
+                <lightning-button-group>
+                    <lightning-button title="local" label="Local" variant={getLocalVariant} disabled onclick={handleFilterClick}></lightning-button>
+                    <lightning-button title="va" label="Virginia" value="US-VA" variant={getVirginiaVariant} onclick={handleFilterClick}></lightning-button>
+                    <lightning-button title="us" label="United States" value="US" variant={getUSVariant} onclick={handleFilterClick}></lightning-button>
+                </lightning-button-group>
+            </div>
+            <div class="slds-p-top_small">
+                
+            </div>
+        </div>
+        <div class="slds-col slds-large-size_3-of-4 slds-small-size_1-of-1">
+            
+        </div>
+        <div class="slds-col slds-large-size_1-of-4 slds-small-size_1-of-1 slds-p-left_x-small">
+            <my-birds></my-birds>
+        </div>
+        <div class="slds-col slds-large-size_3-of-4 slds-small-size_1-of-1">
+            <my-bird-details></my-bird-details>
+        </div>
+    </div>
+</template>
