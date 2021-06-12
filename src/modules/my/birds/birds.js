@@ -62,5 +62,12 @@ export default class Birds extends LightningElement {
         const selectedCode = event.detail.name;
         if (!selectedCode) return;
         this.selected = selectedCode;
+        this.dispatchEvent(
+            new CustomEvent('birdselected', {
+                detail: selectedCode,
+                bubbles: true,
+                composed: true
+            })
+        );
     }
 }
