@@ -5,15 +5,15 @@ const callout = function(url) {
         fetch(url, {
             method: 'GET'
         })
-            .then((response) => {
-                return response.json();
-            })
-            .then((result) => {
-                resolve(result);
-            })
-            .catch((error) => {
-                reject(error);
-            });
+        .then((response) => {
+            return response.json();
+        })
+        .then((result) => {
+            resolve(result);
+        })
+        .catch((error) => {
+            reject(error);
+        });
     });
 }
 
@@ -69,4 +69,8 @@ export const getSpeciesList = ({locId}) => {
     return callout(url);
 };
 
+export const getSpeciesDetailsByLocation = ({locId}) => {
+    const url = `${root}taxonomy/location/${locId}`;
+    return callout(url);
+}
 

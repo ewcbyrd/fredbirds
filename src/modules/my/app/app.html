@@ -116,6 +116,26 @@
                                     >
                                 </a>
                             </li>
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="#" role="menuitem" tabindex="-1">
+                                    <span
+                                        class="slds-truncate"
+                                        title="faqs"
+                                        onclick={handleMenuClick}
+                                        >FAQ's</span
+                                    >
+                                </a>
+                            </li>
+                            <li class="slds-dropdown__item" role="presentation">
+                                <a href="#" role="menuitem" tabindex="-1">
+                                    <span
+                                        class="slds-truncate"
+                                        title="contact"
+                                        onclick={handleMenuClick}
+                                        >Contact Us</span
+                                    >
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
@@ -154,16 +174,11 @@
                                     >
                                 </a>
                             </li>
-                            <li class="slds-dropdown__item" role="presentation">
+                            <!--<li class="slds-dropdown__item" role="presentation">
                                 <a href="#" role="menuitem" tabindex="-1">
-                                    <span
-                                        class="slds-truncate"
-                                        title="birds"
-                                        onclick={handleMenuClick}
-                                        >Birds</span
-                                    >
+                                    <span class="slds-truncate" title="birds" onclick={handleMenuClick}>Birds</span>
                                 </a>
-                            </li>
+                            </li>-->
                             <li class="slds-dropdown__item" role="presentation">
                                 <a href="#" role="menuitem" tabindex="-1">
                                     <span
@@ -210,5 +225,8 @@
     </template>
     <template if:true={announcementsSelected}>
         <my-announcements-parent></my-announcements-parent>
+    </template>
+    <template if:true={birdsSelected}>
+        <my-bird-parent></my-bird-parent>
     </template>
 </template>
