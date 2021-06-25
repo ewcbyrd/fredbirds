@@ -1,0 +1,24 @@
+.contact-us {
+    background-color: white;
+    border-color: black;
+    border-width: 2px;
+    border-style: solid;
+}
+
+img {
+    margin-left: auto;
+    margin-right: auto;
+    height: 100%;
+    width: 100%;
+    border-color: black;
+    border-width: 2px;
+    border-style: solid;
+}
+
+.img-left {
+    border-right-style: none;
+}
+
+.img-right {
+    border-left-style: none;
+}

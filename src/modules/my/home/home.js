@@ -7,6 +7,12 @@ export default class Home extends LightningElement {
 
     items = [
         {
+            image: 'resources/photos/image5.jpeg',
+            header: 'Bristoe Station Heritage Park',
+            description: 'June 19, 2021',
+            href: '#'
+        },
+        {
             image: 'resources/photos/CBBT.jpg',
             header: 'Chesapeake Bay Bridge Tunnel',
             href: '#'

@@ -1,6 +1,5 @@
 import { LightningElement } from 'lwc';
-import {getRegions} from 'data/ebirdService';
-
+import { getRegions } from 'data/ebirdService';
 
 export default class App extends LightningElement {
     homeSelected = true;
@@ -11,7 +10,7 @@ export default class App extends LightningElement {
     aboutSelected = false;
     membershipSelected = false;
     announcementsSelected = false;
-    birdsSelected = false;
+    contactSelected = false;
     birdsOpen = false;
     clubOpen = false;
     properties = {
@@ -24,7 +23,7 @@ export default class App extends LightningElement {
         about: false,
         membership: false,
         announcements: false,
-        birds: false
+        contact: false
     };
 
     connectedCallback() {
@@ -34,7 +33,7 @@ export default class App extends LightningElement {
             getRegions(regOpts).then((result) => {
                 sessionStorage.setItem('regions', JSON.stringify(result));
             });
-        } 
+        }
     }
 
     handleBirdsClick() {
