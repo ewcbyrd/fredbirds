@@ -11,6 +11,7 @@ export default class App extends LightningElement {
     membershipSelected = false;
     announcementsSelected = false;
     contactSelected = false;
+    faqsSelected = false;
     birdsOpen = false;
     clubOpen = false;
     properties = {
@@ -23,7 +24,8 @@ export default class App extends LightningElement {
         about: false,
         membership: false,
         announcements: false,
-        contact: false
+        contact: false,
+        faqs: false
     };
 
     connectedCallback() {

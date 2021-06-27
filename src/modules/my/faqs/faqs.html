@@ -1,0 +1,28 @@
+<template>
+    <div class="slds-grid slds-p-around_medium main">
+        <div class="slds-col slds-small-size_1-of-1 slds-large-size_1-of-3">
+                <img src="resources/photos/P1010796.jpeg" />
+                <img src="resources/photos/P1010808.jpeg" />
+                <img src="resources/photos/P1010820.jpeg" />
+        </div>
+        <div class="slds-col slds-small-size_1-of-1 slds-large-size_2-of-3">
+            <div class="slds-text-heading_large slds-text-align_center">Frequently Asked Questions</div>
+            <div class="select slds-p-top_small">
+                <lightning-combobox
+                name="category"
+                value={category}
+                options={options}
+                variant="label-hidden"
+                onchange={handleCategoryChange}
+            ></lightning-combobox>
+            </div>
+            <div class="slds-p-around_large">
+                <template for:each={selectedFaqs} for:item="faq">
+                    <div key={faq._id} class="question">Q. {faq.question}</div>
+                    <div key={faq._id} class="answer slds-p-bottom_small">A. {faq.answer}</div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+</template>
