@@ -22,3 +22,9 @@ img {
 .img-right {
     border-left-style: none;
 }
+
+@media only screen and (max-width: 800px) {
+    .no-show {
+        display: none;
+    }
+}
