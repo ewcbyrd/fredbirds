@@ -4,25 +4,26 @@
     "version": "0.0.2",
     "bugs": "https://github.com/birds/issues",
     "dependencies": {
-        "@lwc/synthetic-shadow": "^1.9.7",
-        "@salesforce/design-system-react": "^0.10.30",
-        "aws-sdk": "^2.848.0",
+        "@lwc/synthetic-shadow": "^1.18.0",
+        "@salesforce/design-system-react": "^0.10.35",
+        "aws-sdk": "^2.936.0",
         "bootstrap": "^4.6.0",
         "compression": "^1.7.4",
         "express": "^4.17.1",
-        "helmet": "^4.2.0",
+        "helmet": "^4.6.0",
         "jquery": "^3.5.1",
         "lightning-base-components": "^1.11.5-alpha"
     },
     "devDependencies": {
-        "@salesforce-ux/design-system": "^2.14.2",
-        "@types/bootstrap": "^5.0.5",
-        "eslint": "^7.14.0",
-        "gh-pages": "^3.1.0",
+        "@salesforce-ux/design-system": "^2.15.8",
+        "@types/bootstrap": "^5.0.16",
+        "eslint": "^7.29.0",
+        "gh-pages": "^3.2.3",
         "husky": "^4.3.0",
+        "lightning-base-components": "^1.11.5-alpha",
         "lint-staged": "^10.5.2",
         "lwc-services": "^2.3.0",
-        "prettier": "^2.2.0"
+        "prettier": "^2.3.2"
     },
     "engines": {
         "node": ">=10.13.0",
