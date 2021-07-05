@@ -195,41 +195,5 @@
             </ul>
         </nav>
     </div>
-    <template if:true={homeSelected}>
-        <my-home onviewall={handleViewAll}></my-home>
-    </template>
-    <template if:true={sightingsSelected}>
-        <my-resources></my-resources>
-    </template>
-    <template if:true={eventsSelected}>
-        <my-event-parent></my-event-parent>
-    </template>
-    <template if:true={hotspotsSelected}>
-        <my-hotspot-parent></my-hotspot-parent>
-    </template>
-    <template if:true={officersSelected}>
-        <my-officers></my-officers>
-    </template>
-    <template if:true={newsSelected}>
-        <my-news-parent></my-news-parent>
-    </template>
-    <template if:true={aboutSelected}>
-        <div class="slds-p-around_medium">
-            <my-about onviewall={handleViewAll}></my-about>
-        </div>
-    </template>
-    <template if:true={membershipSelected}>
-        <div class="slds-p-around_medium">
-            <my-membership></my-membership>
-        </div>
-    </template>
-    <template if:true={announcementsSelected}>
-        <my-announcements-parent></my-announcements-parent>
-    </template>
-    <template if:true={contactSelected}>
-        <my-contact></my-contact>
-    </template>
-    <template if:true={faqsSelected}>
-        <my-faqs></my-faqs>
-    </template>
+    <my-dynamic-component lwc:dynamic={dynamicCtor}></my-dynamic-component>
 </template>
