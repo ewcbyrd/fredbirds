@@ -144,15 +144,18 @@ export default class Events extends LightningElement {
     }
 
     getEventDate(startDate, endDate) {
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
         let dateText = '';
-        const startMonth = startDate.toLocaleString('default', { month: 'long' });
-        dateText = `${startMonth} ${startDate.getDate() + 1}`;
+        const startMonth = monthNames[startDate.getUTCMonth()];
+        dateText = `${startMonth} ${startDate.getUTCDate()}`;
         if (endDate) {
-            const endMonth = endDate.toLocaleString('default', { month: 'long' });
+            const endMonth = monthNames[endDate.getUTCMonth()];
             if (startMonth === endMonth) {
-                dateText += ` - ${endDate.getDate() + 1}`;
+                dateText += ` - ${endDate.getUTCDate()}`;
             } else {
-                dateText += ` - ${endMonth} ${endDate.getDate() + 1}`;
+                dateText += ` - ${endMonth} ${monthNames[endDate.getUTCDate()]}`;
             }
         }
         return dateText;
