@@ -1,0 +1,81 @@
+<template>
+    <template if:true={newsletters}>
+        <div class="slds-size_1-of-1">
+            <div class="slds-card">
+                <div class="slds-card__header">
+                    <div
+                        class="slds-media slds-media--center slds-has-flexi-truncate"
+                    >
+                        <span
+                            class="slds-icon_container slds-icon_container slds-icon-standard-document"
+                            title="Description of icon when needed"
+                        >
+                            <svg class="slds-icon" aria-hidden="true">
+                                <use
+                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#document"
+                                ></use>
+                            </svg>
+                        </span>
+                        <div class="slds-media__body">
+                            <h2
+                                class="slds-p-left_small slds-text-heading--small slds-wrap"
+                            >
+                                Newsletters
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-card__body">
+                    <div class="slds-scrollable--y" style="max-height: 450px">
+                        <table
+                            class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
+                        >
+                            <thead>
+                                <tr class="slds-text-heading--label">
+                                    <th scope="col">
+                                        <span class="slds-truncate"
+                                            >Year</span
+                                        >
+                                    </th>
+                                    <th scope="col">
+                                        <span class="slds-truncate"
+                                            >Issue</span
+                                        >
+                                    </th>
+                                    <th scope="col">
+                                        <span class="slds-truncate"
+                                            >Title</span
+                                        >
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template
+                                    for:each={newsletters}
+                                    for:item="newsletter"
+                                >
+                                    <tr
+                                        class="slds-hint-parent"
+                                        key={newsletter._id}
+                                        onclick={handleNewsletterClick}
+                                        data-item={newsletter._id}
+                                    >
+                                        <td class="slds-cell-wrap">
+                                            {newsletter.year}
+                                        </td>
+                                        <td class="slds-cell-wrap">
+                                            {newsletter.issue}
+                                        </td>
+                                        <td class="slds-cell-wrap">
+                                            {newsletter.title}
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+</template>
