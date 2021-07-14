@@ -1,9 +1,14 @@
 .slds-carousel__panel.panel-hide {
     display: none;
 }
-
+.slds-carousel__panel {
+    background-color: grey;
+}
 .slds-carousel__panel img {
-    max-height: 60vh !important;
+    max-height: 70vh !important;
+    width: auto;
+    margin: auto;
+    display: block;
 }
 
 .slds-carousel__image {

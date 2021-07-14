@@ -24,18 +24,26 @@ export default class Home extends LightningElement {
             href: '#'
         },
         {
-            image: 'resources/photos/Group1.jpg',
-            header: 'Occoquan Bay National Wildlife Refuge',
-            description: 'March 11, 2017',
+            image: 'resources/photos/IMG_0844.JPG',
+            header: 'Highland County, VA',
+            description: 'June 2014',
             href: '#'
         },
         {
-            image: 'resources/photos/P1020092.jpg',
+            image: 'resources/photos/IMG_0552.JPG',
+            header: 'George Washington Birthplace National Monument',
+            description: 'Feb 2014',
             href: '#'
         },
         {
             image: 'resources/photos/Photo-Op.jpg',
             header: 'Mattamuskeet National Wildlife Refuge',
+            href: '#'
+        },
+        {
+            image: 'resources/photos/IMG_3301.JPG',
+            header: 'Occoquan Bay National Wildlife Refuge',
+            description: 'April 23. 2016',
             href: '#'
         }
     ];
