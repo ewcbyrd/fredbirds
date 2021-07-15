@@ -13,8 +13,9 @@ export default class Home extends LightningElement {
             href: '#'
         },
         {
-            image: 'resources/photos/CBBT.jpg',
+            image: 'resources/photos/CBBT.jpeg',
             header: 'Chesapeake Bay Bridge Tunnel',
+            description: 'October 2009',
             href: '#'
         },
         {
@@ -38,12 +39,25 @@ export default class Home extends LightningElement {
         {
             image: 'resources/photos/Photo-Op.jpg',
             header: 'Mattamuskeet National Wildlife Refuge',
+            description: 'Feb 2013',
             href: '#'
         },
         {
             image: 'resources/photos/IMG_3301.JPG',
             header: 'Occoquan Bay National Wildlife Refuge',
             description: 'April 23. 2016',
+            href: '#'
+        },
+        {
+            image: 'resources/photos/P1020092.jpeg',
+            header: 'Delaware Shore',
+            description: 'September 2013',
+            href: '#'
+        },
+        {
+            image: 'resources/photos/Leesylvania-Group.jpeg',
+            header: 'Leesylvania State Park',
+            description: 'May 14, 2016',
             href: '#'
         }
     ];
