@@ -1,13 +1,15 @@
 import { LightningElement } from 'lwc';
 import {
     getNearbyNotableObservations,
-    getNotableSightingsByLocation
+    getNotableSightingsByLocation,
+    getNearbyObservations
 } from 'data/ebirdService';
 
 export default class Resources extends LightningElement {
     localSightings;
     localSightingsDaysBack = 3;
     stateSightings;
+    nearbySightings;
     vaSightingsDaysBack = 1;
     selectedSightings = [];
     nearbySelected = false;
@@ -19,6 +21,9 @@ export default class Resources extends LightningElement {
     connectedCallback() {
         this.getLocalSightings();
         this.getVirginiaNotableSightings();
+        if (navigator.geolocation) {
+            this.getNearbyObservations();
+        }
     }
 
     get localSightingsHeader() {
@@ -46,8 +51,25 @@ export default class Resources extends LightningElement {
         });
     }
 
+    getNearbyObservations() {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const opts = {
+                lat: position.coords.latitude,
+                long: position.coords.longitude
+            };
+            getNearbyObservations(opts)
+            .then((result) => {
+                this.nearbySightings = result;
+            })
+        })
+    }
+
     get stateSightingsHeader() {
         return `Notable Virginia Sightings for the past day`;
+    }
+
+    get nearbySightingsHeader() {
+        return 'Nearby Sightings for the past 7 days';
     }
 
     handleSightingsSelected(event) {
@@ -62,6 +84,7 @@ export default class Resources extends LightningElement {
         this.selectedSightings = undefined;
         ['nearby', 'local', 'state'].forEach((item) => {this[`${item}Selected`] = false});
         this[`${this.view}Selected`] = event.target.checked;
+        
     }
     
     get sightings() {
@@ -70,5 +93,9 @@ export default class Resources extends LightningElement {
 
     get sightingsHeader() {
         return this[`${this.view}SightingsHeader`];
+    }
+
+    get nearbyDisabled() {
+        return !navigator.geolocation;
     }
 }

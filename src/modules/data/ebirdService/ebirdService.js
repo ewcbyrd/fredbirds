@@ -37,6 +37,16 @@ export const getNearbyNotableObservations = ({
     return callout(url);
 };
 
+export const getNearbyObservations = ({
+    lat,
+    long,
+    dist = 5,
+    daysBack = 7
+}) => {
+    const url = `${root}sightings/nearby?lat=${lat}&lng=${long}&dist=${dist}&back=${daysBack}`;
+    return callout(url);
+};
+
 export const getNotableSightingsByLocation = ({
     regionCode,
     daysBack = 14
