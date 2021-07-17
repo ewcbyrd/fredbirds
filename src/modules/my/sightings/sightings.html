@@ -3,69 +3,81 @@
         <div class="slds-size_1-of-1">
             <div class="slds-card">
                 <div class="slds-card__header">
-                    <div
-                        class="slds-media slds-media--center slds-has-flexi-truncate"
-                    >
-                        <span
-                            class="slds-icon_container slds-icon_container slds-icon-standard-forecasts"
-                            title="Description of icon when needed"
-                        >
+                    <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                        <span class="slds-icon_container slds-icon_container slds-icon-standard-forecasts"
+                            title="Description of icon when needed">
                             <svg class="slds-icon" aria-hidden="true">
-                                <use
-                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#forecasts"
-                                ></use>
+                                <use xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#forecasts"></use>
                             </svg>
                         </span>
                         <div class="slds-media__body">
-                            <h2
-                                class="slds-p-left_small slds-text-heading--small slds-wrap"
-                            >
+                            <h2 class="slds-p-left_small slds-text-heading--small slds-wrap">
                                 {header}
-                                <lightning-helptext class="slds-var-p-left_small" content="Click on a species to see a list of sightings for that species."></lightning-helptext>
+                                <lightning-helptext class="slds-var-p-left_small"
+                                    content="Click on a species to see a list of sightings for that species.">
+                                </lightning-helptext>
                             </h2>
                         </div>
                     </div>
                 </div>
                 <div class="slds-card__body">
                     <div class="slds-scrollable--y" style="max-height: 450px">
-                        <table
-                            class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
-                        >
-                            <thead>
-                                <tr class="slds-text-heading--label">
-                                    <th scope="col">
-                                        <span class="slds-truncate"
-                                            >Species</span
-                                        >
-                                    </th>
-                                    <th scope="col">
-                                        <span class="slds-truncate"
-                                            >Location</span
-                                        >
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <template
-                                    for:each={sightingList}
-                                    for:item="sighting"
-                                >
-                                    <tr
-                                        class="slds-hint-parent"
-                                        key={sighting.id}
-                                        onclick={handleSightingClick}
-                                        data-id={sighting.id}
-                                    >
-                                        <td class="slds-cell-wrap">
-                                            {sighting.name}
-                                        </td>
-                                        <td class="slds-cell-wrap">
-                                            {sighting.locations}
-                                        </td>
+                        <template if:true={showLocations}>
+                            <table
+                                class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                                <thead>
+                                    <tr class="slds-text-heading--label">
+                                        <th scope="col">
+                                            <span class="slds-truncate">Species</span>
+                                        </th>
+                                        <th scope="col">
+                                            <span class="slds-truncate">Location</span>
+                                        </th>
                                     </tr>
-                                </template>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <template for:each={sightingList} for:item="sighting">
+                                        <tr class="slds-hint-parent" key={sighting.id} onclick={handleSightingClick}
+                                            data-id={sighting.id}>
+                                            <td class="slds-cell-wrap">
+                                                {sighting.name}
+                                            </td>
+                                            <td class="slds-cell-wrap">
+                                                {sighting.locations}
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </template>
+                        <template if:false={showLocations}>
+                            <table
+                                class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                                <thead>
+                                    <tr class="slds-text-heading--label">
+                                        <th scope="col">
+                                            <span class="slds-truncate">Species</span>
+                                        </th>
+                                        <th scope="col">
+                                            <span class="slds-truncate">Scientific Name</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={sightingList} for:item="sighting">
+                                        <tr class="slds-hint-parent" key={sighting.id} onclick={handleSightingClick}
+                                            data-id={sighting.id}>
+                                            <td class="slds-cell-wrap">
+                                                {sighting.name}
+                                            </td>
+                                            <td class="slds-cell-wrap">
+                                                <i>{sighting.scientific}</i>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </template>
                     </div>
                 </div>
             </div>
