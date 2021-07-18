@@ -5,6 +5,8 @@ export default class Sightings extends LightningElement {
     @api header;
     @api viewtype;
 
+    rarebirds = new Set(JSON.parse(sessionStorage.getItem('rarebirds')).map(item => item['Scientific Name']));
+
     get sightingList() {
         if (this.sightings.length === 0) {
             return [{id: '0', name: 'None'}];
@@ -13,14 +15,15 @@ export default class Sightings extends LightningElement {
         const speciesSet = new Set(this.sightings.map(item => item.comName));
         speciesSet.forEach((species) => {
             let matches = this.sightings.filter(item => item.comName === species);
-            let locations = new Set(matches.map(item => item.subnational2Name));
+            let locations = this.viewtype === 'us' ? [...new Set(matches.map(item => `${item.subnational2Name}, ${item.subnational1Name}`))].sort() : new Set(matches.map(item => item.subnational2Name));
             filteredList.push(
                 {
                     id: matches[0].speciesCode, 
                     name: species, 
-                    locations: Array.from(locations).join(', '),
+                    locations: this.viewtype === 'us' ? Array.from(locations).join('; ') : Array.from(locations).join(', '),
                     mostRecent: Math.max(...matches.map(e => new Date(e.obsDt))),
-                    scientific: matches[0].sciName
+                    scientific: matches[0].sciName,
+                    class: this.rarebirds.has(matches[0].sciName) ? 'slds-cell-wrap rare' : 'slds-cell-wrap'
                 }
             );
         });

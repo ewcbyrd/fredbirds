@@ -19,3 +19,7 @@
     font-family: 'Playfair Display';
     letter-spacing: 5px;
 }
+
+.slds-context-bar {
+    height: 3.5rem;
+}

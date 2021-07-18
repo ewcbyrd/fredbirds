@@ -1,15 +1,29 @@
 import { LightningElement } from 'lwc';
 import { getRegions } from 'data/ebirdService';
+import { getRareBirds } from 'data/restdbService'
 
 export default class App extends LightningElement {
     dynamicCtor;
     
     async connectedCallback() {
-        let regions = sessionStorage.getItem('regions');
+        const regions = sessionStorage.getItem('regions');
         const regOpts = {};
         if (!regions) {
             getRegions(regOpts).then((result) => {
                 sessionStorage.setItem('regions', JSON.stringify(result));
+            });
+        }
+        const rarebirds = sessionStorage.getItem('rarebirds');
+        if (!rarebirds) {
+            getRareBirds()
+            .then((response) => {
+                return response.json();
+            })
+            .then((results) => {
+                sessionStorage.setItem('rarebirds', JSON.stringify(results));
+            })
+            .catch((error) => {
+                console.log(error);
             });
         }
         const ctor = await import('my/home');
@@ -17,8 +31,6 @@ export default class App extends LightningElement {
     }
 
     handleMenuClick(event) {
-        if (this.birdsOpen) this.handleBirdsClick();
-        if (this.clubOpen) this.handleClubClick();
         this.displayComponent(event.target.title);
     }
 

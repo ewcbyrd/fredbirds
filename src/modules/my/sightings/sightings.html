@@ -39,7 +39,7 @@
                                     <template for:each={sightingList} for:item="sighting">
                                         <tr class="slds-hint-parent" key={sighting.id} onclick={handleSightingClick}
                                             data-id={sighting.id}>
-                                            <td class="slds-cell-wrap">
+                                            <td class={sighting.class}>
                                                 {sighting.name}
                                             </td>
                                             <td class="slds-cell-wrap">
