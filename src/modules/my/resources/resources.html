@@ -3,40 +3,11 @@
     class="slds-grid slds-wrap slds-gutters slds-p-left_medium slds-p-right_medium main slds-p-bottom_xx-large slds-p-top_medium">
     <div
       class="slds-col slds-large-size_1-of-3 slds-small-size_1-of-1 slds-p-left_x-small slds-text-align_center slds-p-bottom_small">
-      <fieldset class="slds-form-element">
-        <div class="slds-form-element__control">
-          <div class="slds-radio_button-group">
-            <span class="slds-button slds-radio_button">
-              <input class="nearby" type="radio" name="sightings" id="nearby" value="nearby"
-                onchange={handleSightingsChange} checked={nearbySelected} disabled={nearbyDisabled} />
-              <label class="slds-radio_button__label" for="nearby">
-                <span class="slds-radio_faux">Nearby</span>
-              </label>
-            </span>
-            <span class="slds-button slds-radio_button">
-              <input class="local" type="radio" name="sightings" id="local" value="local"
-                onchange={handleSightingsChange} checked={localSelected} />
-              <label class="slds-radio_button__label" for="local">
-                <span class="slds-radio_faux">Local</span>
-              </label>
-            </span>
-            <span class="slds-button slds-radio_button">
-              <input class="state" type="radio" name="sightings" id="state" value="state"
-                onchange={handleSightingsChange} checked={stateSelected} />
-              <label class="slds-radio_button__label" for="state">
-                <span class="slds-radio_faux">State</span>
-              </label>
-            </span>
-            <span class="slds-button slds-radio_button">
-              <input class="state" type="radio" name="custom" id="custom" value="cutom" onchange={handleSightingsChange}
-                checked={customSelected} disabled />
-              <label class="slds-radio_button__label" for="custom">
-                <span class="slds-radio_faux">Custom</span>
-              </label>
-            </span>
-          </div>
-        </div>
-      </fieldset>
+      <lightning-radio-group name="radioGroup"
+                           options={options}
+                           value={view}
+                           type="button"
+                           onchange={handleSightingsChange}></lightning-radio-group>
     </div>
     <div class="slds-col slds-large-size_2-of-3 slds-small-size_1-of-1"></div>
     <div class="slds-col slds-large-size_1-of-3 slds-small-size_1-of-1 slds-p-left_x-small">
@@ -44,7 +15,8 @@
 
       </div>
       <div>
-        <my-sightings sightings={sightings} header={sightingsHeader} viewtype={view} onsightingselected={handleSightingsSelected}>
+        <my-sightings sightings={sightings} header={sightingsHeader} viewtype={view}
+          onsightingselected={handleSightingsSelected}>
         </my-sightings>
       </div>
     </div>

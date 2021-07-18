@@ -2,3 +2,8 @@ table {
     table-layout: fixed;
     width: 100%;
 }
+
+.rare {
+    color: red;
+    font-weight: bold;
+}

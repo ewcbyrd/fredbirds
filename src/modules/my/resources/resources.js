@@ -10,6 +10,7 @@ export default class Resources extends LightningElement {
     localSightingsDaysBack = 3;
     stateSightings;
     nearbySightings;
+    usSightings;
     vaSightingsDaysBack = 1;
     selectedSightings = [];
     nearbySelected = false;
@@ -24,6 +25,7 @@ export default class Resources extends LightningElement {
         if (navigator.geolocation) {
             this.getNearbyObservations();
         }
+        this.getUsNotableSightings();
     }
 
     get localSightingsHeader() {
@@ -64,12 +66,26 @@ export default class Resources extends LightningElement {
         })
     }
 
+    getUsNotableSightings() {
+        const opts = {
+            regionCode: 'US',
+            daysBack: this.vaSightingsDaysBack
+        };
+        getNotableSightingsByLocation(opts).then((result) => {
+            this.usSightings = result;
+        });
+    }
+
     get stateSightingsHeader() {
         return `Notable Virginia Sightings for the past day`;
     }
 
     get nearbySightingsHeader() {
         return 'Nearby Sightings for the past 7 days';
+    }
+
+    get usSightingsHeader() {
+        return `Notable United States Sightings for the past day`;
     }
 
     handleSightingsSelected(event) {
@@ -97,5 +113,14 @@ export default class Resources extends LightningElement {
 
     get nearbyDisabled() {
         return !navigator.geolocation;
+    }
+
+    get options() {
+        return [
+            { label: 'Nearby', value: 'nearby' },
+            { label: 'Local', value: 'local' },
+            { label: 'Virginia', value: 'state'},
+            { label: 'United States', value: 'us'}
+        ];
     }
 }
