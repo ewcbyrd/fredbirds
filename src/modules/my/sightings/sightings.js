@@ -16,16 +16,18 @@ export default class Sightings extends LightningElement {
         speciesSet.forEach((species) => {
             let matches = this.sightings.filter(item => item.comName === species);
             let locations = this.viewtype === 'us' ? [...new Set(matches.map(item => `${item.subnational2Name}, ${item.subnational1Name}`))].sort() : new Set(matches.map(item => item.subnational2Name));
-            filteredList.push(
-                {
-                    id: matches[0].speciesCode, 
-                    name: species, 
-                    locations: this.viewtype === 'us' ? Array.from(locations).join('; ') : Array.from(locations).join(', '),
-                    mostRecent: Math.max(...matches.map(e => new Date(e.obsDt))),
-                    scientific: matches[0].sciName,
-                    class: this.rarebirds.has(matches[0].sciName) ? 'slds-cell-wrap rare' : 'slds-cell-wrap'
-                }
-            );
+            if (this.viewtype !== 'us' || (this.viewtype === 'us' && this.rarebirds.has(matches[0].sciName))) {
+                filteredList.push(
+                    {
+                        id: matches[0].speciesCode, 
+                        name: species, 
+                        locations: this.viewtype === 'us' ? Array.from(locations).join('; ') : Array.from(locations).join(', '),
+                        mostRecent: Math.max(...matches.map(e => new Date(e.obsDt))),
+                        scientific: matches[0].sciName,
+                        class: this.rarebirds.has(matches[0].sciName) && this.viewtype !== 'us' ? 'slds-cell-wrap rare' : 'slds-cell-wrap'
+                    }
+                );
+            }
         });
         return filteredList.sort((a, b) => {return a.name > b.name ? 1 : -1});
     }

@@ -5,6 +5,7 @@ export default class Announcements extends LightningElement {
     @api home = false;
     @api numRows = 2;
     announcements = [];
+    announcement;
 
     connectedCallback() {
         this.fetchAnnouncements();

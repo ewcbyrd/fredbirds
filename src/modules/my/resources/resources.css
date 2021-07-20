@@ -1,3 +1,5 @@
-/*.main {
-    background-color: white;
-}*/
+.state-combobox {
+    width: 150px; 
+    margin: auto; 
+    text-align: left
+}

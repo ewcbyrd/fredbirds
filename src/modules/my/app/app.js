@@ -1,6 +1,6 @@
 import { LightningElement } from 'lwc';
 import { getRegions } from 'data/ebirdService';
-import { getRareBirds } from 'data/restdbService'
+import { getRareBirds } from 'data/restdbService';
 
 export default class App extends LightningElement {
     dynamicCtor;

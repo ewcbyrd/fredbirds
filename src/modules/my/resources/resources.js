@@ -2,8 +2,9 @@ import { LightningElement } from 'lwc';
 import {
     getNearbyNotableObservations,
     getNotableSightingsByLocation,
-    getNearbyObservations
+    getNearbyObservations,
 } from 'data/ebirdService';
+import { getStates } from 'data/restdbService';
 
 export default class Resources extends LightningElement {
     localSightings;
@@ -13,19 +14,20 @@ export default class Resources extends LightningElement {
     usSightings;
     vaSightingsDaysBack = 1;
     selectedSightings = [];
-    nearbySelected = false;
-    localSelected = true;
-    stateSelected = false;
-    customSelected = false;
     view = 'local';
+    stateOptions = [];
+    state = 'US-VA'
+    stateLabel = 'Virginia';
+    filter = 'rare';
 
     connectedCallback() {
         this.getLocalSightings();
-        this.getVirginiaNotableSightings();
+        this.getStateNotableSightings();
         if (navigator.geolocation) {
             this.getNearbyObservations();
         }
         this.getUsNotableSightings();
+        this.getStateOptions();
     }
 
     get localSightingsHeader() {
@@ -43,9 +45,9 @@ export default class Resources extends LightningElement {
         });
     }
 
-    getVirginiaNotableSightings() {
+    getStateNotableSightings() {
         const opts = {
-            regionCode: 'US-VA',
+            regionCode: this.state,
             daysBack: this.vaSightingsDaysBack
         };
         getNotableSightingsByLocation(opts).then((result) => {
@@ -69,15 +71,36 @@ export default class Resources extends LightningElement {
     getUsNotableSightings() {
         const opts = {
             regionCode: 'US',
-            daysBack: this.vaSightingsDaysBack
+            daysBack: 3
         };
         getNotableSightingsByLocation(opts).then((result) => {
             this.usSightings = result;
         });
     }
 
+    getStateOptions() {
+        let states = sessionStorage.getItem('states');
+        if (states) {
+            this.stateOptions = JSON.parse(states);
+        } else {
+            getStates()
+            .then((response) => {
+                return response.json();
+            })
+            .then((results) => {
+                results.forEach((item) => {
+                    this.stateOptions.push({label: item.state, value: item.code});
+                });
+                sessionStorage.setItem('states', JSON.stringify(this.stateOptions));
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+        }
+    }
+
     get stateSightingsHeader() {
-        return `Notable Virginia Sightings for the past day`;
+        return `Notable ${this.stateLabel} Sightings for the past day`;
     }
 
     get nearbySightingsHeader() {
@@ -85,7 +108,7 @@ export default class Resources extends LightningElement {
     }
 
     get usSightingsHeader() {
-        return `Notable United States Sightings for the past day`;
+        return `Rare United States Sightings for the past 3 days`;
     }
 
     handleSightingsSelected(event) {
@@ -98,9 +121,6 @@ export default class Resources extends LightningElement {
     handleSightingsChange(event) {        
         this.view = event.target.value;
         this.selectedSightings = undefined;
-        ['nearby', 'local', 'state'].forEach((item) => {this[`${item}Selected`] = false});
-        this[`${this.view}Selected`] = event.target.checked;
-        
     }
     
     get sightings() {
@@ -119,8 +139,27 @@ export default class Resources extends LightningElement {
         return [
             { label: 'Nearby', value: 'nearby' },
             { label: 'Local', value: 'local' },
-            { label: 'Virginia', value: 'state'},
+            { label: 'State', value: 'state'},
             { label: 'United States', value: 'us'}
         ];
+    }
+
+    get filterOptions() {
+        return [
+            { label: 'Rare', value: 'rare' },
+            { label: 'Notable', value: 'notable' },
+            { label: 'All', value: 'all'}
+        ];
+    }
+
+    get showStateSelect() {
+        return this.view === 'state';
+    }
+
+    handleStateChange(event) {
+        
+        this.state = event.target.value;
+        this.stateLabel = this.stateOptions.find((item) => item.value === this.state).label;
+        this.getStateNotableSightings();
     }
 }

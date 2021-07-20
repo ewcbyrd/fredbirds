@@ -3,11 +3,15 @@
     class="slds-grid slds-wrap slds-gutters slds-p-left_medium slds-p-right_medium main slds-p-bottom_xx-large slds-p-top_medium">
     <div
       class="slds-col slds-large-size_1-of-3 slds-small-size_1-of-1 slds-p-left_x-small slds-text-align_center slds-p-bottom_small">
-      <lightning-radio-group name="radioGroup"
-                           options={options}
-                           value={view}
-                           type="button"
-                           onchange={handleSightingsChange}></lightning-radio-group>
+      <lightning-radio-group name="area" options={options} value={view} type="button" onchange={handleSightingsChange}>
+      </lightning-radio-group>
+      <lightning-radio-group name="filter" options={filterOptions} value={filter} type="button"
+        onchange={handleFilterChange}></lightning-radio-group>
+      <template if:true={showStateSelect}>
+        <div class="state-combobox">
+          <lightning-combobox options={stateOptions} value={state} onchange={handleStateChange}></lightning-combobox>
+        </div>
+      </template>
     </div>
     <div class="slds-col slds-large-size_2-of-3 slds-small-size_1-of-1"></div>
     <div class="slds-col slds-large-size_1-of-3 slds-small-size_1-of-1 slds-p-left_x-small">
