@@ -1,7 +1,7 @@
 <template>
     <template if:true={newsletters}>
         <div class="slds-size_1-of-1">
-            <div class="slds-card">
+            <!--<div class="slds-card">
                 <div class="slds-card__header">
                     <div
                         class="slds-media slds-media--center slds-has-flexi-truncate"
@@ -76,6 +76,133 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>-->
+            <div style="display:flex;width:100%;height:42rem">
+                <div class="slds-split-view_container slds-is-open">
+                    <!--<button
+                        class="slds-button slds-button_icon slds-button_icon slds-split-view__toggle-button slds-is-open"
+                        aria-controls="split-view-id" aria-expanded="true" title="Close Split View">
+                        <svg class="slds-button__icon slds-button__icon_x-small" aria-hidden="true">
+                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#left"></use>
+                        </svg>
+                        <span class="slds-assistive-text">Close Split View</span>
+                    </button>-->
+                    <article aria-hidden="false" id="split-view-id"
+                        class="slds-split-view slds-grid slds-grid_vertical slds-grow">
+                        <header class="slds-split-view__header">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_xx-small">
+                                <div class="slds-has-flexi-truncate">
+                                    <div class="slds-media slds-media_center">
+                                        <div class="slds-media__figure">
+                                            <div class="slds-icon_container slds-icon-standard-document">
+                                                <svg class="slds-icon" aria-hidden="true">
+                                                    <use
+                                                        xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#document">
+                                                    </use>
+                                                </svg>
+                                                <span class="slds-assistive-text">Newsletters</span>
+                                            </div>
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <h1
+                                                class="slds-text-heading_small slds-text-color_default slds-p-right_x-small">
+                                                <button
+                                                    class="slds-button slds-button_reset slds-type-focus slds-truncate"
+                                                    aria-haspopup="true" title="">
+                                                    <span
+                                                        class="slds-grid slds-has-flexi-truncate slds-grid_vertical-align-center">
+                                                        <span class="slds-truncate" title="Newsletters">Newsletters</span>
+                                                        <!--<svg class="slds-button__icon slds-button__icon_right slds-no-flex"
+                                                            aria-hidden="true">
+                                                            <use
+                                                                xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#down">
+                                                            </use>
+                                                        </svg>-->
+                                                    </span>
+                                                </button>
+                                            </h1>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--<div class="slds-no-flex slds-grid">
+                                    <button class="slds-button slds-button_icon slds-button_icon-border-filled"
+                                        aria-haspopup="true" title="More Actions">
+                                        <svg class="slds-button__icon" aria-hidden="true">
+                                            <use xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#down"></use>
+                                        </svg>
+                                        <span class="slds-assistive-text">More Actions</span>
+                                    </button>
+                                </div>-->
+                            </div>
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <p class="slds-text-body_small slds-text-color_weak">{numNewsletters} items • Updated <lightning-formatted-date-time value={retrieved} year="numeric" month="numeric" day="numeric" hour="2-digit"
+                                    minute="2-digit" hour12="true"></lightning-formatted-date-time></p>
+                                <div class="slds-no-flex slds-grid slds-col_bump-left">
+                                    <!--<div class="slds-button-group">
+                                        <button
+                                            class="slds-button slds-button_icon slds-button_icon slds-button_icon-container-more"
+                                            aria-haspopup="true" title="Display As Split View">
+                                            <svg class="slds-button__icon" aria-hidden="true">
+                                                <use
+                                                    xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#side_list">
+                                                </use>
+                                            </svg>
+                                            <svg class="slds-button__icon slds-button__icon_x-small" aria-hidden="true">
+                                                <use xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#down">
+                                                </use>
+                                            </svg>
+                                            <span class="slds-assistive-text">Display As Split View</span>
+                                        </button>
+                                    </div>-->
+                                    <div class="slds-button-group">
+                                        <button onclick={retrieveNewsletters}
+                                            class="slds-button slds-button_icon slds-button_icon slds-button_icon-container"
+                                            title="Refresh List">
+                                            <svg class="slds-button__icon" aria-hidden="true">
+                                                <use xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#refresh">
+                                                </use>
+                                            </svg>
+                                            <span class="slds-assistive-text">Refresh List</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </header>
+                        <div class="slds-grid slds-grid_vertical">
+                            <div class="slds-split-view__list-header slds-grid">
+                                <span class="slds-assistive-text">Sorted by:</span>
+                                <span>Date
+                                    <svg class="slds-icon slds-icon_xx-small slds-icon-text-default slds-align-top"
+                                        aria-hidden="true">
+                                        <use xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#arrowdown"></use>
+                                    </svg>
+                                </span>
+                                <span class="slds-assistive-text">- Descending</span>
+                            </div>
+                            <ul aria-multiselectable="true" class="slds-scrollable_y" role="listbox"
+                                aria-label="Select an item to open it in a new workspace tab.">
+                                <template for:each={newsletters} for:item="newsletter">
+                                <li key={newsletter._id} class="slds-split-view__list-item" role="presentation" onclick={handleNewsletterClick} data-item={newsletter._id} >
+                                    <a href="javascript:void(0);" aria-selected="false" role="option" data-item={newsletter._id}
+                                        class="item slds-split-view__list-item-action slds-grow slds-has-flexi-truncate"
+                                        tabindex="0"> 
+                                        <div class="slds-grid slds-wrap">
+                                            <span class="slds-truncate slds-text-body_regular slds-text-color_default"
+                                                title={newsletter.title}>{newsletter.title}</span>
+                                            <!--<span class="slds-truncate slds-col_bump-left" title="99">99</span>-->
+                                        </div>
+                                        <div class="slds-grid slds-wrap">
+                                            <span class="slds-truncate" title={newsletter.year}>Volume {newsletter.year}, Issue {newsletter.issue}</span>
+                                            <!--<span class="slds-truncate slds-col_bump-left"
+                                                title={newsletter.issue}>Issue {newsletter.issue}</span>-->
+                                        </div>
+                                    </a>
+                                </li>
+                                </template>
+                            </ul>
+                        </div>
+                    </article>
                 </div>
             </div>
         </div>
