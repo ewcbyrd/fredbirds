@@ -1,86 +1,157 @@
 <template>
     <template if:true={sightings}>
         <div class="slds-size_1-of-1">
-            <div class="slds-card">
-                <div class="slds-card__header">
-                    <div class="slds-media slds-media--center slds-has-flexi-truncate">
-                        <span class="slds-icon_container slds-icon_container slds-icon-standard-forecasts"
-                            title="Description of icon when needed">
-                            <svg class="slds-icon" aria-hidden="true">
-                                <use xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#forecasts"></use>
-                            </svg>
-                        </span>
-                        <div class="slds-media__body">
-                            <h2 class="slds-p-left_small slds-text-heading--small slds-wrap">
-                                {header}
-                                <lightning-helptext class="slds-var-p-left_small"
-                                    content="Click on a species to see a list of sightings for that species.">
-                                </lightning-helptext>
-                            </h2>
+            <article
+                aria-hidden="false"
+                id="split-view-id"
+                class="slds-split-view slds-grid slds-grid_vertical slds-grow"
+            >
+                <header class="slds-split-view__header">
+                    <div
+                        class="
+                            slds-grid slds-grid_vertical-align-center
+                            slds-m-bottom_xx-small
+                        "
+                    >
+                        <div class="slds-has-flexi-truncate">
+                            <div class="slds-media slds-media_center">
+                                <div class="slds-media__figure">
+                                    <div
+                                        class="
+                                            slds-icon_container
+                                            slds-icon-standard-forecasts
+                                        "
+                                    >
+                                        <svg
+                                            class="slds-icon"
+                                            aria-hidden="true"
+                                        >
+                                            <use
+                                                xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#forecasts"
+                                            ></use>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="slds-media__body">
+                                    <h1
+                                        class="
+                                            slds-text-heading_small
+                                            slds-text-color_default
+                                            slds-p-right_x-small
+                                        "
+                                    >
+                                        <button
+                                            class="
+                                                slds-button slds-button_reset
+                                                slds-type-focus slds-truncate
+                                            "
+                                            aria-haspopup="true"
+                                            title=""
+                                        >
+                                            <span
+                                                class="
+                                                    slds-grid
+                                                    slds-has-flexi-truncate
+                                                    slds-grid_vertical-align-center
+                                                "
+                                            >
+                                                <span
+                                                    class="slds-truncate"
+                                                    title={header}
+                                                >
+                                                    {header}
+                                                </span>
+                                            </span>
+                                        </button>
+                                    </h1>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="slds-card__body">
-                    <div class="slds-scrollable--y" style="max-height: 450px">
-                        <template if:true={showLocations}>
-                            <table
-                                class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
-                                <thead>
-                                    <tr class="slds-text-heading--label">
-                                        <th scope="col">
-                                            <span class="slds-truncate">Species</span>
-                                        </th>
-                                        <th scope="col">
-                                            <span class="slds-truncate">Location</span>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template for:each={sightingList} for:item="sighting">
-                                        <tr class="slds-hint-parent" key={sighting.id} onclick={handleSightingClick}
-                                            data-id={sighting.id}>
-                                            <td class={sighting.class}>
-                                                {sighting.name}
-                                            </td>
-                                            <td class="slds-cell-wrap">
-                                                {sighting.locations}
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </template>
-                        <template if:false={showLocations}>
-                            <table
-                                class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
-                                <thead>
-                                    <tr class="slds-text-heading--label">
-                                        <th scope="col">
-                                            <span class="slds-truncate">Species</span>
-                                        </th>
-                                        <th scope="col">
-                                            <span class="slds-truncate">Scientific Name</span>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template for:each={sightingList} for:item="sighting">
-                                        <tr class="slds-hint-parent" key={sighting.id} onclick={handleSightingClick}
-                                            data-id={sighting.id}>
-                                            <td class="slds-cell-wrap">
-                                                {sighting.name}
-                                            </td>
-                                            <td class="slds-cell-wrap">
-                                                <i>{sighting.scientific}</i>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </template>
+                </header>
+                <div class="slds-grid slds-grid_vertical">
+                    <div class="slds-split-view__list-header slds-grid">
+                        <span class="slds-assistive-text">Sorted by:</span>
+                        <span>
+                            Date
+                            <svg
+                                class="
+                                    slds-icon slds-icon_xx-small
+                                    slds-icon-text-default slds-align-top
+                                "
+                                aria-hidden="true"
+                            >
+                                <use
+                                    xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#arrowdown"
+                                ></use>
+                            </svg>
+                        </span>
+                        <span class="slds-assistive-text">- Descending</span>
                     </div>
+                    <ul
+                        aria-multiselectable="true"
+                        class="slds-scrollable_y"
+                        role="listbox"
+                        aria-label="Select an item to open it in a new workspace tab."
+                        style="height: 450px"
+                    >
+                        <template for:each={sightingList} for:item="sighting">
+                            <li
+                                key={sighting.id}
+                                class="slds-split-view__list-item"
+                                role="presentation"
+                                onclick={handleSightingClick}
+                                data-id={sighting.id}
+                            >
+                                <a
+                                    href="javascript:void(0);"
+                                    aria-selected="false"
+                                    role="option"
+                                    data-id={sighting.id}
+                                    class="
+                                        item
+                                        slds-split-view__list-item-action
+                                        slds-grow slds-has-flexi-truncate
+                                    "
+                                    tabindex="0"
+                                >
+                                    <div class="slds-grid slds-wrap">
+                                        <span
+                                            class="
+                                                slds-truncate
+                                                slds-text-body_regular
+                                                slds-text-color_default
+                                            "
+                                            title={sighting.name}
+                                        >
+                                            {sighting.name}
+                                        </span>
+                                        <span
+                                            class="
+                                                slds-truncate
+                                                slds-col_bump-left
+                                            "
+                                            title="Most Recent Observation"
+                                        >
+                                            <lightning-formatted-date-time
+                                                value={sighting.mostRecent}
+                                            ></lightning-formatted-date-time>
+                                        </span>
+                                    </div>
+                                    <div class="slds-grid slds-wrap">
+                                        <span
+                                            class="slds-truncate"
+                                            title={sighting.locations}
+                                        >
+                                            {sighting.locations}
+                                        </span>
+                                    </div>
+                                </a>
+                            </li>
+                        </template>
+                    </ul>
                 </div>
-            </div>
+            </article>
         </div>
     </template>
 </template>
