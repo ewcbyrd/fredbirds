@@ -1,0 +1,92 @@
+<template>
+    <div>
+        <div class="slds-card">
+            <div class="slds-card__header">
+                <div
+                    class="
+                        slds-media slds-media--center
+                        slds-has-flexi-truncate
+                    "
+                >
+                    <span
+                        class="
+                            slds-icon_container slds-icon_container
+                            slds-icon-standard-forecasts
+                        "
+                        title="Description of icon when needed"
+                    >
+                        <svg class="slds-icon" aria-hidden="true">
+                            <use
+                                xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#forecasts"
+                            ></use>
+                        </svg>
+                    </span>
+                    <div class="slds-media__body">
+                        <h2 class="slds-p-left_small slds-card__header-title">
+                            Notable Regional Sightings
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-card__body">
+                <table
+                    class="
+                        fixed_header
+                        slds-table
+                        slds-table_cell-buffer
+                        slds-table_bordered
+                        slds-table_col-bordered
+                    "
+                >
+                    <thead>
+                        <tr class="slds-text-heading--label">
+                            <th scope="col">
+                                <span class="slds-truncate">Date</span>
+                            </th>
+                            <th scope="col">
+                                <span class="slds-truncate">Species</span>
+                            </th>
+                            <th scope="col">
+                                <span class="slds-truncate">County/City</span>
+                            </th>
+                            <th scope="col">
+                                <span class="slds-truncate">Location</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={localSightings} for:item="sighting">
+                            <tr class="slds-hint-parent" key={sighting.obsId}>
+                                <td class="slds-cell-wrap">
+                                    <lightning-formatted-date-time
+                                        value={sighting.obsDt}
+                                        day="2-digit"
+                                        month="long"
+                                    ></lightning-formatted-date-time>
+                                </td>
+                                <td class="slds-cell-wrap">
+                                    {sighting.comName}
+                                </td>
+                                <td class="slds-cell-wrap">
+                                    {sighting.subnational2Name}
+                                </td>
+                                <td class="slds-cell-wrap">
+                                    {sighting.locName}
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+            <footer class="slds-card__footer">
+                <a
+                    class="slds-card__footer-action"
+                    href="#"
+                    onclick={handleViewAllSightingsClick}
+                >
+                    View All Sightings
+                </a>
+            </footer>
+        </div>
+    </div>
+</template>
