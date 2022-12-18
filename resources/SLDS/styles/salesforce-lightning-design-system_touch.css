@@ -1,5 +1,4 @@
-/*! Lightning Design System 2.15.9 */
-@charset "UTF-8";
+/*! Lightning Design System 2.19.0 */
 @media (pointer: coarse) and (hover: none){
   body{
     font-size:1rem;
@@ -10,7 +9,7 @@
   }
 
   .slds-button{
-    --sds-c-button-line-height:2.625rem;
+    --slds-c-button-line-height:2.625rem;
     font-weight:700;
   }
 
@@ -47,6 +46,12 @@
 .slds-button--icon-more,
 .slds-button_icon-container-more,
 .slds-button--icon-container-more{
+    width:2.75rem;
+    height:2.75rem;
+  }
+
+  .slds-button_icon-large,
+.slds-button--icon-large{
     width:2.75rem;
     height:2.75rem;
   }
@@ -100,7 +105,7 @@
 .slds-checkbox--button-group .slds-checkbox_button + .slds-checkbox_button,
 .slds-checkbox--button-group .slds-checkbox--button + .slds-checkbox--button{
     border-left:0;
-    border-top:1px solid #dddbda;
+    border-top:1px solid #e5e5e5;
   }
   .slds-checkbox_button-group .slds-checkbox_button:first-child > .slds-checkbox_button__label,
 .slds-checkbox_button-group .slds-checkbox--button:first-child > .slds-checkbox--button__label,
@@ -164,6 +169,7 @@
         -ms-flex-align:start;
             align-items:flex-start;
     font-size:1rem;
+    padding-right:0.5rem;
   }
   .slds-checkbox_toggle [type=checkbox] + .slds-checkbox_faux_container,
 .slds-checkbox_toggle [type=checkbox] + .slds-checkbox--faux_container,
@@ -333,6 +339,10 @@
 .slds-form_horizontal .slds-form-element_stacked .slds-form-element__icon{
     padding-top:0;
   }
+  .slds-input,
+.slds-input_faux{
+    line-height:2.625rem;
+  }
   .slds-input{
     line-height:2.625rem;
   }
@@ -355,20 +365,24 @@
     height:1rem;
     margin-top:-0.5rem;
   }
-  .slds-input-has-icon_left .slds-input__icon, .slds-input-has-icon--left .slds-input__icon{
+  .slds-input__icon_left .slds-input__icon,
+.slds-input__icon--left .slds-input__icon{
     left:0.5rem;
   }
-  .slds-input-has-icon_right .slds-input__icon, .slds-input-has-icon--right .slds-input__icon{
+  .slds-input__icon_right .slds-input__icon,
+.slds-input__icon--right .slds-input__icon{
     right:0.5rem;
   }
-  .slds-input-has-icon_left-right .slds-input__icon_left,
-.slds-input-has-icon_left-right .slds-input__icon--left, .slds-input-has-icon--left-right .slds-input__icon_left,
-.slds-input-has-icon--left-right .slds-input__icon--left{
+  .slds-input__icon_left-right .slds-input__icon_left,
+.slds-input__icon_left-right .slds-input__icon--left,
+.slds-input__icon--left-right .slds-input__icon_left,
+.slds-input__icon--left-right .slds-input__icon--left{
     left:0.5rem;
   }
-  .slds-input-has-icon_left-right .slds-input__icon_right,
-.slds-input-has-icon_left-right .slds-input__icon--right, .slds-input-has-icon--left-right .slds-input__icon_right,
-.slds-input-has-icon--left-right .slds-input__icon--right{
+  .slds-input__icon_left-right .slds-input__icon_right,
+.slds-input__icon_left-right .slds-input__icon--right,
+.slds-input__icon--left-right .slds-input__icon_right,
+.slds-input__icon--left-right .slds-input__icon--right{
     right:0.5rem;
   }
   .slds-input__icon-group_right .slds-input__spinner{
@@ -403,6 +417,8 @@
   .slds-modal__close{
     width:2.75rem;
     height:2.75rem;
+  }
+  .slds-modal__header .slds-modal__close{
     top:-2.75rem;
     right:0;
   }
@@ -442,13 +458,16 @@
   .slds-pill + .slds-pill{
     margin-left:0.25rem;
   }
-  .slds-pill__container, .slds-pill-container, .slds-pill_container{
+  .slds-pill .slds-pill__container,
+.slds-pill .slds-pill-container,
+.slds-pill .slds-pill_container{
     padding:0.25rem;
   }
-  .slds-pill__label{
+  .slds-pill .slds-pill__label{
     font-size:0.875rem;
   }
-  .slds-pill__icon ~ .slds-pill__action, .slds-pill__icon_container ~ .slds-pill__action{
+  .slds-pill .slds-pill__icon ~ .slds-pill__action,
+.slds-pill .slds-pill__icon_container ~ .slds-pill__action{
     padding-left:calc(1.25rem + 0.5rem);
   }
   .slds-pill_link,
@@ -467,9 +486,10 @@
     margin:0;
     border:0;
   }
-  .slds-pill_link__icon ~ .slds-pill__action, .slds-pill_link__icon_container ~ .slds-pill__action,
-.slds-pill--link__icon ~ .slds-pill__action,
-.slds-pill--link__icon_container ~ .slds-pill__action{
+  .slds-pill_link .slds-pill__icon ~ .slds-pill__action,
+.slds-pill_link .slds-pill__icon_container ~ .slds-pill__action,
+.slds-pill--link .slds-pill__icon ~ .slds-pill__action,
+.slds-pill--link .slds-pill__icon_container ~ .slds-pill__action{
     padding-left:calc(1.25rem + 0.5rem);
   }
   .slds-pill__action{
@@ -534,7 +554,7 @@
 .slds-radio--button-group .slds-radio_button + .slds-radio_button,
 .slds-radio--button-group .slds-radio--button + .slds-radio--button{
     border-left:0;
-    border-top:1px solid #dddbda;
+    border-top:1px solid #e5e5e5;
   }
   .slds-radio_button-group .slds-radio_button:first-child > .slds-radio_button__label,
 .slds-radio_button-group .slds-radio--button:first-child > .slds-radio--button__label,
