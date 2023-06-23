@@ -7,10 +7,7 @@
                         <div class="slds-media">
                             <div class="slds-media__figure">
                                 <span
-                                    class="
-                                        slds-icon_container
-                                        slds-icon-standard-forecasts
-                                    "
+                                    class="slds-icon_container slds-icon-standard-forecasts"
                                 >
                                     <svg
                                         class="slds-icon slds-page-header__icon"
@@ -28,10 +25,7 @@
                                         <h1>
                                             <span>Sightings</span>
                                             <span
-                                                class="
-                                                    slds-page-header__title
-                                                    slds-truncate
-                                                "
+                                                class="slds-page-header__title slds-truncate"
                                                 title={dropdown}
                                             >
                                                 {dropdown}
@@ -42,27 +36,16 @@
                                         class="slds-page-header__name-switcher"
                                     >
                                         <div
-                                            class="
-                                                list-select
-                                                slds-dropdown-trigger
-                                                slds-dropdown-trigger_click
-                                            "
+                                            class="list-select slds-dropdown-trigger slds-dropdown-trigger_click"
                                         >
                                             <button
-                                                class="
-                                                    slds-button
-                                                    slds-button_icon
-                                                    slds-button_icon-small
-                                                "
+                                                class="slds-button slds-button_icon slds-button_icon-small"
                                                 aria-haspopup="true"
                                                 title="Switch list view"
                                                 onclick={handleListClick}
                                             >
                                                 <svg
-                                                    class="
-                                                        slds-button__icon
-                                                        slds-icon_x-small
-                                                    "
+                                                    class="slds-button__icon slds-icon_x-small"
                                                     aria-hidden="true"
                                                 >
                                                     <use
@@ -76,10 +59,7 @@
                                                 </span>
                                             </button>
                                             <div
-                                                class="
-                                                    slds-dropdown
-                                                    slds-dropdown_left
-                                                "
+                                                class="slds-dropdown slds-dropdown_left"
                                             >
                                                 <ul
                                                     class="slds-dropdown__list"
@@ -87,9 +67,7 @@
                                                     aria-label="Show More"
                                                 >
                                                     <li
-                                                        class="
-                                                            slds-dropdown__item
-                                                        "
+                                                        class="slds-dropdown__item"
                                                         role="presentation"
                                                         onclick={handleSightingsChange}
                                                         data-id="nearby"
@@ -100,9 +78,7 @@
                                                             tabindex="0"
                                                         >
                                                             <span
-                                                                class="
-                                                                    slds-truncate
-                                                                "
+                                                                class="slds-truncate"
                                                                 title="Menu Item One"
                                                             >
                                                                 Nearby
@@ -110,9 +86,7 @@
                                                         </a>
                                                     </li>
                                                     <li
-                                                        class="
-                                                            slds-dropdown__item
-                                                        "
+                                                        class="slds-dropdown__item"
                                                         role="presentation"
                                                         onclick={handleSightingsChange}
                                                         data-id="local"
@@ -123,9 +97,7 @@
                                                             tabindex="-1"
                                                         >
                                                             <span
-                                                                class="
-                                                                    slds-truncate
-                                                                "
+                                                                class="slds-truncate"
                                                                 title="Menu Item Two"
                                                             >
                                                                 Local
@@ -133,9 +105,7 @@
                                                         </a>
                                                     </li>
                                                     <li
-                                                        class="
-                                                            slds-dropdown__item
-                                                        "
+                                                        class="slds-dropdown__item"
                                                         role="presentation"
                                                         onclick={handleSightingsChange}
                                                         data-id="state"
@@ -146,9 +116,7 @@
                                                             tabindex="-1"
                                                         >
                                                             <span
-                                                                class="
-                                                                    slds-truncate
-                                                                "
+                                                                class="slds-truncate"
                                                                 title="Menu Item Three"
                                                             >
                                                                 State
@@ -156,9 +124,7 @@
                                                         </a>
                                                     </li>
                                                     <li
-                                                        class="
-                                                            slds-dropdown__item
-                                                        "
+                                                        class="slds-dropdown__item"
                                                         role="presentation"
                                                         onclick={handleSightingsChange}
                                                         data-id="county"
@@ -169,9 +135,7 @@
                                                             tabindex="-1"
                                                         >
                                                             <span
-                                                                class="
-                                                                    slds-truncate
-                                                                "
+                                                                class="slds-truncate"
                                                                 title="Menu Item Three"
                                                             >
                                                                 County
@@ -211,11 +175,7 @@
                         <div class="slds-page-header__controls">
                             <div class="slds-page-header__control">
                                 <button
-                                    class="
-                                        slds-button
-                                        slds-button_icon
-                                        slds-button_icon-border-filled
-                                    "
+                                    class="slds-button slds-button_icon slds-button_icon-border-filled"
                                     title="Refresh List"
                                     onclick={loadSightings}
                                 >
@@ -236,11 +196,7 @@
                                 <ul class="slds-button-group-list">
                                     <li>
                                         <button
-                                            class="
-                                                slds-button
-                                                slds-button_icon
-                                                slds-button_icon-border-filled
-                                            "
+                                            class="slds-button slds-button_icon slds-button_icon-border-filled"
                                             title="Filters"
                                             onclick={handleFilterClick}
                                         >
@@ -265,13 +221,7 @@
             </div>
         </div>
         <div
-            class="
-                slds-col
-                slds-large-size_1-of-3
-                slds-small-size_1-of-1
-                slds-p-left_x-small
-                slds-var-p-top_small
-            "
+            class="slds-col slds-size_1-of-1 slds-large-size_1-of-3 slds-var-p-top_small"
         >
             <div>
                 <my-sightings
@@ -284,12 +234,7 @@
             </div>
         </div>
         <div
-            class="
-                slds-col
-                slds-large-size_2-of-3
-                slds-small-size_1-of-1
-                slds-var-p-top_small
-            "
+            class="slds-col slds-large-size_2-of-3 slds-size_1-of-1 slds-var-p-top_small"
         >
             <my-sightings-details
                 sightings={selectedSightings}
@@ -309,11 +254,7 @@
             <div class="slds-modal__container">
                 <header class="slds-modal__header">
                     <button
-                        class="
-                            slds-button slds-button_icon
-                            slds-modal__close
-                            slds-button_icon-inverse
-                        "
+                        class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
                         title="Close"
                     >
                         <svg

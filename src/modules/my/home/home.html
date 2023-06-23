@@ -1,14 +1,6 @@
 <template>
     <div
-        class="
-            slds-grid slds-wrap
-            slds-p-left_large
-            slds-p-right_large
-            main
-            slds-p-bottom_xx-large
-            slds-p-top_medium
-            slds-gutters
-        "
+        class="slds-grid slds-wrap slds-p-left_large slds-p-right_large main slds-p-bottom_xx-large slds-p-top_medium slds-gutters"
     >
         <div class="slds-large-size_2-of-3 slds-small-size_1-of-1 slds-col">
             <div class="">
@@ -30,11 +22,7 @@
         </div>
         <div class="slds-large-size_1-of-3 slds-small-size_1-of-1 slds-col">
             <div
-                class="
-                    slds-text-align_center
-                    slds-p-bottom_large
-                    slds-p-top_large
-                "
+                class="slds-text-align_center slds-p-bottom_large slds-p-top_large"
             >
                 <a href="https://ebird.org/" target="_blank">
                     <img class="ebird" src="resources/photos/ebird.png" />
@@ -50,33 +38,17 @@
                     ></c-carousel-component>
                 </div>
             </div>
-            <!--<div class="slds-p-top_small">
-                <my-news home="true"></my-news>
-            </div>-->
         </div>
         <div
-            class="
-                slds-large-size_1-of-3
-                slds-small-size_1-of-1
-                slds-col
-                slds-p-top_medium
-            "
+            class="slds-large-size_1-of-3 slds-small-size_1-of-1 slds-col slds-p-top_medium"
         >
             <my-events home="true"></my-events>
-            <!--<div class="slds-p-top_small">
-                <my-membership-form
-                    onmemberevent={handleMemberEvent}
-                ></my-membership-form>
-            </div>-->
             <div class="slds-p-top_small">
                 <my-nearby-sightings></my-nearby-sightings>
             </div>
             <div class="slds-p-top_small">
                 <my-announcements home="true"></my-announcements>
             </div>
-            <!--<div class="slds-p-top_small">
-                <my-news home="true"></my-news>
-            </div>-->
         </div>
     </div>
 </template>
