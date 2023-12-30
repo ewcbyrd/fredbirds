@@ -22,7 +22,7 @@ export default class Events extends LightningElement {
     @api readOnly = false;
 
     connectedCallback() {
-        const year = 2023;
+        const year = 2024;
         this.year = year;
         this.fetchEvents(year);
     }
