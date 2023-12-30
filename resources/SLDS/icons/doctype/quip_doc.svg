@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
 	 width="56px" height="64px" viewBox="0 0 56 64" enable-background="new 0 0 56 64" xml:space="preserve">
-<path fill-rule="evenodd" clip-rule="evenodd" fill="#3D87F5" d="M0,5.1v53.7C0,61.7,2.3,64,5.1,64h45.7
+<path fill-rule="evenodd" clip-rule="evenodd" fill="#0176D3" d="M0,5.1v53.7C0,61.7,2.3,64,5.1,64h45.7
 	c2.8,0,5.1-2.3,5.1-5.1V21L37,0H5.1C2.3,0,0,2.3,0,5.1z"/>
-<path opacity="0.5" fill="#FFFFFF" enable-background="new    " d="M37,0l19,21H42.1c-2.8,0-5.2-2.3-5.2-5.2L37,0z"/>
+<path fill="#AACBFF" enable-background="new    " d="M37,0l19,21H42.1c-2.8,0-5.2-2.3-5.2-5.2L37,0z"/>
 <g>
-	<path opacity="0.5" fill="#216AC1" enable-background="new    " d="M37,15.9v1c0,2.8,2.3,5.2,5.2,5.2H56v-1H42.1
+	<path fill="#014486" enable-background="new    " d="M37,15.9v1c0,2.8,2.3,5.2,5.2,5.2H56v-1H42.1
 		C39.3,21,37,18.7,37,15.9z"/>
 </g>
 <path fill="#FFFFFF" d="M23.5,46.7h-6.9c-0.4,0-0.8,0.3-0.8,0.8s0.3,0.8,0.8,0.8h6.9c0.4,0,0.8-0.3,0.8-0.8
