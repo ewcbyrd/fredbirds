@@ -18,10 +18,18 @@ export default class NearbySightings extends LightningElement {
         getNearbyNotableObservations(opts).then((result) => {
             const sightingsMap = new Map();
             result.forEach((item) => {
+                console.dir(item);
                 item.obsDt = new Date(item.obsDt);
-                sightingsMap.set(item.obsId, item);
+                let sighting = sightingsMap.get(
+                    item.speciesCode + item.subnational2Name
+                );
+                if (!sighting || (sighting && item.obsDt > sighting.obsDt)) {
+                    sightingsMap.set(
+                        item.speciesCode + item.subnational2Name,
+                        item
+                    );
+                }
             });
-            console.log();
             this.localSightings = sightingsMap.values();
         });
     }
