@@ -18,8 +18,12 @@ export default class Events extends LightningElement {
     opts = { autoScroll: false, autoScrollTime: 7 };
 
     @api home;
+    @api singleEvent = false;
 
     @api readOnly = false;
+    
+    // Single event pagination properties
+    currentEventIdx = 0;
 
     connectedCallback() {
         const year = 2025;
@@ -29,6 +33,30 @@ export default class Events extends LightningElement {
 
     get options() {
         return Object.keys(this.events);
+    }
+
+    // Single event getters
+    get currentEvent() {
+        if (this.singleEvent && this.yearEvents && this.yearEvents.length > 0) {
+            return this.yearEvents[this.currentEventIdx];
+        }
+        return null;
+    }
+
+    get currentEventIndex() {
+        return this.currentEventIdx + 1;
+    }
+
+    get totalEvents() {
+        return this.yearEvents ? this.yearEvents.length : 0;
+    }
+
+    get isFirstEvent() {
+        return this.currentEventIdx <= 0;
+    }
+
+    get isLastEvent() {
+        return this.currentEventIdx >= this.totalEvents - 1;
     }
 
     handleEventClick(event) {
@@ -47,6 +75,19 @@ export default class Events extends LightningElement {
         this.year = year;
         this.fetchEvents(year);
         this.dispatchEvent(new CustomEvent('eventyearchange'));
+    }
+
+    // Pagination handlers
+    handlePreviousEvent() {
+        if (this.currentEventIdx > 0) {
+            this.currentEventIdx--;
+        }
+    }
+
+    handleNextEvent() {
+        if (this.currentEventIdx < this.totalEvents - 1) {
+            this.currentEventIdx++;
+        }
     }
 
     get eventCancelled() {
@@ -75,10 +116,10 @@ export default class Events extends LightningElement {
             }
             if (item.species_sighted)
                 item.species_sighted.sort((a, b) =>
-                    (a.common > b.common ? 1 : -1)
+                    ((a.common > b.common) ? 1 : -1)
                 );
             if (item.participants)
-                item.participants.sort((a, b) => (a.name > b.name ? 1 : -1));
+                item.participants.sort((a, b) => ((a.name > b.name) ? 1 : -1));
             this.yearEvents.push({
                 id: item._id,
                 date: this.getEventDate(new Date(item.start), item.end ? new Date(item.end) : null),

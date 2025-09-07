@@ -11,7 +11,15 @@
                 class="slds-context-bar__item slds-context-bar__dropdown-trigger slds-dropdown-trigger slds-dropdown-trigger_click slds-no-hover">
                 <span class="slds-context-bar__label-action slds-context-bar__app-name">
                     <span title="App Name">
-                        <lightning-button-menu label="FBC" icon-name="utility:connected_apps" icon-size="large">
+                        <div class="button-menu">
+                            <lightning-button-menu 
+                                label="FBC" 
+                                class="menu-label"
+                                icon-name="utility:connected_apps" 
+                                icon-size="large" 
+                                menu-alignment="auto" 
+                                variant="container"
+                                part="button">
                             <lightning-menu-item label="Home" title="home" onclick={handleMenuClick}>
                             </lightning-menu-item>
                             <lightning-menu-subheader label="Club"></lightning-menu-subheader>
@@ -36,7 +44,8 @@
                             </lightning-menu-item>
                             <lightning-menu-item label="Birding News" title="news" onclick={handleMenuClick}>
                             </lightning-menu-item>
-                        </lightning-button-menu>
+                            </lightning-button-menu>
+                        </div>
                     </span>
                 </span>
             </div>

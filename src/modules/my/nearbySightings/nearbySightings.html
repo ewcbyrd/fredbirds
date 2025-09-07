@@ -1,64 +1,54 @@
 <template>
     <div>
         <div class="slds-card">
-            <div class="slds-card__header">
-                <div
-                    class="slds-media slds-media--center slds-has-flexi-truncate"
-                >
-                    <span
-                        class="slds-icon_container slds-icon_container slds-icon-standard-forecasts"
-                        title="Description of icon when needed"
-                    >
-                        <svg class="slds-icon" aria-hidden="true">
-                            <use
-                                xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#forecasts"
-                            ></use>
-                        </svg>
-                    </span>
-                    <div class="slds-media__body">
-                        <h2 class="slds-p-left_small slds-card__header-title">
+            <div class="events-main-header">
+                    <div class="header-content">
+                        <h2 class="slds-text-heading_medium">
                             Notable Regional Sightings
                         </h2>
                     </div>
                 </div>
-            </div>
             <div class="slds-card__body">
-                <table
-                    class="fixed_header slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
-                >
-                    <thead>
-                        <tr class="slds-text-heading--label">
-                            <th scope="col">
-                                <span class="slds-truncate">Date</span>
-                            </th>
-                            <th scope="col">
-                                <span class="slds-truncate">Species</span>
-                            </th>
-                            <th scope="col">
-                                <span class="slds-truncate">County/City</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template for:each={localSightings} for:item="sighting">
-                            <tr class="slds-hint-parent" key={sighting.obsId}>
-                                <td class="slds-cell-wrap">
-                                    <lightning-formatted-date-time
-                                        value={sighting.obsDt}
-                                        day="2-digit"
-                                        month="long"
-                                    ></lightning-formatted-date-time>
-                                </td>
-                                <td class="slds-cell-wrap">
-                                    {sighting.comName}
-                                </td>
-                                <td class="slds-cell-wrap">
-                                    {sighting.subnational2Name}
-                                </td>
-                            </tr>
+                <div class="slds-scrollable--y slds-is-relative">
+                    <div class="slds-grid slds-gutters slds-wrap slds-p-around_medium">
+                        <template if:true={hasSightings}>
+                            <template for:each={localSightings} for:item="sighting">
+                                <div key={sighting.obsId} class="slds-col slds-large-size_1-of-4 slds-small-size_1-of-1 slds-p-around_x-small">
+                                    <article class="slds-card slds-card_boundary event-card">
+                                        <div class="slds-card__header slds-grid">
+                                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                <div class="slds-media__body">
+                                                    <h2 class="slds-card__header-title">
+                                                        <span class="slds-text-heading_small">
+                                                            {sighting.comName}
+                                                        </span>
+                                                    </h2>
+                                                </div>
+                                            </header>
+                                        </div>
+                                        <div class="slds-card__body slds-card__body_inner">
+                                            <p class="slds-text-body_regular">{sighting.subnational2Name}</p>
+                                            <p class="slds-text-body_small slds-m-top_x-small">
+                                                <lightning-formatted-date-time
+                                                    value={sighting.obsDt}
+                                                    day="2-digit"
+                                                    month="long"
+                                                ></lightning-formatted-date-time>
+                                            </p>
+                                        </div>
+                                    </article>
+                                </div>
+                            </template>
                         </template>
-                    </tbody>
-                </table>
+                        <template if:false={hasSightings}>
+                            <div class="slds-col slds-size_1-of-1">
+                                <div class="slds-text-align_center slds-p-around_medium slds-text-color_weak">
+                                    There are no recent notable nearby sightings.
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
             </div>
             <footer class="slds-card__footer">
                 <a

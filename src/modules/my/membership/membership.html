@@ -1,5 +1,5 @@
 <template>
-    <div class="slds-p-around_medium main">
+    <div class="main">
         <template if:true={showModal}>
             <section
                 role="dialog"
@@ -50,74 +50,75 @@
             </section>
             <div class="slds-backdrop slds-backdrop_open"></div>
         </template>
-        <div class="slds-grid slds-wrap">
-            <div
-                class="slds-small-size_1-of-1 slds-large-size_7-of-12 slds-p-left_large slds-p-right_large"
-            >
-                <div class="slds-text-heading_large slds-p-top_x-small">
-                    FBC Membership
+        <div class="slds-card">
+            <div class="events-main-header">
+                <div class="header-content">
+                    <h2 class="slds-text-heading_medium">
+                        FBC Membership
+                    </h2>
                 </div>
-                <div>
-                    Are you a new birder looking to gain exerpience? Are you a
-                    veteran birder looking for a group to share your love of
-                    birding with? Or, are you just looking to get outdoors with
-                    nice people? We have some great news! The Fredericksburg
-                    Birding Club delivers all of this and more.
-                </div>
-                <div class="slds-p-top_x-small">
-                    There are two levels of membership in the club, Basic and
-                    Full. Both allow full participation in field trips and
-                    access to the club web site.
-                </div>
-                <div class="slds-text-heading_medium slds-p-top_x-small">
-                    Basic Membership
-                </div>
-                <div class="slds-p-bottom_x-small">
-                    Basic Membership is our free level. It is designed for
-                    individuals who will occasionally participate in club
-                    events. It provides for:
-                </div>
-                <ul class="slds-list_dotted">
-                    <li>Participation in regular club field trips</li>
-                </ul>
-                <div class="slds-text-heading_medium slds-p-top_x-small">
-                    Full Membership
-                </div>
-                <div class="slds-p-bottom_x-small">
-                    Full Membership is our paid level. It is designed for
-                    individuals who will be regular participants in club events.
-                    Annual membership dues are $20 for an individual or $25 for
-                    a family. It provides for:
-                </div>
-                <ul class="slds-list_dotted">
-                    <li>Voting rights at club meetings</li>
-                    <li>Eligibility for club officer positions</li>
-                </ul>
-                <div class="slds-p-top_x-small slds-p-bottom_x-small">
-                    Our club is open to anyone who would like to join. Just fill
-                    in the form to the right and click submit. This will add you 
-                    as a non-paying member. If you desire to become
-                    a paid member, there are two ways to pay:
-                </div>
-                    <ul class="slds-list_dotted">
-                        <li>Send a check made out to Fredericksburg 
-                            Birding Club to</li>
-                        <div class="slds-p-top_small slds-p-bottom_small">Jeannie Hartzell
-                            </br>Fredericksburg Birding Club
-                            </br>383 Brenthem Farm Dr
-                            </br>Fredericksburg, VA 2240 
-                        </div>
-                    </ul>
-                                   
             </div>
-            <div
-                class="slds-small-size_1-of-1 slds-large-size_5-of-12 slds-p-top_x-small"
-            >
-                <!--<my-membership-form onmemberevent={handleMemberEvent}></my-membership-form>-->
-                <iframe
-                    style="height: 670px; width: 100%"
-                    src="https://cdn.forms-content.sg-form.com/7af3b17c-c85b-11eb-8dc8-7eae1ceb606b"
-                ></iframe>
+            <div class="slds-card__body">
+                <div class="slds-p-around_medium">
+                    <div class="membership-content">
+                        <div>
+                            Are you a new birder looking to gain exerpience? Are you a
+                            veteran birder looking for a group to share your love of
+                            birding with? Or, are you just looking to get outdoors with
+                            nice people? We have some great news! The Fredericksburg
+                            Birding Club delivers all of this and more.
+                        </div>
+                        <div class="slds-p-top_x-small">
+                            There are two levels of membership in the club, Basic and
+                            Full. Both allow full participation in field trips and
+                            access to the club web site.
+                        </div>
+                        <div class="slds-text-heading_medium slds-p-top_x-small">
+                            Basic Membership
+                        </div>
+                        <div class="slds-p-bottom_x-small">
+                            Basic Membership is our free level. It is designed for
+                            individuals who will occasionally participate in club
+                            events. It provides for:
+                        </div>
+                        <ul class="slds-list_dotted">
+                            <li>Participation in regular club field trips</li>
+                        </ul>
+                        <div class="slds-text-heading_medium slds-p-top_x-small">
+                            Full Membership
+                        </div>
+                        <div class="slds-p-bottom_x-small">
+                            Full Membership is our paid level. It is designed for
+                            individuals who will be regular participants in club events.
+                            Annual membership dues are $20 for an individual or $25 for
+                            a family. It provides for:
+                        </div>
+                        <ul class="slds-list_dotted">
+                            <li>Voting rights at club meetings</li>
+                            <li>Eligibility for club officer positions</li>
+                        </ul>
+                        <div class="slds-text-heading_medium slds-p-top_x-small">
+                            Join the Club
+                        </div>
+                        <div class="slds-p-bottom_x-small">
+                            Contact us to join as a Basic Member (free) or Full Member ($20 individual, $25 family).
+                        </div>
+                        <div class="slds-p-top_x-small slds-p-bottom_x-small">
+                            Our club is open to anyone who would like to join. If you desire to become
+                            a paid member, send a check made out to Fredericksburg 
+                            Birding Club to:
+                        </div>
+                        <div class="slds-p-top_small slds-p-bottom_small">
+                            Jeannie Hartzell<br/>
+                            Fredericksburg Birding Club<br/>
+                            383 Brenthem Farm Dr<br/>
+                            Fredericksburg, VA 22401
+                        </div>
+                        <div class="slds-p-bottom_small">
+                            <strong>Email:</strong> admin@fredbirds.com
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -4,6 +4,10 @@ import { getNearbyNotableObservations } from 'data/ebirdService';
 export default class NearbySightings extends LightningElement {
     localSightings = [];
 
+    get hasSightings() {
+        return this.localSightings && this.localSightings.length > 0;
+    }
+
     connectedCallback() {
         this.getLocalSightings();
     }
@@ -30,7 +34,7 @@ export default class NearbySightings extends LightningElement {
                     );
                 }
             });
-            this.localSightings = sightingsMap.values();
+            this.localSightings = Array.from(sightingsMap.values());
         });
     }
 

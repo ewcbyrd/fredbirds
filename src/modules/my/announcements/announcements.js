@@ -7,6 +7,10 @@ export default class Announcements extends LightningElement {
     announcements = [];
     announcement;
 
+    get hasAnnouncements() {
+        return this.announcements && this.announcements.length > 0;
+    }
+
     connectedCallback() {
         this.fetchAnnouncements();
     }

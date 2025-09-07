@@ -1,4 +1,11 @@
-/*.main {
+.main {
     background-color: white;
-    min-height: 700px;
-}*/
+    max-width: 70%;
+    margin: 0 auto;
+}
+
+@media screen and (max-width: 767px) {
+    .main {
+        max-width: 100%;
+    }
+}

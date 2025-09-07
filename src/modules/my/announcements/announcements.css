@@ -1,0 +1,49 @@
+:host {
+    display: block;
+}
+
+.events-main-header {
+    background: linear-gradient(45deg, #718e5c, #8fa77d);
+    padding: 0.75rem;
+    color: white;
+    border-radius: 4px 4px 0 0;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.event-card {
+    transition: transform 0.2s ease-in-out;
+    height: 100%;
+    border: 1px solid #d8d8d8;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.announcement-content {
+    font-size: 0.875rem;
+    color: #3e3e3c;
+}
+
+.slds-card__header {
+    margin-bottom: 0;
+    padding: 0.75rem;
+    background-color: #f3f3f3;
+}
+
+.slds-card__body {
+    margin-bottom: 0;
+}
+
+.slds-scrollable--y {
+    max-height: 600px;
+    overflow-y: auto;
+}

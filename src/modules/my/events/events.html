@@ -2,32 +2,15 @@
     <template if:true={yearEvents}>
         <div>
             <div class="slds-card">
-                <div class="slds-card__header">
-                    <div
-                        class="slds-media slds-media--center slds-has-flexi-truncate"
-                    >
-                        <span
-                            class="slds-icon_container slds-icon_container slds-icon-standard-event"
-                            title="Description of icon when needed"
-                        >
-                            <svg class="slds-icon" aria-hidden="true">
-                                <use
-                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#event"
-                                ></use>
-                            </svg>
-                            <span class="slds-assistive-text">
-                                Description of icon when needed
-                            </span>
-                        </span>
-                        <div class="slds-media__body">
-                            <h2
-                                class="slds-p-left_small slds-card__header-title"
-                            >
-                                <template if:true={isHome}>
-                                    Upcoming Events
-                                </template>
-                                <template if:false={isHome}>
-                                    <select onchange={handleYearChange}>
+                <div class="events-main-header">
+                    <div class="header-content">
+                        <h2 class="slds-text-heading_medium">
+                            <template if:true={isHome}>
+                                Upcoming Events
+                            </template>
+                            <template if:false={isHome}>
+                                <div class="header-controls">
+                                    <select class="year-select" onchange={handleYearChange}>
                                         <option value="2025">2025</option>
                                         <option value="2024">2024</option>
                                         <option value="2023">2023</option>
@@ -40,14 +23,14 @@
                                         <option value="2016">2016</option>
                                         <option value="2015">2015</option>
                                     </select>
-                                    &nbsp; Calendar of Events
+                                    <span class="header-title">Calendar of Events</span>
                                     <lightning-helptext
                                         class="slds-var-p-left_small"
                                         content="Select a year from the dropdown to view a list of events for that year. Click on an event to view event details and/or the trip report for the event."
                                     ></lightning-helptext>
-                                </template>
-                            </h2>
-                        </div>
+                                </div>
+                            </template>
+                        </h2>
                     </div>
                 </div>
                 <div class="slds-card__body">
@@ -66,111 +49,133 @@
                                 </div>
                             </div>
                         </template>
-                        <table
-                            class="fixed_header slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
-                        >
-                            <thead>
-                                <tr class="slds-text-heading--label">
-                                    <th scope="col">
-                                        <span class="slds-truncate">
-                                            Date(s)
-                                        </span>
-                                    </th>
-                                    <th scope="col">
-                                        <span class="slds-truncate">Event</span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <template
-                                    for:each={yearEvents}
-                                    for:item="event"
-                                >
-                                    <tr
-                                        class="slds-hint-parent"
-                                        key={event.id}
-                                        onclick={handleEventClick}
-                                        data-item={event.id}
-                                    >
-                                        <td class="slds-cell-wrap">
-                                            {event.date}
-                                            <div class="slds-float_right">
-                                                <template
-                                                    if:true={event.cancelled}
-                                                >
-                                                    <div
-                                                        class="slds-media__figure"
-                                                    >
-                                                        <span
-                                                            class="slds-icon_container slds-icon-custom-custom60"
-                                                            title="Cancelled"
-                                                        >
-                                                            <svg
-                                                                class="slds-icon slds-icon_x-small"
-                                                                aria-hidden="true"
-                                                            >
-                                                                <use
-                                                                    xlink:href="resources/SLDS/icons/custom-sprite/svg/symbols.svg#custom60"
-                                                                ></use>
-                                                            </svg>
-                                                        </span>
+                        <template if:true={singleEvent}>
+                            <!-- Single Event Display with Pagination -->
+                            <div class="slds-p-around_medium">
+                                <template if:true={currentEvent}>
+                                    <div class="single-event-container">
+                                        <article class="slds-card slds-card_boundary event-card single-event-card" onclick={handleEventClick} data-item={currentEvent.id}>
+                                            <div class="slds-card__header slds-grid">
+                                                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                    <div class="slds-media__body">
+                                                        <h2 class="slds-card__header-title">
+                                                            <span class="slds-text-heading_small">{currentEvent.date}</span>
+                                                        </h2>
+                                                    </div>
+                                                    <div class="slds-no-flex">
+                                                        <template if:true={currentEvent.cancelled}>
+                                                            <span class="slds-icon_container slds-icon-custom-custom60" title="Cancelled">
+                                                                <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                                    <use xlink:href="resources/SLDS/icons/custom-sprite/svg/symbols.svg#custom60"></use>
+                                                                </svg>
+                                                            </span>
+                                                        </template>
+                                                        <template if:true={currentEvent.pdfFile}>
+                                                            <span class="slds-icon_container slds-icon-standard-knowledge slds-m-left_x-small" title="Trip Report">
+                                                                <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                                    <use xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#knowledge"></use>
+                                                                </svg>
+                                                            </span>
+                                                        </template>
+                                                        <template if:true={currentEvent.details}>
+                                                            <span class="slds-icon_container slds-icon-standard-address slds-m-left_x-small" title="Details">
+                                                                <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                                    <use xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#address"></use>
+                                                                </svg>
+                                                            </span>
+                                                        </template>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                            <div class="slds-card__body slds-card__body_inner">
+                                                <div class="event-name-section slds-m-bottom_small">
+                                                    <h3 class="slds-text-heading_medium event-name">{currentEvent.event}</h3>
+                                                </div>
+                                                <template if:true={currentEvent.details}>
+                                                    <div class="event-details-content">
+                                                        <lightning-formatted-rich-text value={currentEvent.details}></lightning-formatted-rich-text>
                                                     </div>
                                                 </template>
                                             </div>
-                                            <div class="slds-float_right">
-                                                <template
-                                                    if:true={event.pdfFile}
-                                                >
-                                                    <div
-                                                        class="slds-media__figure"
-                                                    >
-                                                        <span
-                                                            class="slds-icon_container slds-icon-standard-knowledge"
-                                                            title="Trip Report"
-                                                        >
-                                                            <svg
-                                                                class="slds-icon slds-icon_x-small"
-                                                                aria-hidden="true"
-                                                            >
-                                                                <use
-                                                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#knowledge"
-                                                                ></use>
-                                                            </svg>
-                                                        </span>
-                                                    </div>
-                                                </template>
-                                            </div>
-                                            <div class="slds-float_right">
-                                                <template
-                                                    if:true={event.details}
-                                                >
-                                                    <div
-                                                        class="slds-media__figure"
-                                                    >
-                                                        <span
-                                                            class="slds-icon_container slds-icon-standard-address"
-                                                            title="Details"
-                                                        >
-                                                            <svg
-                                                                class="slds-icon slds-icon_x-small"
-                                                                aria-hidden="true"
-                                                            >
-                                                                <use
-                                                                    xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#address"
-                                                                ></use>
-                                                            </svg>
-                                                        </span>
-                                                    </div>
-                                                </template>
-                                            </div>
-                                        </td>
-                                        <td class="slds-cell-wrap">
-                                            {event.event}
-                                        </td>
-                                    </tr>
+                                        </article>
+                                        
+                                        <!-- Pagination Controls -->
+                                        <div class="pagination-controls slds-grid slds-grid_align-space slds-m-top_small">
+                                            <button class="slds-button slds-button_icon slds-button_icon-border" 
+                                                    onclick={handlePreviousEvent} 
+                                                    disabled={isFirstEvent}
+                                                    title="Previous Event">
+                                                <svg class="slds-button__icon" aria-hidden="true">
+                                                    <use xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#chevronleft"></use>
+                                                </svg>
+                                                <span class="slds-assistive-text">Previous Event</span>
+                                            </button>
+                                            
+                                            <span class="slds-text-body_small slds-grid slds-grid_vertical-align-center">
+                                                {currentEventIndex} of {totalEvents}
+                                            </span>
+                                            
+                                            <button class="slds-button slds-button_icon slds-button_icon-border" 
+                                                    onclick={handleNextEvent} 
+                                                    disabled={isLastEvent}
+                                                    title="Next Event">
+                                                <svg class="slds-button__icon" aria-hidden="true">
+                                                    <use xlink:href="resources/SLDS/icons/utility-sprite/svg/symbols.svg#chevronright"></use>
+                                                </svg>
+                                                <span class="slds-assistive-text">Next Event</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </template>
-                            </tbody>
-                        </table>
+                            </div>
+                        </template>
+                        
+                        <template if:false={singleEvent}>
+                            <!-- Multi-Event Grid Display -->
+                            <div class="slds-grid slds-gutters slds-wrap slds-p-around_medium">
+                                <template for:each={yearEvents} for:item="event">
+                                    <div key={event.id} class="slds-col slds-large-size_1-of-4 slds-small-size_1-of-1 slds-p-around_x-small">
+                                        <article class="slds-card slds-card_boundary event-card" onclick={handleEventClick} data-item={event.id}>
+                                        <div class="slds-card__header slds-grid">
+                                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                <div class="slds-media__body">
+                                                    <h2 class="slds-card__header-title">
+                                                        <span class="slds-text-heading_small">{event.date}</span>
+                                                    </h2>
+                                                </div>
+                                                <div class="slds-no-flex">
+                                                    <template if:true={event.cancelled}>
+                                                        <span class="slds-icon_container slds-icon-custom-custom60" title="Cancelled">
+                                                            <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                                <use xlink:href="resources/SLDS/icons/custom-sprite/svg/symbols.svg#custom60"></use>
+                                                            </svg>
+                                                        </span>
+                                                    </template>
+                                                    <template if:true={event.pdfFile}>
+                                                        <span class="slds-icon_container slds-icon-standard-knowledge slds-m-left_x-small" title="Trip Report">
+                                                            <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                                <use xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#knowledge"></use>
+                                                            </svg>
+                                                        </span>
+                                                    </template>
+                                                    <template if:true={event.details}>
+                                                        <span class="slds-icon_container slds-icon-standard-address slds-m-left_x-small" title="Details">
+                                                            <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                                <use xlink:href="resources/SLDS/icons/standard-sprite/svg/symbols.svg#address"></use>
+                                                            </svg>
+                                                        </span>
+                                                    </template>
+                                                </div>
+                                            </header>
+                                        </div>
+                                        <div class="slds-card__body slds-card__body_inner">
+                                            <p class="slds-text-heading_medium">{event.event}</p>
+                                        </div>
+                                    </article>
+                                </div>
+                                </template>
+                            </div>
+                        </template>
                     </div>
                 </div>
                 <template if:true={isHome}>

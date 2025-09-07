@@ -1,3 +1,52 @@
+.main {
+    background-color: white;
+    max-width: 70%;
+    margin: 0 auto;
+}
+
+@media screen and (max-width: 767px) {
+    .main {
+        max-width: 100%;
+    }
+}
+
+.slds-page-header {
+    background: linear-gradient(to right, #718e5c, #8fa77d);
+    border-radius: 8px;
+    color: white;
+    margin-bottom: 1rem;
+    padding: 1.5rem;
+}
+
+.slds-page-header__icon {
+    fill: white;
+}
+
+.slds-page-header h1,
+.slds-page-header__title,
+.slds-page-header__meta-text {
+    color: white;
+}
+
+.slds-page-header__name-title h1 span {
+    color: white;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.slds-page-header__controls .slds-button_icon-border-filled {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.slds-page-header__controls .slds-button_icon-border-filled:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.slds-page-header__controls .slds-button__icon {
+    fill: white;
+}
+
 .state-combobox {
     width: 150px;
     margin: auto;

@@ -2,3 +2,32 @@
     background-color: white;
     font-size: 1rem;
 }
+
+.events-main-header {
+    background: linear-gradient(to right, #718e5c, #8fa77d);
+    border-radius: 4px 4px 0 0;
+    padding: 1rem;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+}
+
+.header-content h2 {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 500;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.membership-content {
+    color: #2f4f2f;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.membership-content .slds-text-heading_medium {
+    color: #2f4f2f;
+    font-weight: 600;
+}
