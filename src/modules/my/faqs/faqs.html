@@ -1,28 +1,41 @@
 <template>
-    <div class="slds-grid slds-wrap slds-p-around_medium main">
-        <div class="slds-large-size_1-of-3 slds-small-size_1-of-1 slds-p-bottom_small no-show">
-                <img src="resources/photos/P1010796.jpeg" />
-                <img src="resources/photos/P1010808.jpeg" />
-                <img src="resources/photos/P1010820.jpeg" />
-        </div>
-        <div class="slds-small-size-of-1 slds-large-size_2-of-3">
-            <div class="slds-text-heading_large slds-text-align_center">Frequently Asked Questions</div>
-            <div class="select slds-p-top_small">
-                <lightning-combobox
-                name="category"
-                value={category}
-                options={options}
-                variant="label-hidden"
-                onchange={handleCategoryChange}
-            ></lightning-combobox>
+    <div class="main">
+        <div class="slds-card">
+            <div class="events-main-header">
+                <div class="header-content">
+                    <h2 class="slds-text-heading_medium">
+                        Frequently Asked Questions
+                    </h2>
+                </div>
             </div>
-            <div class="slds-p-around_large">
-                <template for:each={selectedFaqs} for:item="faq">
-                    <div key={faq._id} class="question">Q. {faq.question}</div>
-                    <div key={faq._id} class="answer slds-p-bottom_small">A. {faq.answer}</div>
-                </template>
+            <div class="slds-card__body">
+                <div class="slds-p-around_medium">
+                    <div class="faq-content">
+                        <div class="category-select slds-m-bottom_medium">
+                            <lightning-combobox
+                                name="category"
+                                value={category}
+                                options={options}
+                                variant="label-hidden"
+                                onchange={handleCategoryChange}
+                            ></lightning-combobox>
+                        </div>
+                        <div class="faq-list">
+                            <template for:each={selectedFaqs} for:item="faq">
+                                <div
+                                    key={faq._id}
+                                    class="faq-item slds-m-bottom_medium"
+                                >
+                                    <div class="question slds-m-bottom_x-small">
+                                        Q. {faq.question}
+                                    </div>
+                                    <div class="answer">A. {faq.answer}</div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
 </template>

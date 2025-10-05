@@ -3,53 +3,63 @@
         class="slds-grid slds-wrap slds-p-left_large slds-p-right_large main slds-p-bottom_xx-large slds-p-top_medium slds-gutters"
     >
         <div class="slds-large-size_1-of-1 slds-small-size_1-of-1 slds-col">
-            <div class="">
-                <div class="slds-text-heading_large slds-p-top_small">
-                    <strong>Welcome!</strong>
+            <div class="slds-card">
+                <div class="events-main-header">
+                    <div class="header-content">
+                        <h2 class="slds-text-heading_medium">Welcome to FBC</h2>
+                    </div>
                 </div>
-                <div class="opening">
-                    Welcome to the webpage for the
-                    Fredericksburg Birding Club (FBC). Our members are bird
-                    enthusiasts of all skill levels – from beginning to advanced
-                    birders – who reside in the greater Fredericksburg, Virginia
-                    area. We have been brought together because of our interest
-                    in birds and our love of birding. We welcome anyone to join
-                    us on one of our upcoming trips – even if you have never
-                    birded before – and hope you will consider becoming a
-                    member.
+                <div class="slds-card__body">
+                    <div class="slds-p-around_medium">
+                        <div class="welcome-content">
+                            Welcome to the webpage for the Fredericksburg
+                            Birding Club (FBC). Our members are bird enthusiasts
+                            of all skill levels – from beginning to advanced
+                            birders – who reside in the greater Fredericksburg,
+                            Virginia area. We have been brought together because
+                            of our interest in birds and our love of birding. We
+                            welcome anyone to join us on one of our upcoming
+                            trips – even if you have never birded before – and
+                            hope you will consider becoming a member.
+                        </div>
+
+                        <div class="slds-m-top_large">
+                            <div
+                                class="slds-text-align_center slds-p-bottom_large"
+                            >
+                                <a href="https://ebird.org/" target="_blank">
+                                    <img
+                                        class="ebird"
+                                        src="resources/photos/ebird.png"
+                                    />
+                                </a>
+                            </div>
+                            <div class="carousel-container">
+                                <c-carousel-component
+                                    items={items}
+                                    options={options}
+                                ></c-carousel-component>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="slds-large-size_1-of-1 slds-small-size_1-of-1 slds-col">
-            <div
-                class="slds-text-align_center slds-p-bottom_large slds-p-top_large"
-            >
-                <a href="https://ebird.org/" target="_blank">
-                    <img class="ebird" src="resources/photos/ebird.png" />
-                </a>
             </div>
         </div>
         <div
-            class="slds-large-size_1-of-1 slds-small-size_1-of-1 slds-col"
+            class="slds-large-size_1-of-1 slds-small-size_1-of-1 slds-col slds-p-top_medium"
         >
-            <div class="slds-p-top_medium">
-                <div class="carousel-container">
-                    <c-carousel-component
-                        items={items}
-                        options={options}
-                    ></c-carousel-component>
-                </div>
-            </div>
-        </div>
-        <div class="slds-large-size_1-of-1 slds-small-size_1-of-1 slds-col slds-p-top_medium">
             <my-events home="true" single-event="true"></my-events>
         </div>
-        <div class="slds-large-size_1-of-1 slds-small-size_1-of-1 slds-col slds-p-top_medium">
+        <div
+            class="slds-large-size_1-of-1 slds-small-size_1-of-1 slds-col slds-p-top_medium"
+        >
             <div class="slds-p-top_small">
                 <my-nearby-sightings></my-nearby-sightings>
             </div>
         </div>
-        <div class="slds-large-size_1-of-1 slds-small-size_1-of-1 slds-col slds-p-top_medium">
+        <div
+            class="slds-large-size_1-of-1 slds-small-size_1-of-1 slds-col slds-p-top_medium"
+        >
             <my-membership></my-membership>
         </div>
     </div>

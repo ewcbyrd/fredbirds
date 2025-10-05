@@ -27,3 +27,46 @@
     height: 85px;
 }
 
+.events-main-header {
+    background: linear-gradient(to right, #718e5c, #8fa77d);
+    border-radius: 4px 4px 0 0;
+    padding: 1rem;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+}
+
+.header-content h2 {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 500;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-content {
+    color: #2f4f2f;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.slds-card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e5ee;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.carousel-container {
+    padding: 0;
+    background: transparent;
+}
+
+/* Welcome tile responsive layout */
+@media screen and (max-width: 767px) {
+    .ebird {
+        width: 150px;
+        height: auto;
+    }
+}

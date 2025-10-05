@@ -1,6 +1,16 @@
 .main {
     background-color: white;
     font-size: 1rem;
+    max-width: 70%;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+@media screen and (max-width: 767px) {
+    .main {
+        max-width: 100%;
+        padding: 1rem;
+    }
 }
 
 .events-main-header {
@@ -30,4 +40,16 @@
 .membership-content .slds-text-heading_medium {
     color: #2f4f2f;
     font-weight: 600;
+}
+
+/* Enhanced card styling for standalone page */
+.slds-card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e5ee;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.slds-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
