@@ -125,7 +125,9 @@ pre {
     border-color: #718e5c;
 }
 
-.pagination-controls .slds-button_icon-border:hover:not(:disabled) .slds-button__icon {
+.pagination-controls
+    .slds-button_icon-border:hover:not(:disabled)
+    .slds-button__icon {
     fill: white;
 }
 
@@ -153,4 +155,41 @@ pre {
     color: #2f4f2f;
     font-weight: 600;
     margin: 0;
+}
+
+.event-modal-content {
+    color: #2f4f2f;
+    line-height: 1.5;
+}
+
+.event-modal-content .slds-text-heading_small {
+    color: #2f4f2f;
+    font-weight: 600;
+}
+
+.event-modal-content .event-details-content {
+    color: #2f4f2f;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.event-modal-content .slds-list_dotted {
+    color: #2f4f2f;
+    padding-left: 1rem;
+}
+
+.slds-modal__container {
+    max-width: 50rem;
+}
+
+.slds-modal__content {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+@media screen and (max-width: 767px) {
+    .slds-modal__container {
+        max-width: 95vw;
+        margin: 1rem;
+    }
 }
