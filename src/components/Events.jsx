@@ -1,0 +1,438 @@
+import React, { useEffect, useState } from 'react'
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar'
+import { format, parse, startOfWeek, getDay } from 'date-fns'
+import enUS from 'date-fns/locale/en-US'
+import 'react-big-calendar/lib/css/react-big-calendar.css'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Box from '@mui/material/Box'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
+import { getEventsByYear, getFutureEvents } from '../services/restdbService'
+
+const locales = {
+  'en-US': enUS
+}
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+})
+
+export default function Events({ home = false, singleEvent = false, onViewAll }){
+  const [year, setYear] = useState(new Date().getFullYear())
+  const [yearEvents, setYearEvents] = useState([])
+  const [allEvents, setAllEvents] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [selected, setSelected] = useState(null)
+  const [currentIdx, setCurrentIdx] = useState(0)
+  const [currentDate, setCurrentDate] = useState(new Date())
+
+  useEffect(()=>{
+    setLoading(true)
+    if (home) {
+      getFutureEvents(new Date(), 3).then(res=>{
+        setYearEvents(transformEvents(res))
+        setLoading(false)
+      }).catch(()=>setLoading(false))
+    } else {
+      // Load events for multiple years to cover past and future
+      const currentYear = new Date().getFullYear()
+      // Load from 2015 to next year to show full history
+      const years = []
+      for (let y = 2015; y <= currentYear + 1; y++) {
+        years.push(y)
+      }
+      
+      Promise.all(years.map(y => getEventsByYear(y)))
+        .then(results => {
+          const combined = results.flat()
+          const transformed = transformEvents(combined)
+          setAllEvents(transformed)
+          setYearEvents(transformed)
+          setLoading(false)
+        })
+        .catch(()=>{
+          setLoading(false)
+        })
+    }
+  },[home])
+
+  function transformEvents(result){
+    if (!result || result.length===0) return []
+    // Map to React Big Calendar format
+    return result.map(item=>{
+      // Parse date strings and adjust for timezone to avoid off-by-one day issues
+      const startDate = new Date(item.start)
+      const endDate = item.end ? new Date(item.end) : new Date(item.start)
+      
+      // Create date in local timezone by using year, month, day components from UTC
+      const localStart = new Date(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate())
+      const localEnd = new Date(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate())
+      
+      // React Big Calendar treats end date as exclusive, so add 1 day to include the final day
+      // Since we're displaying the actual last day of the event, we need to set end to the day after
+      localEnd.setDate(localEnd.getDate() + 1)
+      
+      return {
+        id: item._id,
+        title: item.event,
+        start: localStart,
+        end: localEnd,
+        allDay: true,
+        resource: {
+          details: item.details,
+          cancelled: item.cancelled,
+          participants: item.participants || [],
+          species_sighted: item.species_sighted || [],
+          pdfFile: item.pdfFile
+        }
+      }
+    })
+  }
+
+  function formatEventDate(start, end){
+    if (!start) return ''
+    const s = new Date(start)
+    if (!end) return s.toLocaleDateString(undefined, { month: 'long', day: 'numeric' })
+    // Subtract 1 day from end since we added 1 day for calendar display (exclusive end date)
+    const e = new Date(end)
+    e.setDate(e.getDate() - 1)
+    const opts = { month: 'long', day: 'numeric' }
+    if (s.getMonth() === e.getMonth()) return `${s.toLocaleDateString(undefined, opts)} - ${e.getDate()}`
+    return `${s.toLocaleDateString(undefined, opts)} - ${e.toLocaleDateString(undefined, opts)}`
+  }
+
+  function handleSelectEvent(event){
+    setSelected(event)
+  }
+
+  function closeEvent(){ setSelected(null) }
+
+  if (loading) return <Typography>Loading...</Typography>
+
+  if (singleEvent){
+    const upcomingEvents = yearEvents.slice(0, 5)
+    if (upcomingEvents.length === 0) return <Typography>No upcoming events</Typography>
+    
+    return (
+      <Box>
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            mb: 3, 
+            fontWeight: 700,
+            color: '#1a1a1a'
+          }}
+        >
+          Upcoming Events
+        </Typography>
+        {upcomingEvents.map((event, idx) => {
+          // Calculate actual end date for display
+          const actualEnd = event.end ? new Date(event.end) : null
+          if (actualEnd) actualEnd.setDate(actualEnd.getDate() - 1)
+          const isMultiDay = actualEnd && actualEnd.toDateString() !== event.start.toDateString()
+          
+          return (
+            <Card 
+              key={event.id || idx} 
+              sx={{ 
+                mb: 2, 
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                borderRadius: 2,
+                overflow: 'hidden',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                '&:hover': {
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                  transform: 'translateY(-2px)'
+                }
+              }} 
+              onClick={() => handleSelectEvent(event)}
+            >
+              <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                  {/* Date box */}
+                  <Box 
+                    sx={{ 
+                      minWidth: 70,
+                      textAlign: 'center',
+                      bgcolor: event.resource?.cancelled ? '#d32f2f' : '#2c5f2d',
+                      color: 'white',
+                      borderRadius: 1,
+                      p: 1,
+                      flexShrink: 0
+                    }}
+                  >
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', lineHeight: 1 }}>
+                      {event.start.getDate()}
+                    </Typography>
+                    <Typography variant="caption" sx={{ textTransform: 'uppercase', fontSize: '0.65rem' }}>
+                      {event.start.toLocaleDateString('en-US', { month: 'short' })}
+                    </Typography>
+                  </Box>
+                  
+                  {/* Event details */}
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 0.5, flexWrap: 'wrap' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        {event.title}
+                      </Typography>
+                      {isMultiDay && (
+                        <Typography 
+                          component="span" 
+                          variant="caption" 
+                          sx={{ 
+                            bgcolor: '#e3f2fd', 
+                            color: '#1976d2',
+                            px: 1, 
+                            py: 0.25, 
+                            borderRadius: 1,
+                            fontWeight: 500
+                          }}
+                        >
+                          Multi-day
+                        </Typography>
+                      )}
+                      {event.resource?.cancelled && (
+                        <Typography 
+                          component="span" 
+                          variant="caption" 
+                          sx={{ 
+                            bgcolor: '#ffebee', 
+                            color: '#d32f2f',
+                            px: 1, 
+                            py: 0.25, 
+                            borderRadius: 1,
+                            fontWeight: 500
+                          }}
+                        >
+                          Cancelled
+                        </Typography>
+                      )}
+                    </Box>
+                    
+                    {isMultiDay && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                        {event.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {actualEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </Typography>
+                    )}
+                    
+                    {event.resource?.details && (
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ 
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          '& p': { margin: 0 }
+                        }}
+                        dangerouslySetInnerHTML={{__html: event.resource.details}} 
+                      />
+                    )}
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          )
+        })}
+        
+        <Button 
+          variant="contained"
+          fullWidth
+          size="large"
+          sx={{ 
+            mt: 3,
+            bgcolor: '#2c5f2d',
+            py: 1.5,
+            fontSize: '1rem',
+            fontWeight: 600,
+            textTransform: 'none',
+            boxShadow: '0 4px 12px rgba(44, 95, 45, 0.3)',
+            '&:hover': {
+              bgcolor: '#1e4620',
+              boxShadow: '0 6px 16px rgba(44, 95, 45, 0.4)'
+            }
+          }}
+          onClick={() => onViewAll && onViewAll('events')}
+        >
+          View Full Calendar
+        </Button>
+        
+        <Dialog open={!!selected} onClose={closeEvent} fullWidth maxWidth="sm">
+          <DialogTitle>{selected?.title}</DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              {selected?.start?.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+              {selected?.end && (() => {
+                // Subtract 1 day from end since we added 1 day for calendar display
+                const actualEnd = new Date(selected.end)
+                actualEnd.setDate(actualEnd.getDate() - 1)
+                // Only show range if actual end is different from start
+                if (actualEnd.toDateString() !== selected.start.toDateString()) {
+                  return ` - ${actualEnd.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
+                }
+                return ''
+              })()}
+            </Typography>
+            {selected?.resource?.details && <div dangerouslySetInnerHTML={{__html: selected.resource.details}} />}
+            {selected?.resource?.species_sighted?.length > 0 && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2">Species Sighted</Typography>
+                <ul>{selected.resource.species_sighted.map(s=> <li key={s.common}>{s.common}</li>)}</ul>
+              </Box>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeEvent}>Close</Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    )
+  }
+
+  const CustomToolbar = ({ label, onNavigate, onView, view }) => {
+    const goToYear = (targetYear) => {
+      const newDate = new Date(targetYear, 0, 1)
+      setCurrentDate(newDate)
+      onNavigate('DATE', newDate)
+    }
+
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+          <Button size="small" variant="outlined" onClick={() => onNavigate('PREV')}>
+            &lt;
+          </Button>
+          <Button size="small" variant="outlined" onClick={() => onNavigate('TODAY')}>
+            Today
+          </Button>
+          <Button size="small" variant="outlined" onClick={() => onNavigate('NEXT')}>
+            &gt;
+          </Button>
+        </Box>
+        
+        <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
+          {label}
+        </Typography>
+
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+          <Typography variant="body2" sx={{ mr: 1 }}>Year:</Typography>
+          <Select
+            size="small"
+            value={currentDate.getFullYear()}
+            onChange={(e) => goToYear(e.target.value)}
+            sx={{ minWidth: 100 }}
+          >
+            {[2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026].map(y => (
+              <MenuItem key={y} value={y}>{y}</MenuItem>
+            ))}
+          </Select>
+        </Box>
+
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button 
+            size="small" 
+            variant={view === 'month' ? 'contained' : 'outlined'}
+            onClick={() => onView('month')}
+          >
+            Month
+          </Button>
+          <Button 
+            size="small" 
+            variant={view === 'agenda' ? 'contained' : 'outlined'}
+            onClick={() => onView('agenda')}
+          >
+            Agenda
+          </Button>
+        </Box>
+      </Box>
+    )
+  }
+
+  // Full calendar view
+  return (
+    <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, py: 4 }}>
+      <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 3 }}>
+        Events Calendar
+      </Typography>
+      <Box sx={{ 
+        height: 650, 
+        bgcolor: 'white', 
+        p: 2, 
+        borderRadius: 2,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+        transition: 'box-shadow 0.3s ease',
+        '&:hover': { boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }
+      }}>
+        <Calendar
+          localizer={localizer}
+          events={yearEvents}
+          startAccessor="start"
+          endAccessor="end"
+          date={currentDate}
+          onNavigate={(date) => setCurrentDate(date)}
+          onSelectEvent={handleSelectEvent}
+          views={['month', 'agenda']}
+          defaultView="month"
+          style={{ height: '100%' }}
+          components={{
+            toolbar: CustomToolbar
+          }}
+          eventPropGetter={(event) => ({
+            style: {
+              backgroundColor: event.resource?.cancelled ? '#d32f2f' : '#2c5f2d',
+              borderRadius: '4px',
+              opacity: 0.9,
+              color: 'white',
+              border: '0px',
+              display: 'block'
+            }
+          })}
+        />
+      </Box>
+      
+      <Dialog open={!!selected} onClose={closeEvent} fullWidth maxWidth="sm">
+        <DialogTitle>{selected?.title}</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            {selected?.start?.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            {selected?.end && (() => {
+              // Subtract 1 day from end since we added 1 day for calendar display
+              const actualEnd = new Date(selected.end)
+              actualEnd.setDate(actualEnd.getDate() - 1)
+              // Only show range if actual end is different from start
+              if (actualEnd.toDateString() !== selected.start.toDateString()) {
+                return ` - ${actualEnd.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
+              }
+              return ''
+            })()}
+          </Typography>
+          {selected?.resource?.details && <div dangerouslySetInnerHTML={{__html: selected.resource.details}} />}
+          {selected?.resource?.species_sighted?.length > 0 && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle2">Species Sighted</Typography>
+              <ul>{selected.resource.species_sighted.map(s=> <li key={s.common}>{s.common}</li>)}</ul>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeEvent}>Close</Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  )
+}

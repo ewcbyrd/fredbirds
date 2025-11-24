@@ -1,0 +1,20 @@
+:root{
+  --header-gradient: linear-gradient(45deg,#718e5c,#8fa77d);
+}
+body{
+  margin:0;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+.header-box{
+  background: var(--header-gradient);
+  color: white;
+  padding: 1rem 0.5rem;
+}
+.header-title{
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.header-sub{
+  opacity: 0.95;
+  font-size: 0.9rem;
+}

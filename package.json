@@ -1,67 +1,28 @@
 {
-    "name": "birds",
-    "description": "Fredericksburg Birding Club App",
-    "version": "1.0.0",
-    "bugs": "https://github.com/birds/issues",
-    "dependencies": {
-        "@lwc/synthetic-shadow": "^1.18.0",
-        "@salesforce/design-system-react": "^0.10.50",
-        "aws-sdk": "^2.1257.0",
-        "bootstrap": "^4.6.2",
-        "compression": "^1.7.4",
-        "express": "^4.18.2",
-        "helmet": "^4.6.0",
-        "jquery": "^3.6.1",
-        "lightning-base-components": "^1.11.5-alpha"
-    },
-    "devDependencies": {
-        "@salesforce-ux/design-system": "^2.19.0",
-        "@types/bootstrap": "^5.2.6",
-        "eslint": "^7.29.0",
-        "gh-pages": "^3.2.3",
-        "husky": "^4.3.0",
-        "lightning-base-components": "^1.11.5-alpha",
-        "lint-staged": "^10.5.2",
-        "lwc-services": "^2.3.0",
-        "prettier": "^2.7.1"
-    },
-    "engines": {
-        "node": ">=10.13.0",
-        "npm": ">=6.4.1",
-        "yarn": ">=1.9.4"
-    },
-    "homepage": "https://ewcbyrd.github.io/fredbirds",
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
-    "keywords": [
-        "lwc"
-    ],
-    "license": "MIT",
-    "lint-staged": {
-        "**/*.{css,html,js,json,md,ts,yaml,yml}": [
-            "prettier --write"
-        ],
-        "./src/**/*.js": [
-            "eslint"
-        ]
-    },
-    "repository": "birds",
-    "scripts": {
-        "build": "lwc-services build -m production",
-        "build:development": "lwc-services build",
-        "lint": "eslint ./src/**/*.js",
-        "prettier": "prettier --write \"**/*.{css,html,js,json,md,ts,yaml,yml}\"",
-        "prettier:verify": "prettier --list-different \"**/*.{css,html,js,json,md,ts,yaml,yml}\"",
-        "serve": "node scripts/server.js",
-        "test:unit": "lwc-services test:unit",
-        "test:unit:coverage": "lwc-services test:unit --coverage",
-        "test:unit:debug": "lwc-services test:unit --debug",
-        "test:unit:watch": "lwc-services test:unit --watch",
-        "watch": "lwc-services watch",
-        "predeploy": "npm run build",
-        "deploy": "gh-pages -d dist"
-    }
+  "name": "birds-react",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.0",
+    "@mui/material": "^5.14.0",
+    "date-fns": "^4.1.0",
+    "react": "^18.2.0",
+    "react-big-calendar": "^1.19.4",
+    "react-dom": "^18.2.0",
+    "react-photo-album": "^3.2.1",
+    "react-router-dom": "^6.18.0",
+    "yet-another-react-lightbox": "^3.25.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.1",
+    "vite": "^5.0.0"
+  }
 }
