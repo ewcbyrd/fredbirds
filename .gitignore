@@ -28,8 +28,9 @@ ehthumbs.db
 [Dd]esktop.ini
 $RECYCLE.BIN/
 
-srs/SLDS/*
-
 src/resources/pdf/*
 
-src/modules/data/*
+# Environment variables
+.env
+.env.local
+.env.*.local
