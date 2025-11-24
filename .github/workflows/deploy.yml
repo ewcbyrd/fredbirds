@@ -37,9 +37,13 @@ jobs:
       - name: Copy index.html to 404.html for SPA routing
         run: cp ./dist/index.html ./dist/404.html
 
+      - name: Add CNAME file for custom domain
+        run: echo "www.fredbirds.com" > ./dist/CNAME
+
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: gh-pages
+          cname: www.fredbirds.com
