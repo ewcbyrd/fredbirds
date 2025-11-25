@@ -2,7 +2,14 @@ const api = 'https://fredbirds-api.herokuapp.com/';
 
 const get = async (url) => {
   const res = await fetch(url, { method: 'GET' });
-  return res.json();
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  }
+  const contentType = res.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return res.json();
+  }
+  throw new Error(`Expected JSON response, got ${contentType || 'unknown'}`);
 };
 
 const post = async (url, body) => {
@@ -85,8 +92,69 @@ export const getNewsFeeds = async () => {
 };
 
 export const getFeed = async (feedUrl) => {
-  const url = `${api}rss?url=${encodeURIComponent(feedUrl)}`;
-  return get(url);
+  try {
+    // Use rss2json.com service to convert RSS to JSON
+    const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
+    const response = await fetch(proxyUrl);
+    
+    if (!response.ok) {
+      if (response.status === 422) {
+        throw new Error('RSS feed format not supported by conversion service');
+      }
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    if (data.status !== 'ok') {
+      throw new Error(data.message || 'RSS fetch failed');
+    }
+    
+    // Helper function to extract first image from HTML
+    const extractImage = (htmlString) => {
+      if (!htmlString) return null;
+      const imgMatch = htmlString.match(/<img[^>]+src="([^">]+)"/);
+      return imgMatch ? imgMatch[1] : null;
+    };
+    
+    // Helper function to strip HTML tags
+    const stripHtml = (htmlString) => {
+      if (!htmlString) return '';
+      return htmlString
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .substring(0, 200) + (htmlString.length > 200 ? '...' : '');
+    };
+    
+    // Convert rss2json format to our expected format
+    const items = (data.items || []).map((item, idx) => {
+      const description = item.description || '';
+      const content = item.content || description;
+      const imageUrl = extractImage(content) || item.thumbnail || null;
+      
+      return {
+        id: idx,
+        title: item.title || '',
+        description: stripHtml(description),
+        link: item.link || '',
+        pubDate: item.pubDate || '',
+        content: content,
+        thumbnail: imageUrl,
+        enclosure: imageUrl ? { url: imageUrl } : {}
+      };
+    });
+    
+    return { items };
+  } catch (error) {
+    console.warn(`RSS feed unavailable: ${feedUrl}`, error.message);
+    // Return empty feed structure with error info instead of throwing
+    return { 
+      items: [],
+      error: error.message,
+      feedUrl 
+    };
+  }
 };
 
 export const getRareBirds = async () => {

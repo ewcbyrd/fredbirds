@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Typography, Card, CardContent, CardActionArea, Grid, Select, MenuItem, FormControl, InputLabel, CircularProgress, CardMedia } from '@mui/material'
+import { Box, Typography, Card, CardContent, CardActionArea, Grid, Select, MenuItem, FormControl, InputLabel, CircularProgress, CardMedia, Button } from '@mui/material'
+import { Flaky as FeatherIcon } from '@mui/icons-material'
 import { getNewsFeeds, getFeed } from '../services/restdbService'
 import NewsFeedDetails from './NewsFeedDetails'
 
@@ -38,7 +39,13 @@ export default function NewsFeed() {
         const res = await getFeed(selectedFeed.url)
         const data = res && typeof res.json === 'function' ? await res.json() : res
         const items = data && data.items ? data.items.map((item, idx) => ({ ...item, id: item.id || idx })) : []
-        if (!cancelled) setArticles(items)
+        if (!cancelled) {
+          setArticles(items)
+          // Show error message if feed failed but don't block the UI
+          if (data.error && items.length === 0) {
+            console.warn(`Feed error for ${selectedFeed.title}:`, data.error)
+          }
+        }
       } catch (e) {
         console.error('getFeed error', e)
         if (!cancelled) setArticles([])
@@ -49,6 +56,17 @@ export default function NewsFeed() {
     loadArticles()
     return () => { cancelled = true }
   }, [selectedFeed])
+
+  const handleFeedSelect = (event) => {
+    const feed = feeds.find(f => f._id === event.target.value)
+    setSelectedFeed(feed)
+  }
+
+  const handleDirectLink = () => {
+    if (selectedFeed?.url) {
+      window.open(selectedFeed.url, '_blank', 'noopener,noreferrer')
+    }
+  }
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
@@ -75,24 +93,88 @@ export default function NewsFeed() {
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}><CircularProgress /></Box>
+      ) : articles.length === 0 && selectedFeed ? (
+        <Box sx={{ textAlign: 'center', my: 4 }}>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            RSS feed content is temporarily unavailable.
+          </Typography>
+          <Button 
+            variant="outlined" 
+            onClick={handleDirectLink}
+            sx={{ mb: 2 }}
+          >
+            Visit {selectedFeed.title} directly
+          </Button>
+          <Typography variant="body2" color="text.secondary">
+            Click the button above to read the latest articles from {selectedFeed.title}
+          </Typography>
+        </Box>
       ) : articles.length === 0 ? (
-        <Typography>No articles available.</Typography>
+        <Typography>No news sources available.</Typography>
       ) : (
         <Grid container spacing={2}>
           {articles.map((article) => (
             <Grid item xs={12} sm={6} md={4} key={article.id}>
-              <Card>
-                <CardActionArea onClick={() => setSelectedArticle(article)}>
+              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <CardActionArea 
+                  onClick={() => setSelectedArticle(article)}
+                  sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}
+                >
                   {article.enclosure?.url ? (
-                    <CardMedia component="img" image={article.enclosure.url} alt={article.title} sx={{ height: 140, objectFit: 'cover' }} />
-                  ) : null}
-                  <CardContent>
-                    <Typography variant="h6" sx={{ fontSize: '1rem', mb: 0.5 }}>{article.title}</Typography>
-                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+                    <CardMedia 
+                      component="img" 
+                      image={article.enclosure.url} 
+                      alt={article.title} 
+                      sx={{ height: 140, objectFit: 'cover', flexShrink: 0 }} 
+                    />
+                  ) : (
+                    <Box 
+                      sx={{ 
+                        height: 140, 
+                        backgroundColor: 'grey.100',
+                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)'
+                      }} 
+                    >
+                      <Typography sx={{ fontSize: 48 }}>🦅</Typography>
+                    </Box>
+                  )}
+                  <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        fontSize: '1rem', 
+                        mb: 0.5, 
+                        fontWeight: 500,
+                        lineHeight: 1.2,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        minHeight: '2.4rem'
+                      }}
+                    >
+                      {article.title}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1, flexShrink: 0 }}>
                       {article.pubDate || article.isoDate || ''}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ maxHeight: 60, overflow: 'hidden' }}>
-                      {article.contentSnippet || article.description || ''}
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary" 
+                      sx={{ 
+                        flexGrow: 1,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        lineHeight: 1.4
+                      }}
+                    >
+                      {article.description || ''}
                     </Typography>
                   </CardContent>
                 </CardActionArea>

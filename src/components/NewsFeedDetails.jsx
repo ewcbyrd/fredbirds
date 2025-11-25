@@ -52,13 +52,31 @@ export default function NewsFeedDetails({ item, feedUrl, index, open = !!item ||
               </Typography>
             ) : null}
 
-            {entry.enclosure?.url ? (
+            {entry.thumbnail || entry.enclosure?.url ? (
               <Box sx={{ textAlign: 'center', mb: 2 }}>
-                <img src={entry.enclosure.url} alt={entry.title} style={{ maxWidth: '100%', height: 'auto' }} />
+                <img 
+                  src={entry.thumbnail || entry.enclosure?.url} 
+                  alt={entry.title} 
+                  style={{ 
+                    maxWidth: '100%', 
+                    height: 'auto',
+                    borderRadius: '8px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                  }} 
+                />
               </Box>
             ) : null}
 
-            <div dangerouslySetInnerHTML={{ __html: entry.content || entry.contentSnippet || entry.description || '' }} />
+            {/* Show either clean description or HTML content, but not both */}
+            {entry.description && entry.description.length > 50 ? (
+              <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
+                {entry.description}
+              </Typography>
+            ) : entry.content ? (
+              <Box sx={{ mb: 2, '& img': { display: 'none' } }}>
+                <div dangerouslySetInnerHTML={{ __html: entry.content }} />
+              </Box>
+            ) : null}
 
             {entry.link ? (
               <Typography sx={{ mt: 2 }}>
