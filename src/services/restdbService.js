@@ -41,6 +41,11 @@ export const getNewsletters = async () => {
   return get(url);
 };
 
+export const getOfficers = async () => {
+  const url = `${api}members/officers`;
+  return get(url);
+};
+
 export const saveMember = async (memberJson) => {
   const url = `${api}members`;
   return post(url, memberJson);
