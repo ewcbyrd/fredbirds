@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box, Typography, Card, CardContent } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import vsoLogo from '../resources/photos/vso.png'
 
 export default function About() {
   const navigate = useNavigate()
@@ -26,7 +27,7 @@ export default function About() {
           <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
             <Box sx={{ flexShrink: 0 }}>
               <img 
-                src="/src/resources/photos/vso.png" 
+                src={vsoLogo} 
                 alt="Virginia Society of Ornithology"
                 style={{ maxWidth: '200px' }}
               />
@@ -50,7 +51,7 @@ export default function About() {
               </Typography>
               <Typography variant="body1" paragraph sx={{ lineHeight: 1.7 }}>
                 Many opportunities are provided for members to enjoy birds locally and across the state. 
-                Club Coordinator, Sally Knight, and other FBC members lead numerous field trips throughout the year (see our <a href="#" onClick={handleViewEventsClick}>Calendar of Events</a>). 
+                Club Coordinator, Mike Lott, and other FBC members lead numerous field trips throughout the year (see our <a href="#" onClick={handleViewEventsClick}>Calendar of Events</a>). 
                 In addition to these, the FBC participates with fellow VSO chapters in birding activities. 
                 Our trip leaders and members are always happy to help beginning birders develop their love of birding and grow more familiar with our local birds. 
                 Speaking engagements on bird research and conservation are also offered.
