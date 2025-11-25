@@ -5,6 +5,9 @@ import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import Link from '@mui/material/Link'
+import Container from '@mui/material/Container'
+import Chip from '@mui/material/Chip'
+import AnnouncementIcon from '@mui/icons-material/Announcement'
 import { getAnnouncements } from '../services/restdbService'
 
 export default function Announcements(){
@@ -77,20 +80,161 @@ export default function Announcements(){
     });
   };
 
-  if (!items.length) return (<Typography variant="body1" color="text.secondary">There is no current club news</Typography>)
+  if (!items.length) return (
+    <Box sx={{ bgcolor: '#f7faf7', minHeight: '50vh', py: 6 }}>
+      <Container maxWidth="lg">
+        {/* Header Section */}
+        <Box sx={{ textAlign: 'center', mb: 6 }}>
+          <Typography 
+            variant="h3" 
+            sx={{ 
+              fontWeight: 700,
+              mb: 2,
+              color: 'text.primary',
+              fontSize: { xs: '2rem', md: '2.5rem' }
+            }}
+          >
+            Club Announcements
+          </Typography>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              color: 'text.secondary',
+              fontWeight: 400,
+              maxWidth: 600,
+              mx: 'auto'
+            }}
+          >
+            Stay updated with the latest news and important information from the Fredericksburg Birding Club
+          </Typography>
+        </Box>
+
+        {/* No Announcements Message */}
+        <Box sx={{ 
+          textAlign: 'center', 
+          py: 6,
+          bgcolor: 'white',
+          borderRadius: 3,
+          boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
+        }}>
+          <AnnouncementIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+          <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
+            There is no current club news
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+            Check back soon for updates and announcements
+          </Typography>
+        </Box>
+      </Container>
+    </Box>
+  )
 
   return (
-    <Grid container spacing={2}>
-      {items.map(item=> (
-        <Grid item xs={12} key={item._id}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 2 }}>{item.headline}</Typography>
-              <Box>{formatText(item.details)}</Box>
-            </CardContent>
-          </Card>
+    <Box sx={{ bgcolor: '#f7faf7', minHeight: '100vh', py: 6 }}>
+      <Container maxWidth="lg">
+        {/* Header Section */}
+        <Box sx={{ textAlign: 'center', mb: 6 }}>
+          <Typography 
+            variant="h3" 
+            sx={{ 
+              fontWeight: 700,
+              mb: 2,
+              color: 'text.primary',
+              fontSize: { xs: '2rem', md: '2.5rem' }
+            }}
+          >
+            Club Announcements
+          </Typography>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              color: 'text.secondary',
+              fontWeight: 400,
+              maxWidth: 600,
+              mx: 'auto'
+            }}
+          >
+            Stay updated with the latest news and important information from the Fredericksburg Birding Club
+          </Typography>
+        </Box>
+
+        {/* Announcements Grid */}
+        <Grid container spacing={3}>
+          {items.map(item=> (
+            <Grid item xs={12} key={item._id}>
+              <Card sx={{ 
+                height: '100%',
+                borderRadius: 3,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+                  transform: 'translateY(-2px)'
+                }
+              }}>
+                <CardContent sx={{ p: 4 }}>
+                  {/* Announcement Header */}
+                  <Box sx={{ mb: 3 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                      <AnnouncementIcon sx={{ color: 'primary.main', fontSize: 24 }} />
+                      <Chip 
+                        label="Announcement" 
+                        size="small" 
+                        sx={{ 
+                          bgcolor: 'primary.50',
+                          color: 'primary.700',
+                          fontWeight: 600
+                        }} 
+                      />
+                    </Box>
+                    
+                    <Typography 
+                      variant="h5" 
+                      sx={{ 
+                        fontWeight: 700,
+                        color: 'text.primary',
+                        lineHeight: 1.3,
+                        mb: 2
+                      }}
+                    >
+                      {item.headline}
+                    </Typography>
+                    
+                    {item.date && (
+                      <Typography 
+                        variant="caption" 
+                        sx={{ 
+                          color: 'text.secondary',
+                          fontWeight: 500,
+                          textTransform: 'uppercase',
+                          letterSpacing: 0.5
+                        }}
+                      >
+                        {new Date(item.date).toLocaleDateString('en-US', { 
+                          month: 'long', 
+                          day: 'numeric', 
+                          year: 'numeric' 
+                        })}
+                      </Typography>
+                    )}
+                  </Box>
+                  
+                  {/* Announcement Content */}
+                  <Box sx={{ 
+                    '& p': { mb: 1 },
+                    '& .MuiTypography-root': { 
+                      lineHeight: 1.6,
+                      fontSize: '0.95rem'
+                    }
+                  }}>
+                    {formatText(item.details)}
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
-      ))}
-    </Grid>
+      </Container>
+    </Box>
   )
 }
