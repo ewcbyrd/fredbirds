@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import Fade from '@mui/material/Fade'
+import AnnouncementIcon from '@mui/icons-material/Announcement'
 import Events from './Events'
 import NearbySightings from './NearbySightings'
+import { getAnnouncements } from '../services/restdbService'
 
 import img5 from '../resources/photos/image5.jpeg?url'
 import imgCBBT from '../resources/photos/CBBT.jpeg?url'
@@ -28,6 +31,37 @@ const items = [
 ]
 
 export default function Home({ onNavigate }){
+  const [announcements, setAnnouncements] = useState([])
+  const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0)
+  const [fadeIn, setFadeIn] = useState(true)
+
+  // Load announcements on component mount
+  useEffect(() => {
+    getAnnouncements().then(data => {
+      if (data && data.length > 0) {
+        setAnnouncements(data)
+      }
+    })
+  }, [])
+
+  // Rotate announcements every 5 seconds
+  useEffect(() => {
+    if (announcements.length <= 1) return
+
+    const interval = setInterval(() => {
+      setFadeIn(false)
+      
+      setTimeout(() => {
+        setCurrentAnnouncementIndex(prev => 
+          (prev + 1) % announcements.length
+        )
+        setFadeIn(true)
+      }, 300) // Half of the fade transition duration
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [announcements.length])
+
   return (
     <Box>
       {/* Hero Banner - Full Width */}
@@ -81,7 +115,13 @@ export default function Home({ onNavigate }){
             events, and community.
           </Typography>
 
-          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 2, 
+            justifyContent: 'center', 
+            flexWrap: 'wrap',
+            pb: { xs: 3, md: 0 }
+          }}>
             <Button
               variant="outlined"
               size="large"
@@ -148,6 +188,63 @@ export default function Home({ onNavigate }){
           </Box>
         </Box>
       </Box>
+
+      {/* Announcements Headlines Section */}
+      {announcements.length > 0 && (
+        <Box sx={{ 
+          bgcolor: '#f8f9fa', 
+          borderTop: '1px solid #e9ecef',
+          borderBottom: '1px solid #e9ecef',
+          py: 3,
+          position: 'relative',
+          overflow: 'hidden',
+          minHeight: { xs: 96, md: 120 }
+        }}>
+          <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 } }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              gap: 2,
+              height: { xs: 48, md: 72 }
+            }}>
+              
+              <Box sx={{ flex: 1, textAlign: 'center', overflow: 'hidden' }}>
+                <Fade in={fadeIn} timeout={600}>
+                  <Box sx={{ 
+                    height: { xs: 48, md: 72 },
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    px: 2
+                  }}>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        color: 'text.primary',
+                        transition: 'color 0.3s ease',
+                        lineHeight: { xs: 1.3, md: 1.2 },
+                        fontSize: { xs: '1rem', md: '1.25rem' },
+                        overflow: 'hidden',
+                        textAlign: 'center',
+                        width: '100%',
+                        '&:hover': {
+                          color: 'primary.main'
+                        }
+                      }}
+                      onClick={() => onNavigate('announcements')}
+                    >
+                      {announcements[currentAnnouncementIndex]?.headline}
+                    </Typography>
+                  </Box>
+                </Fade>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      )}
 
       {/* Events Section - White Background */}
       <Box sx={{ bgcolor: 'white', py: 6 }}>
