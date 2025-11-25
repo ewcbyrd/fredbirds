@@ -7,15 +7,30 @@ import Box from '@mui/material/Box'
 import Link from '@mui/material/Link'
 import Container from '@mui/material/Container'
 import Chip from '@mui/material/Chip'
+import Pagination from '@mui/material/Pagination'
+import Stack from '@mui/material/Stack'
 import AnnouncementIcon from '@mui/icons-material/Announcement'
 import { getAnnouncements } from '../services/restdbService'
 
 export default function Announcements(){
   const [items, setItems] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 1
 
   useEffect(()=>{
     getAnnouncements().then(data=> setItems(data || []))
   },[])
+
+  // Pagination logic
+  const totalPages = Math.ceil(items.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const currentItems = items.slice(startIndex, startIndex + itemsPerPage)
+
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page)
+    // Smooth scroll to top of announcements
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   // Function to format text content for display
   const formatText = (text) => {
@@ -158,9 +173,43 @@ export default function Announcements(){
           </Typography>
         </Box>
 
+        {/* Pagination - Above Cards */}
+        {totalPages > 1 && (
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            mb: 4
+          }}>
+            <Stack spacing={2} alignItems="center">
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Showing announcement {currentPage} of {totalPages}
+              </Typography>
+              <Pagination 
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                size="large"
+                sx={{
+                  '& .MuiPaginationItem-root': {
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                  },
+                  '& .MuiPaginationItem-root.Mui-selected': {
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    '&:hover': {
+                      bgcolor: 'primary.dark',
+                    }
+                  }
+                }}
+              />
+            </Stack>
+          </Box>
+        )}
+
         {/* Announcements Grid */}
         <Grid container spacing={3}>
-          {items.map(item=> (
+          {currentItems.map(item=> (
             <Grid item xs={12} key={item._id}>
               <Card sx={{ 
                 height: '100%',
