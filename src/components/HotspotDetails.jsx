@@ -77,8 +77,12 @@ export default function HotspotDetails() {
     )
   }
 
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  
   const mapUrl = hotspot.lat && hotspot.lng
-    ? `https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${hotspot.lat},${hotspot.lng}&zoom=14`
+    ? apiKey 
+      ? `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${hotspot.lat},${hotspot.lng}&zoom=14`
+      : `https://www.google.com/maps?q=${hotspot.lat},${hotspot.lng}&output=embed&z=14`
     : null
 
   return (

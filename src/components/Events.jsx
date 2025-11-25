@@ -15,6 +15,13 @@ import DialogActions from '@mui/material/DialogActions'
 import Box from '@mui/material/Box'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
+import Link from '@mui/material/Link'
+import Chip from '@mui/material/Chip'
+import Divider from '@mui/material/Divider'
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import LocationOnIcon from '@mui/icons-material/LocationOn'
 import { getEventsByYear, getFutureEvents } from '../services/restdbService'
 
 const locales = {
@@ -28,6 +35,105 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 })
+
+// Function to detect URLs and render them as clickable links
+const renderTextWithLinks = (text) => {
+  if (!text) return text;
+  
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+  
+  return parts.map((part, index) => {
+    if (urlRegex.test(part)) {
+      return (
+        <Link 
+          key={index} 
+          href={part} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          sx={{ color: 'primary.main', textDecoration: 'underline' }}
+        >
+          {part}
+        </Link>
+      );
+    }
+    return part;
+  });
+};
+
+// Function to format text content with line breaks and URLs
+const formatEventDetails = (details) => {
+  if (!details) return null;
+  
+  const lines = details.split('\n');
+  
+  return lines.map((line, index) => (
+    <Box key={index} component="div" sx={{ mb: 0.5 }}>
+      {renderTextWithLinks(line)}
+    </Box>
+  ));
+};
+
+// Component to render event location map
+const EventMap = ({ lat, lon, title }) => {
+  if (!lat || !lon) return null;
+  
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  
+  // Use Google Maps embed with API key if available, fallback to basic embed
+  const mapSrc = apiKey 
+    ? `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${lat},${lon}&zoom=15`
+    : `https://www.google.com/maps?q=${lat},${lon}&output=embed&z=15`;
+  
+  return (
+    <Box>
+      <Divider sx={{ mb: 2 }} />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+        <LocationOnIcon color="primary" fontSize="small" />
+        <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+          Event Location
+        </Typography>
+      </Box>
+      <Box sx={{ 
+        bgcolor: 'info.50',
+        p: 2,
+        borderRadius: 2,
+        border: 1,
+        borderColor: 'info.200',
+        mb: 3
+      }}>
+        <Box sx={{ 
+          position: 'relative',
+          width: '100%',
+          height: 250,
+          borderRadius: 2,
+          overflow: 'hidden',
+          border: 1,
+          borderColor: 'grey.300'
+        }}>
+          <iframe
+            src={mapSrc}
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title={`Map for ${title}`}
+          />
+        </Box>
+        <Typography variant="caption" sx={{ 
+          display: 'block', 
+          mt: 1, 
+          color: 'text.secondary',
+          textAlign: 'center'
+        }}>
+          {apiKey ? 'Interactive Google Maps • Click and drag to explore' : 'Basic map view • Click to open in Google Maps'}
+        </Typography>
+      </Box>
+    </Box>
+  );
+};
 
 export default function Events({ home = false, singleEvent = false, onViewAll }){
   const [year, setYear] = useState(new Date().getFullYear())
@@ -95,7 +201,9 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
           cancelled: item.cancelled,
           participants: item.participants || [],
           species_sighted: item.species_sighted || [],
-          pdfFile: item.pdfFile
+          pdfFile: item.pdfFile,
+          lat: item.lat,
+          lon: item.lon
         }
       }
     })
@@ -240,8 +348,9 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
                           WebkitBoxOrient: 'vertical',
                           '& p': { margin: 0 }
                         }}
-                        dangerouslySetInnerHTML={{__html: event.resource.details}} 
-                      />
+                      >
+                        {formatEventDetails(event.resource.details)}
+                      </Typography>
                     )}
                   </Box>
                 </Box>
@@ -272,32 +381,154 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
           View Full Calendar
         </Button>
         
-        <Dialog open={!!selected} onClose={closeEvent} fullWidth maxWidth="sm">
-          <DialogTitle>{selected?.title}</DialogTitle>
-          <DialogContent>
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              {selected?.start?.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-              {selected?.end && (() => {
-                // Subtract 1 day from end since we added 1 day for calendar display
-                const actualEnd = new Date(selected.end)
-                actualEnd.setDate(actualEnd.getDate() - 1)
-                // Only show range if actual end is different from start
-                if (actualEnd.toDateString() !== selected.start.toDateString()) {
-                  return ` - ${actualEnd.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
-                }
-                return ''
-              })()}
-            </Typography>
-            {selected?.resource?.details && <div dangerouslySetInnerHTML={{__html: selected.resource.details}} />}
-            {selected?.resource?.species_sighted?.length > 0 && (
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle2">Species Sighted</Typography>
-                <ul>{selected.resource.species_sighted.map(s=> <li key={s.common}>{s.common}</li>)}</ul>
+        <Dialog 
+          open={!!selected} 
+          onClose={closeEvent} 
+          fullWidth 
+          maxWidth="sm"
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)'
+            }
+          }}
+        >
+          <DialogTitle 
+            sx={{ 
+              bgcolor: 'primary.main', 
+              color: 'white', 
+              py: 3,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2
+            }}
+          >
+            <CalendarTodayIcon />
+            <Box>
+              <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+                {selected?.title}
+              </Typography>
+              {selected?.resource?.cancelled && (
+                <Chip 
+                  label="CANCELLED" 
+                  size="small" 
+                  sx={{ 
+                    bgcolor: 'error.main', 
+                    color: 'white', 
+                    fontWeight: 600,
+                    mt: 1
+                  }} 
+                />
+              )}
+            </Box>
+          </DialogTitle>
+          <DialogContent sx={{ p: 3 }}>
+            <Box sx={{ 
+              bgcolor: 'grey.50', 
+              p: 2, 
+              borderRadius: 2, 
+              mb: 3,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
+            }}>
+              <CalendarTodayIcon color="primary" fontSize="small" />
+              <Typography variant="body1" sx={{ fontWeight: 500, color: 'text.primary' }}>
+                {selected?.start?.toLocaleDateString('en-US', { 
+                  weekday: 'long',
+                  month: 'long', 
+                  day: 'numeric', 
+                  year: 'numeric' 
+                })}
+                {selected?.end && (() => {
+                  // Subtract 1 day from end since we added 1 day for calendar display
+                  const actualEnd = new Date(selected.end)
+                  actualEnd.setDate(actualEnd.getDate() - 1)
+                  // Only show range if actual end is different from start
+                  if (actualEnd.toDateString() !== selected.start.toDateString()) {
+                    return ` - ${actualEnd.toLocaleDateString('en-US', { 
+                      weekday: 'long',
+                      month: 'long', 
+                      day: 'numeric', 
+                      year: 'numeric' 
+                    })}`
+                  }
+                  return ''
+                })()}
+              </Typography>
+            </Box>
+            {selected?.resource?.details && (
+              <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                  <InfoOutlinedIcon color="primary" fontSize="small" />
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                    Event Details
+                  </Typography>
+                </Box>
+                <Box sx={{ 
+                  bgcolor: 'white',
+                  p: 2,
+                  borderRadius: 2,
+                  border: 1,
+                  borderColor: 'grey.200',
+                  mb: 3
+                }}>
+                  {formatEventDetails(selected.resource.details)}
+                </Box>
               </Box>
             )}
+            {selected?.resource?.species_sighted?.length > 0 && (
+              <Box>
+                <Divider sx={{ mb: 2 }} />
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                  <VisibilityIcon color="primary" fontSize="small" />
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                    Species Sighted
+                  </Typography>
+                </Box>
+                <Box sx={{ 
+                  bgcolor: 'success.50',
+                  p: 2,
+                  borderRadius: 2,
+                  border: 1,
+                  borderColor: 'success.200'
+                }}>
+                  <Box component="ul" sx={{ 
+                    m: 0, 
+                    pl: 2,
+                    '& li': {
+                      mb: 0.5,
+                      color: 'success.800',
+                      fontWeight: 500
+                    }
+                  }}>
+                    {selected.resource.species_sighted.map(s=> 
+                      <li key={s.common}>{s.common}</li>
+                    )}
+                  </Box>
+                </Box>
+              </Box>
+            )}
+            <EventMap 
+              lat={selected?.resource?.lat} 
+              lon={selected?.resource?.lon} 
+              title={selected?.title}
+            />
           </DialogContent>
-          <DialogActions>
-            <Button onClick={closeEvent}>Close</Button>
+          <DialogActions sx={{ p: 3, pt: 0 }}>
+            <Button 
+              onClick={closeEvent}
+              variant="contained"
+              size="large"
+              sx={{
+                minWidth: 120,
+                textTransform: 'none',
+                fontWeight: 600,
+                borderRadius: 2
+              }}
+            >
+              Close
+            </Button>
           </DialogActions>
         </Dialog>
       </Box>
@@ -405,32 +636,154 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
         />
       </Box>
       
-      <Dialog open={!!selected} onClose={closeEvent} fullWidth maxWidth="sm">
-        <DialogTitle>{selected?.title}</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" sx={{ mb: 2 }}>
-            {selected?.start?.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-            {selected?.end && (() => {
-              // Subtract 1 day from end since we added 1 day for calendar display
-              const actualEnd = new Date(selected.end)
-              actualEnd.setDate(actualEnd.getDate() - 1)
-              // Only show range if actual end is different from start
-              if (actualEnd.toDateString() !== selected.start.toDateString()) {
-                return ` - ${actualEnd.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
-              }
-              return ''
-            })()}
-          </Typography>
-          {selected?.resource?.details && <div dangerouslySetInnerHTML={{__html: selected.resource.details}} />}
-          {selected?.resource?.species_sighted?.length > 0 && (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="subtitle2">Species Sighted</Typography>
-              <ul>{selected.resource.species_sighted.map(s=> <li key={s.common}>{s.common}</li>)}</ul>
+      <Dialog 
+        open={!!selected} 
+        onClose={closeEvent} 
+        fullWidth 
+        maxWidth="sm"
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)'
+          }
+        }}
+      >
+        <DialogTitle 
+          sx={{ 
+            bgcolor: 'primary.main', 
+            color: 'white', 
+            py: 3,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2
+          }}
+        >
+          <CalendarTodayIcon />
+          <Box>
+            <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+              {selected?.title}
+            </Typography>
+            {selected?.resource?.cancelled && (
+              <Chip 
+                label="CANCELLED" 
+                size="small" 
+                sx={{ 
+                  bgcolor: 'error.main', 
+                  color: 'white', 
+                  fontWeight: 600,
+                  mt: 1
+                }} 
+              />
+            )}
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          <Box sx={{ 
+            bgcolor: 'grey.50', 
+            p: 2, 
+            borderRadius: 2, 
+            mb: 3,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1
+          }}>
+            <CalendarTodayIcon color="primary" fontSize="small" />
+            <Typography variant="body1" sx={{ fontWeight: 500, color: 'text.primary' }}>
+              {selected?.start?.toLocaleDateString('en-US', { 
+                weekday: 'long',
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric' 
+              })}
+              {selected?.end && (() => {
+                // Subtract 1 day from end since we added 1 day for calendar display
+                const actualEnd = new Date(selected.end)
+                actualEnd.setDate(actualEnd.getDate() - 1)
+                // Only show range if actual end is different from start
+                if (actualEnd.toDateString() !== selected.start.toDateString()) {
+                  return ` - ${actualEnd.toLocaleDateString('en-US', { 
+                    weekday: 'long',
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                  })}`
+                }
+                return ''
+              })()}
+            </Typography>
+          </Box>
+          {selected?.resource?.details && (
+            <Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <InfoOutlinedIcon color="primary" fontSize="small" />
+                <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                  Event Details
+                </Typography>
+              </Box>
+              <Box sx={{ 
+                bgcolor: 'white',
+                p: 2,
+                borderRadius: 2,
+                border: 1,
+                borderColor: 'grey.200',
+                mb: 3
+              }}>
+                {formatEventDetails(selected.resource.details)}
+              </Box>
             </Box>
           )}
+          {selected?.resource?.species_sighted?.length > 0 && (
+            <Box>
+              <Divider sx={{ mb: 2 }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <VisibilityIcon color="primary" fontSize="small" />
+                <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                  Species Sighted
+                </Typography>
+              </Box>
+              <Box sx={{ 
+                bgcolor: 'success.50',
+                p: 2,
+                borderRadius: 2,
+                border: 1,
+                borderColor: 'success.200'
+              }}>
+                <Box component="ul" sx={{ 
+                  m: 0, 
+                  pl: 2,
+                  '& li': {
+                    mb: 0.5,
+                    color: 'success.800',
+                    fontWeight: 500
+                  }
+                }}>
+                  {selected.resource.species_sighted.map(s=> 
+                    <li key={s.common}>{s.common}</li>
+                  )}
+                </Box>
+              </Box>
+            </Box>
+          )}
+          <EventMap 
+            lat={selected?.resource?.lat} 
+            lon={selected?.resource?.lon} 
+            title={selected?.title}
+          />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={closeEvent}>Close</Button>
+        <DialogActions sx={{ p: 3, pt: 0 }}>
+          <Button 
+            onClick={closeEvent}
+            variant="contained"
+            size="large"
+            sx={{
+              minWidth: 120,
+              textTransform: 'none',
+              fontWeight: 600,
+              borderRadius: 2
+            }}
+          >
+            Close
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
