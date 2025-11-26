@@ -81,6 +81,87 @@ export const getMembers = async () => {
   return get(url);
 };
 
+export const getActiveMembers = async () => {
+  const url = `${api}members/active`;
+  return get(url);
+};
+
+export const getUserRole = async (email, auth0Id) => {
+  const url = `${api}members/role`;
+  return post(url, JSON.stringify({ email, auth0Id }));
+};
+
+export const getMemberByEmail = async (email) => {
+  const url = `${api}members/email?email=${encodeURIComponent(email)}`;
+  return get(url);
+};
+
+export const autoRegisterMember = async (auth0User) => {
+  const parseName = (fullName, email, directFirstName, directLastName) => {
+    // If we have direct name inputs from form, use those
+    if (directFirstName !== undefined || directLastName !== undefined) {
+      return {
+        firstName: directFirstName || '',
+        lastName: directLastName || ''
+      };
+    }
+    
+    // If no name provided, try to extract from email
+    if (!fullName || fullName === email) {
+      const emailLocal = email.split('@')[0];
+      // Handle common email formats like first.last@domain.com
+      if (emailLocal.includes('.')) {
+        const parts = emailLocal.split('.');
+        return {
+          firstName: parts[0].charAt(0).toUpperCase() + parts[0].slice(1),
+          lastName: parts.slice(1).map(part => 
+            part.charAt(0).toUpperCase() + part.slice(1)
+          ).join(' ')
+        };
+      } else {
+        // Use email local part as first name if no dots
+        return {
+          firstName: emailLocal.charAt(0).toUpperCase() + emailLocal.slice(1),
+          lastName: ''
+        };
+      }
+    }
+    
+    // Parse actual name
+    const parts = fullName.trim().split(/\s+/);
+    return {
+      firstName: parts[0] || '',
+      lastName: parts.slice(1).join(' ') || ''
+    };
+  };
+  
+  const { firstName, lastName } = parseName(
+    auth0User.name, 
+    auth0User.email,
+    auth0User.firstName,
+    auth0User.lastName
+  );
+  
+  const url = `${api}members/auto-register`;
+  return post(url, JSON.stringify({
+    email: auth0User.email,
+    name: auth0User.name,           // Keep full name
+    firstName: firstName,           // Parsed first name
+    lastName: lastName,             // Parsed last name
+    phone: auth0User.phone || '',   // Optional phone from form
+    showEmail: auth0User.showEmail !== undefined ? auth0User.showEmail : true,  // Privacy setting
+    showPhone: auth0User.showPhone !== undefined ? auth0User.showPhone : false, // Privacy setting
+    auth0Id: auth0User.sub,
+    emailVerified: auth0User.email_verified,
+    picture: auth0User.picture
+  }));
+};
+
+export const updateMember = async (memberId, memberData) => {
+  const url = `${api}members/${memberId}`;
+  return post(url, JSON.stringify(memberData));
+};
+
 export const getStates = async () => {
   const url = `${api}locations/states`;
   return get(url);
@@ -213,6 +294,11 @@ export default {
   getMember,
   getFaqs,
   getMembers,
+  getActiveMembers,
+  getUserRole,
+  getMemberByEmail,
+  autoRegisterMember,
+  updateMember,
   getStates,
   getCounties,
   getNewsFeeds,

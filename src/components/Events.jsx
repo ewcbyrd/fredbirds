@@ -22,6 +22,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
+import { Add, Edit, Delete } from '@mui/icons-material'
 import PeopleIcon from '@mui/icons-material/People'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -33,6 +34,9 @@ import ListItemText from '@mui/material/ListItemText'
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction'
 import IconButton from '@mui/material/IconButton'
 import { getEventsByYear, getFutureEvents, getEventAttendees, registerForEvent, unregisterFromEvent, getMembers } from '../services/restdbService'
+import AccessControl from './AccessControl'
+import { ACCESS_LEVELS } from '../hooks/useUserRole'
+import WeatherForecast from './WeatherForecast'
 
 const locales = {
   'en-US': enUS
@@ -423,17 +427,21 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
                     )}
                     
                     {event.resource?.details && (
-                      <Typography 
-                        variant="body2" 
+                      <Typography
+                        variant="body2"
                         component="div"
                         color="text.secondary"
-                        sx={{ 
+                        sx={{
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           display: '-webkit-box',
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: 'vertical',
-                          '& p': { margin: 0 }
+                          '& > div': {
+                            margin: 0,
+                            fontSize: '0.875rem',
+                            color: 'text.secondary'
+                          }
                         }}
                       >
                         {formatEventDetails(event.resource.details)}
@@ -601,6 +609,12 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
               lon={selected?.resource?.lon} 
               title={selected?.title}
             />
+            <WeatherForecast 
+              latitude={selected?.resource?.lat}
+              longitude={selected?.resource?.lon}
+              eventDate={selected?.start}
+              eventTitle={selected?.title}
+            />
           </DialogContent>
           <DialogActions sx={{ p: 3, pt: 0 }}>
             <Button 
@@ -687,6 +701,48 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
       <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 3 }}>
         Events Calendar
       </Typography>
+      
+      {/* Officer Management Section */}
+      <AccessControl 
+        requiredLevel={ACCESS_LEVELS.OFFICER} 
+        showMessage={false}
+        fallback={null}
+      >
+        <Card sx={{ mb: 3, bgcolor: 'primary.light', color: 'primary.contrastText' }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Event Management
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              <Button
+                variant="contained"
+                startIcon={<Add />}
+                size="small"
+                sx={{ bgcolor: 'white', color: 'primary.main' }}
+              >
+                Add Event
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<Edit />}
+                size="small"
+                sx={{ bgcolor: 'white', color: 'primary.main' }}
+              >
+                Edit Events
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<Delete />}
+                size="small"
+                sx={{ bgcolor: 'white', color: 'primary.main' }}
+              >
+                Manage Events
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+      </AccessControl>
+      
       <Box sx={{ 
         height: 650, 
         bgcolor: 'white', 
