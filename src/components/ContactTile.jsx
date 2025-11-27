@@ -24,7 +24,12 @@ export default function ContactTile({ contact }) {
     <Card>
       <CardContent>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Avatar src={contact.Picture} alt={contact.Name} sx={{ width: 80, height: 80 }} />
+          <Avatar 
+            src={contact.Picture} 
+            alt={contact.Name} 
+            sx={{ width: 80, height: 80 }}
+            imgProps={{ crossOrigin: 'anonymous' }}
+          />
           <Box>
             <Typography variant="h6">{contact.Name}</Typography>
             <Typography variant="body2" color="text.secondary">{contact.Title}</Typography>

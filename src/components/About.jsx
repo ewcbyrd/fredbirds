@@ -1,7 +1,9 @@
 import React from 'react'
 import { Box, Typography, Card, CardContent } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
-import vsoLogo from '../resources/photos/vso.png'
+import { getCloudinaryUrl, transformations } from '../services/cloudinaryService'
+
+const vsoLogo = getCloudinaryUrl('vso.png', transformations.optimized)
 
 export default function About() {
   const navigate = useNavigate()

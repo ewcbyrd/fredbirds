@@ -19,7 +19,6 @@ import MembershipList from './components/MembershipList'
 import Resources from './components/Resources'
 import Officers from './components/Officers'
 import Photos from './components/Photos'
-import RareBirds from './components/RareBirds'
 import { Routes, Route, useNavigate } from 'react-router-dom'
 
 const theme = createTheme({
@@ -49,7 +48,6 @@ export default function App() {
       contact: '/contact',
       news: '/news',
       newsfeed: '/newsfeed',
-      rarebirds: '/rarebirds',
       resources: '/resources',
       officers: '/officers',
       photos: '/photos'
@@ -77,7 +75,6 @@ export default function App() {
             <Route path="/membership/list" element={<MembershipList />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/officers" element={<Officers />} />
-            <Route path="/rarebirds" element={<RareBirds />} />
             <Route path="/photos" element={<Photos />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/faqs" element={<FAQs />} />

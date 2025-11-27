@@ -25,7 +25,6 @@ export default function MenuButton({ onNavigate }) {
     hotspots: '/hotspots',
     news: '/news',
     newsfeed: '/newsfeed',
-    rarebirds: '/rarebirds',
     resources: '/resources',
     officers: '/officers',
     photos: '/photos'
@@ -65,7 +64,6 @@ export default function MenuButton({ onNavigate }) {
         <MenuItem onClick={() => handleSelect('contact')}>Contact</MenuItem>
         <MenuItem onClick={() => handleSelect('sightings')}>Sightings</MenuItem>
         <MenuItem onClick={() => handleSelect('hotspots')}>Hotspots</MenuItem>
-        <MenuItem onClick={() => handleSelect('rarebirds')}>Rare Birds</MenuItem>
         <MenuItem onClick={() => handleSelect('newsfeed')}>Birding News</MenuItem>
         <MenuItem onClick={() => handleSelect('resources')}>Resources</MenuItem>
         <MenuItem onClick={() => handleSelect('photos')}>Photos</MenuItem>
