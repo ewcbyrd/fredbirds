@@ -7,27 +7,18 @@ import AnnouncementIcon from '@mui/icons-material/Announcement'
 import Events from './Events'
 import NearbySightings from './NearbySightings'
 import { getAnnouncements } from '../services/restdbService'
-
-import img5 from '../resources/photos/image5.jpeg?url'
-import imgCBBT from '../resources/photos/CBBT.jpeg?url'
-import imgGroup from '../resources/photos/Group.jpg?url'
-import img0844 from '../resources/photos/IMG_0844.JPG?url'
-import img0552 from '../resources/photos/IMG_0552.JPG?url'
-import imgPhotoOp from '../resources/photos/Photo-Op.jpg?url'
-import img3301 from '../resources/photos/IMG_3301.JPG?url'
-import imgP1020092 from '../resources/photos/P1020092.jpeg?url'
-import imgLees from '../resources/photos/Leesylvania-Group.jpeg?url'
+import { getCloudinaryUrl, transformations } from '../services/cloudinaryService'
 
 const items = [
-  img5,
-  imgCBBT,
-  imgGroup,
-  img0844,
-  img0552,
-  imgPhotoOp,
-  img3301,
-  imgP1020092,
-  imgLees
+  getCloudinaryUrl('image5.jpeg', transformations.hero),
+  getCloudinaryUrl('CBBT.jpeg', transformations.hero),
+  getCloudinaryUrl('Group.jpg', transformations.hero),
+  getCloudinaryUrl('IMG_0844.JPG', transformations.hero),
+  getCloudinaryUrl('IMG_0552.JPG', transformations.hero),
+  getCloudinaryUrl('Photo-Op.jpg', transformations.hero),
+  getCloudinaryUrl('IMG_3301.JPG', transformations.hero),
+  getCloudinaryUrl('P1020092.jpeg', transformations.hero),
+  getCloudinaryUrl('Leesylvania-Group.jpeg', transformations.hero)
 ]
 
 export default function Home({ onNavigate }){
@@ -72,7 +63,7 @@ export default function Home({ onNavigate }){
           minHeight: { xs: 400, md: 500 },
           display: 'flex',
           alignItems: 'center',
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), url(${imgGroup})`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), url(${getCloudinaryUrl('Group.jpg', transformations.hero)})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

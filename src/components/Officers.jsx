@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Box, Grid, Typography, Container } from '@mui/material'
 import ContactTile from './ContactTile'
 import { getOfficers } from '../services/restdbService'
-import imgScott from '../resources/photos/scott_byrd.jpg?url'
+import { getPictureUrl } from '../services/cloudinaryService'
 
 export default function Officers() {
   const [officers, setOfficers] = useState([])
@@ -17,7 +17,7 @@ export default function Officers() {
           Title: officer.position,
           Phone: officer.phone,
           Email: officer.email,
-          Picture: officer.picture === 'imgScott' ? imgScott : officer.picture
+          Picture: getPictureUrl(officer.picture)
         }))
         
         // Sort officers in specified order
@@ -44,7 +44,7 @@ export default function Officers() {
           Title: 'Web Master',
           Phone: '5406568078',
           Email: 'sbyrd1968@verizon.net',
-          Picture: imgScott
+          Picture: getPictureUrl('scott_byrd')
         }])
         setLoading(false)
       })

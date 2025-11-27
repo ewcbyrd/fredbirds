@@ -162,10 +162,6 @@ export const getFeed = async (feedUrl) => {
   }
 };
 
-export const getRareBirds = async () => {
-  const url = `${api}rarebirds`;
-  return get(url);
-};
 
 export default {
   getEventsByYear,
@@ -181,5 +177,4 @@ export default {
   getCounties,
   getNewsFeeds,
   getFeed,
-  getRareBirds
 };
