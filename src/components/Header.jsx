@@ -75,24 +75,15 @@ export default function Header({ onNavigate }) {
     setDrawerOpen(false)
   }
 
-  // Define which paths require authentication
-  const memberOnlyPaths = [
-    '/announcements',
-    '/sightings', 
-    '/newsfeed',
-    '/newsletters',
-    '/membership',
-    '/officers',
-    '/photos',
-    '/members-directory'
-  ]
+  // Only Members Directory is restricted
+  const memberOnlyPaths = ['/members-directory']
 
   // Filter function to check if menu item should be shown
   const shouldShowMenuItem = (path) => {
     if (memberOnlyPaths.includes(path)) {
       return hasAccess(ACCESS_LEVELS.MEMBER)
     }
-    return true // Public pages are always shown
+    return true // All other pages are public
   }
 
   const menuSections = [
