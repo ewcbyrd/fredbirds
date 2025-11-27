@@ -339,6 +339,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
                     {event.resource?.details && (
                       <Typography 
                         variant="body2" 
+                        component="div"
                         color="text.secondary"
                         sx={{ 
                           overflow: 'hidden',

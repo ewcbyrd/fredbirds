@@ -1,17 +1,19 @@
-name: Deploy to GitHub Pages
+name: PR Build Check
 
 on:
-  push:
+  pull_request:
     branches:
       - main
-  workflow_dispatch:
+    types: [opened, synchronize, reopened]
 
 permissions:
-  contents: write
+  contents: read
+  pull-requests: read
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build application
         run: npm run build
         env:
           VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
@@ -34,19 +36,5 @@ jobs:
           VITE_OPENWEATHER_API_KEY: ${{ secrets.VITE_OPENWEATHER_API_KEY }}
           VITE_EBIRD_KEY: ${{ secrets.VITE_EBIRD_KEY }}
 
-      - name: Add .nojekyll file
-        run: touch ./dist/.nojekyll
-
-      - name: Copy index.html to 404.html for SPA routing
-        run: cp ./dist/index.html ./dist/404.html
-
-      - name: Add CNAME file for custom domain
-        run: echo "www.fredbirds.com" > ./dist/CNAME
-
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          publish_branch: gh-pages
-          cname: www.fredbirds.com
+      - name: Build success
+        run: echo "✅ Build completed successfully - PR can be merged"
