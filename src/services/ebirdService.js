@@ -1,48 +1,50 @@
-const root = 'https://api.ebird.org/v2';
-const ebirdApiKey = import.meta.env.VITE_EBIRD_KEY;
+const api = 'https://fredbirds-api.herokuapp.com/';
+
+
+
 
 const callout = async (url) => {
-  const res = await fetch(url, { 
-    method: 'GET',
-    headers: {
-      'X-eBirdApiToken': ebirdApiKey
-    }
-  });
-  return res.json();
+  try {
+    const res = await fetch(url, { method: 'GET' });
+    return res.json();
+  } catch (err) {
+    console.error('Fetch error:', err);
+    throw err;
+  }
 };
 
 export const getRegions = async () => {
-  const url = `${root}/ref/region/list/subnational2/US`;
+  const url = `${api}regions/US`;
   return callout(url);
 };
 
 export const getNearbyNotableObservations = async ({ lat, long, dist = 50, daysBack = 7 }) => {
-  const url = `${root}/data/obs/geo/recent/notable?lat=${lat}&lng=${long}&dist=${dist}&back=${daysBack}&detail=full`;
+  const url = `${api}sightings/nearby/notable?lat=${lat}&lng=${long}&dist=${dist}&back=${daysBack}&detail=full`;
   return callout(url);
 };
 
 export const getHotspotDetails = async (locId) => {
-  const url = `${root}/ref/hotspot/info/${locId}`;
+  const url = `${api}hotspots/${locId}/details`;
   return callout(url);
 };
 
 export const getSpeciesDetailsByLocation = async (locId) => {
-  const url = `${root}/product/spplist/${locId}`;
+  const url = `${api}hotspots/${locId}/species`;
   return callout(url);
 };
 
 export const getNearbyObservations = async ({ lat, long, dist = 5, daysBack = 7 }) => {
-  const url = `${root}/data/obs/geo/recent?lat=${lat}&lng=${long}&dist=${dist}&back=${daysBack}`;
+  const url = `${api}sightings/nearby?lat=${lat}&lng=${long}&dist=${dist}&back=${daysBack}`;
   return callout(url);
 };
 
 export const getNotableSightingsByLocation = async ({ regionCode, daysBack = 14 }) => {
-  const url = `${root}/data/obs/${regionCode}/recent/notable?back=${daysBack}&detail=full`;
+  const url = `${api}sightings/location/${regionCode}/notable?days=${daysBack}&detail=full`;
   return callout(url);
 };
 
 export const getNearbyHotspots = async ({ lat, long, dist = 50 }) => {
-  const url = `${root}/ref/hotspot/geo?lat=${lat}&lng=${long}&dist=${dist}&fmt=json`;
+  const url = `${api}hotspots/nearby?lat=${lat}&long=${long}&dist=${dist}`;
   return callout(url);
 };
 
