@@ -43,7 +43,6 @@ import {
   WorkspacePremium
 } from '@mui/icons-material'
 import { getMemberByEmail } from '../services/restdbService'
-import imgScott from '../resources/photos/scott_byrd.jpg?url'
 
 const MemberProfile = () => {
   const { email } = useParams()
@@ -143,10 +142,7 @@ const MemberProfile = () => {
   }
 
   const getProfileImage = () => {
-    // For now, using Scott's image as example - could be expanded to support member photos
-    if (memberData?.imgScott) {
-      return imgScott
-    }
+    // No profile images available at this time
     return null
   }
 

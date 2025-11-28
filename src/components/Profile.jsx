@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useUserRole } from '../hooks/useUserRole'
 import { getMemberByEmail } from '../services/restdbService'
-import imgScott from '../resources/photos/scott_byrd.jpg?url'
 import { 
   Container, 
   Typography, 
@@ -117,9 +116,7 @@ const Profile = () => {
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 3 }}>
             <Avatar 
-              src={memberData?.picture === 'imgScott' ? imgScott : 
-                   memberData?.picture ? `/resources/photos/${memberData.picture}.jpg` : 
-                   user.picture}
+              src={user.picture}
               alt={memberData?.first && memberData?.last ? `${memberData.first} ${memberData.last}` : user.name}
               sx={{ width: 80, height: 80 }}
             />

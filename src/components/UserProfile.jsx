@@ -172,12 +172,7 @@ const UserProfile = () => {
         }}
       >
         <Avatar 
-          src={memberData?.picture && memberData.picture !== 'imgScott' 
-            ? `/resources/photos/${memberData.picture}.jpg`
-            : memberData?.picture === 'imgScott'
-            ? '/resources/photos/scott_byrd.jpg'
-            : user?.picture
-          }
+          src={user?.picture}
           alt={memberData ? `${memberData.first} ${memberData.last}` : user?.name}
           sx={{ width: 32, height: 32, mr: 1 }}
         />

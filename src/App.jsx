@@ -97,7 +97,7 @@ export default function App() {
             
             {/* All features public except Members Directory */}
             <Route path="/announcements" element={<Announcements />} />
-            <Route path="/sightings" element={<NearbySightings />} />
+            <Route path="/sightings" element={<Resources />} />
             <Route path="/news" element={<News />} />
             <Route path="/newsfeed" element={<NewsFeed />} />
             <Route path="/newsletters" element={<Newsletters />} />
