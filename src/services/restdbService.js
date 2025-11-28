@@ -96,6 +96,11 @@ export const getNewsFeeds = async () => {
   return get(url);
 };
 
+export const getRareBirds = async () => {
+  const url = `${api}rarebirds`;
+  return get(url);
+};
+
 export const getFeed = async (feedUrl) => {
   try {
     // Use rss2json.com service to convert RSS to JSON
@@ -176,5 +181,6 @@ export default {
   getStates,
   getCounties,
   getNewsFeeds,
+  getRareBirds,
   getFeed,
 };
