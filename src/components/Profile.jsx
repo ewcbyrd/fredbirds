@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useUserRole } from '../hooks/useUserRole'
-import { getMemberByEmail } from '../services/restdbService'
+import { getMemberByEmail, updateMember } from '../services/restdbService'
 import { 
   Container, 
   Typography, 
@@ -17,7 +17,10 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  FormControlLabel,
+  Switch,
+  Paper
 } from '@mui/material'
 import { 
   Person, 
@@ -44,6 +47,9 @@ const Profile = () => {
   const [memberData, setMemberData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showEmail, setShowEmail] = useState(false)
+  const [showPhone, setShowPhone] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     const fetchMemberData = async () => {
@@ -63,6 +69,8 @@ const Profile = () => {
         console.log('US Count:', data?.usCount)
         console.log('World Count:', data?.worldCount)
         setMemberData(data)
+        setShowEmail(data?.showEmail ?? false)
+        setShowPhone(data?.showPhone ?? false)
       } catch (err) {
         console.error('Error fetching member data:', err)
         setError(err.message)
@@ -94,6 +102,22 @@ const Profile = () => {
       </Container>
     )
   }
+
+  const handleToggle = async (field, value) => {
+    if (!memberData?._id) return;
+    setSaving(true);
+    try {
+      const updated = { ...memberData, [field]: value };
+      await updateMember(memberData._id, updated);
+      setMemberData(updated);
+      if (field === 'showEmail') setShowEmail(value);
+      if (field === 'showPhone') setShowPhone(value);
+    } catch (err) {
+      alert('Failed to update settings.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
@@ -272,6 +296,62 @@ const Profile = () => {
             </Grid>
           </Grid>
           
+        {/* Account Settings Section */}
+        <Divider sx={{ my: 3 }} />
+        <Typography variant="h6" gutterBottom color="primary">
+          Account Settings
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Choose what information is visible to other members in the directory and profiles.
+        </Typography>
+        <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50', mb: 2 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={showEmail}
+                    onChange={e => handleToggle('showEmail', e.target.checked)}
+                    color="primary"
+                    disabled={saving}
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography variant="body1">Show Email Address</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Allow other members to see your email in the directory
+                    </Typography>
+                  </Box>
+                }
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={showPhone}
+                    onChange={e => handleToggle('showPhone', e.target.checked)}
+                    color="primary"
+                    disabled={saving || !memberData?.phone?.trim()}
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography variant="body1" color={!memberData?.phone?.trim() ? 'text.disabled' : 'text.primary'}>
+                      Show Phone Number
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Allow other members to see your phone in the directory
+                    </Typography>
+                  </Box>
+                }
+              />
+            </Grid>
+          </Grid>
+        </Paper>
+        {/* End Account Settings Section */}
+
           {/* Social Links */}
           {(memberData?.ebirdProfileUrl || memberData?.facebook) && (
             <>
