@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Card, CardHeader, CardContent, Typography, Menu, MenuItem, IconButton, Button } from '@mui/material'
+import { Box, Card, CardHeader, CardContent, Typography, Menu, MenuItem, IconButton, Button, CircularProgress } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import {
@@ -17,13 +17,10 @@ export default function Resources() {
   const stateMenuOpen = Boolean(stateAnchorEl)
   const [countyAnchorEl, setCountyAnchorEl] = useState(null)
   const countyMenuOpen = Boolean(countyAnchorEl)
-  const [filterAnchorEl, setFilterAnchorEl] = useState(null)
-  const filterMenuOpen = Boolean(filterAnchorEl)
-  const [setting, setSetting] = useState({ view: 'local', filter: 'notable', back: 7, state: 'US-VA', county: null })
+  const [setting, setSetting] = useState({ view: 'local', back: 7, state: 'US-VA', county: null })
   const [dropdown, setDropdown] = useState('Local')
   const [stateDropdown, setStateDropdown] = useState('Virginia')
   const [countyDropdown, setCountyDropdown] = useState('All')
-  const [filterDropdown, setFilterDropdown] = useState('Notable')
   const [sightings, setSightings] = useState([])
   const [rawSightings, setRawSightings] = useState([])
   const [lastUpdated, setLastUpdated] = useState({})
@@ -31,10 +28,11 @@ export default function Resources() {
   const [countyOptions, setCountyOptions] = useState([])
   const [filteredCountyOptions, setFilteredCountyOptions] = useState([])
   const [rarebirds, setRarebirds] = useState(new Set())
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     // Load rare birds from session storage
-    const rareBirdData = sessionStorage.getItem('rarebirds')
+    const rareBirdData = sessionStorage.getItem('rareBirds')
     if (rareBirdData) {
       try {
         const rarebirdsArray = JSON.parse(rareBirdData)
@@ -57,10 +55,11 @@ export default function Resources() {
   }, [setting.view, setting.state, setting.county])
 
   useEffect(() => {
-    // Process raw sightings data when it changes or filter changes
+    // Process raw sightings data when it changes
     processSightings()
+    setLoading(false) // Set loading to false after processing is complete
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawSightings, setting.filter, rarebirds])
+  }, [rawSightings, rarebirds])
 
   const processSightings = () => {
     if (!rawSightings || rawSightings.length === 0) {
@@ -87,45 +86,39 @@ export default function Resources() {
 
       const isRare = matches[0].sciName && rarebirds.has(matches[0].sciName)
 
-      // Apply filter
-      if (
-        (setting.filter === 'rare' && isRare) ||
-        setting.filter === 'notable' ||
-        setting.filter === 'all'
-      ) {
-        // Create individual sighting records
-        const individualSightings = []
-        matches.forEach((item) => {
-          if (individualSightings.findIndex((temp) => temp.id === item.obsId) < 0) {
-            individualSightings.push({
-              id: item.obsId,
-              location: item.locName,
-              locality:
-                item.subnational2Name === undefined
-                  ? ''
-                  : `${item.subnational2Name}, ${item.subnational1Name}`,
-              quantity: item.howMany,
-              by: item.userDisplayName,
-              date: item.obsDt,
-              lat: item.lat,
-              lng: item.lng
-            })
-          }
-        })
+      // Show all sightings (no filtering needed since rare birds are now automatically marked)
+      // Create individual sighting records
+      const individualSightings = []
+      matches.forEach((item) => {
+        if (individualSightings.findIndex((temp) => temp.id === item.obsId) < 0) {
+          individualSightings.push({
+            id: item.obsId,
+            location: item.locName,
+            locality:
+              item.subnational2Name === undefined
+                ? ''
+                : `${item.subnational2Name}, ${item.subnational1Name}`,
+            quantity: item.howMany,
+            by: item.userDisplayName,
+            date: item.obsDt,
+            lat: item.lat,
+            lng: item.lng
+          })
+        }
+      })
 
-        processed.push({
-          id: matches[0].speciesCode,
-          name: species,
-          locations:
-            setting.view === 'state'
-              ? Array.from(locations).join('; ')
-              : Array.from(locations).join(', '),
-          mostRecent: Math.max(...matches.map((e) => new Date(e.obsDt))),
-          scientific: matches[0].sciName,
-          isRare,
-          individualSightings
-        })
-      }
+      processed.push({
+        id: matches[0].speciesCode,
+        name: species,
+        locations:
+          setting.view === 'state'
+            ? Array.from(locations).join('; ')
+            : Array.from(locations).join(', '),
+        mostRecent: Math.max(...matches.map((e) => new Date(e.obsDt))),
+        scientific: matches[0].sciName,
+        isRare,
+        individualSightings
+      })
     })
 
     // Sort by name
@@ -139,13 +132,11 @@ export default function Resources() {
   const handleStateMenuClose = () => setStateAnchorEl(null)
   const handleCountyMenuClick = (e) => setCountyAnchorEl(e.currentTarget)
   const handleCountyMenuClose = () => setCountyAnchorEl(null)
-  const handleFilterMenuClick = (e) => setFilterAnchorEl(e.currentTarget)
-  const handleFilterMenuClose = () => setFilterAnchorEl(null)
 
   const handleSelectView = (view) => {
     handleMenuClose()
     const map = { nearby: 'Nearby', local: 'Local', state: 'State' }
-    setSetting((s) => ({ ...s, view, filter: { nearby: 'all', local: 'notable', state: 'notable' }[view] }))
+    setSetting((s) => ({ ...s, view }))
     setDropdown(map[view])
   }
 
@@ -166,13 +157,21 @@ export default function Resources() {
     setCountyDropdown(countyLabel)
   }
 
-  const handleSelectFilter = (filterValue, filterLabel) => {
-    handleFilterMenuClose()
-    setSetting((s) => ({ ...s, filter: filterValue }))
-    setFilterDropdown(filterLabel)
-  }
 
   async function fetchStates() {
+    // First, check for cached states and load them immediately
+    const cached = sessionStorage.getItem('states')
+    if (cached) {
+      try {
+        const opts = JSON.parse(cached)
+        opts.sort((a, b) => a.label.localeCompare(b.label))
+        setStateOptions(opts)
+      } catch (e) {
+        console.error('Error parsing cached states:', e)
+      }
+    }
+
+    // Then fetch fresh data in the background to update cache
     try {
       const res = await getStates()
       const opts = Array.isArray(res) ? res.map((i) => ({ label: i.state, value: i.code })) : []
@@ -180,16 +179,29 @@ export default function Resources() {
       setStateOptions(opts)
       sessionStorage.setItem('states', JSON.stringify(opts))
     } catch (e) {
-      const cached = sessionStorage.getItem('states')
-      if (cached) {
-        const opts = JSON.parse(cached)
-        opts.sort((a, b) => a.label.localeCompare(b.label))
-        setStateOptions(opts)
-      }
+      console.error('Error fetching states:', e)
+      // If we don't have cached data and fetch fails, states will remain empty
     }
   }
 
   async function fetchCounties() {
+    // First, check for cached counties and load them immediately
+    const cached = sessionStorage.getItem('counties')
+    if (cached) {
+      try {
+        const opts = JSON.parse(cached)
+        opts.sort((a, b) => a.label.localeCompare(b.label))
+        setCountyOptions(opts)
+        // Filter for Virginia by default
+        const vaCounties = opts.filter(c => c.value.startsWith('US-VA'))
+        vaCounties.sort((a, b) => a.label.localeCompare(b.label))
+        setFilteredCountyOptions(vaCounties)
+      } catch (e) {
+        console.error('Error parsing cached counties:', e)
+      }
+    }
+
+    // Then fetch fresh data in the background to update cache
     try {
       const res = await getCounties()
       const opts = Array.isArray(res) ? res.map((i) => ({ label: i.county, value: i.code })) : []
@@ -201,52 +213,49 @@ export default function Resources() {
       setFilteredCountyOptions(vaCounties)
       sessionStorage.setItem('counties', JSON.stringify(opts))
     } catch (e) {
-      const cached = sessionStorage.getItem('counties')
-      if (cached) {
-        const opts = JSON.parse(cached)
-        opts.sort((a, b) => a.label.localeCompare(b.label))
-        setCountyOptions(opts)
-        const vaCounties = opts.filter(c => c.value.startsWith('US-VA'))
-        vaCounties.sort((a, b) => a.label.localeCompare(b.label))
-        setFilteredCountyOptions(vaCounties)
-      }
+      console.error('Error fetching counties:', e)
+      // If we don't have cached data and fetch fails, counties will remain empty
     }
   }
 
   async function loadSightings() {
-    if (setting.view === 'local') {
-      // use fixed coords for Fredericksburg region
-      try {
+    setLoading(true)
+    try {
+      if (setting.view === 'local') {
+        // use fixed coords for Fredericksburg region
         const res = await getNearbyNotableObservations({ lat: 38.31, long: -77.46, daysBack: setting.back })
         setRawSightings(res || [])
         setLastUpdated((s) => ({ ...s, local: new Date() }))
-      } catch (e) {
-        console.error('Error loading local sightings:', e)
-        setRawSightings([])
-      }
-    } else if (setting.view === 'state') {
-      try {
+      } else if (setting.view === 'state') {
         // Use county if selected, otherwise use state
         const regionCode = setting.county || setting.state
         const res = await getNotableSightingsByLocation({ regionCode, daysBack: 3 })
         setRawSightings(res || [])
         setLastUpdated((s) => ({ ...s, state: new Date() }))
-      } catch (e) {
-        console.error('Error loading state sightings:', e)
-        setRawSightings([])
-      }
-    } else if (setting.view === 'nearby') {
-      if (!navigator.geolocation) return setRawSightings([])
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        try {
-          const res = await getNearbyObservations({ lat: position.coords.latitude, long: position.coords.longitude })
-          setRawSightings(res || [])
-          setLastUpdated((s) => ({ ...s, nearby: new Date() }))
-        } catch (e) {
-          console.error('Error loading nearby sightings:', e)
+      } else if (setting.view === 'nearby') {
+        if (!navigator.geolocation) {
           setRawSightings([])
+          return
         }
-      })
+        await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(async (position) => {
+            try {
+              const res = await getNearbyObservations({ lat: position.coords.latitude, long: position.coords.longitude })
+              setRawSightings(res || [])
+              setLastUpdated((s) => ({ ...s, nearby: new Date() }))
+              resolve()
+            } catch (e) {
+              console.error('Error loading nearby sightings:', e)
+              setRawSightings([])
+              reject(e)
+            }
+          }, reject)
+        })
+      }
+    } catch (e) {
+      console.error('Error loading sightings:', e)
+      setRawSightings([])
+      setLoading(false) // Only set loading false on error
     }
   }
 
@@ -342,9 +351,26 @@ export default function Resources() {
                   >
                     {stateDropdown}
                   </Button>
-                  <Menu anchorEl={stateAnchorEl} open={stateMenuOpen} onClose={handleStateMenuClose}>
+                  <Menu 
+                    anchorEl={stateAnchorEl} 
+                    open={stateMenuOpen} 
+                    onClose={handleStateMenuClose}
+                    PaperProps={{
+                      style: {
+                        maxHeight: 300,
+                        overflow: 'auto'
+                      }
+                    }}
+                    MenuListProps={{
+                      dense: true
+                    }}
+                  >
                     {stateOptions.map((state) => (
-                      <MenuItem key={state.value} onClick={() => handleSelectState(state.value, state.label)}>
+                      <MenuItem 
+                        key={state.value} 
+                        onClick={() => handleSelectState(state.value, state.label)}
+                        dense
+                      >
                         {state.label}
                       </MenuItem>
                     ))}
@@ -373,48 +399,53 @@ export default function Resources() {
                   >
                     {countyDropdown}
                   </Button>
-                  <Menu anchorEl={countyAnchorEl} open={countyMenuOpen} onClose={handleCountyMenuClose}>
-                    <MenuItem onClick={() => handleSelectCounty(null, 'All')}>All</MenuItem>
+                  <Menu 
+                    anchorEl={countyAnchorEl} 
+                    open={countyMenuOpen} 
+                    onClose={handleCountyMenuClose}
+                    PaperProps={{
+                      style: {
+                        maxHeight: 300,
+                        overflow: 'auto'
+                      }
+                    }}
+                    MenuListProps={{
+                      dense: true
+                    }}
+                  >
+                    <MenuItem onClick={() => handleSelectCounty(null, 'All')} dense>All</MenuItem>
                     {filteredCountyOptions.map((county) => (
-                      <MenuItem key={county.value} onClick={() => handleSelectCounty(county.value, county.label)}>
+                      <MenuItem 
+                        key={county.value} 
+                        onClick={() => handleSelectCounty(county.value, county.label)}
+                        dense
+                      >
                         {county.label}
                       </MenuItem>
                     ))}
-                  </Menu>
-                </Box>
-
-                <Box sx={{ minWidth: { xs: '100%', sm: 120 } }}>
-                  <Typography variant="caption" sx={{ display: 'block', mb: 0.5, color: '#666' }}>
-                    Type
-                  </Typography>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    endIcon={<ExpandMoreIcon />}
-                    onClick={handleFilterMenuClick}
-                    sx={{ 
-                      textTransform: 'none',
-                      borderColor: '#2c5f2d',
-                      color: '#2c5f2d',
-                      justifyContent: 'space-between',
-                      '&:hover': { 
-                        borderColor: '#234d24',
-                        bgcolor: 'rgba(44, 95, 45, 0.04)'
-                      }
-                    }}
-                  >
-                    {filterDropdown}
-                  </Button>
-                  <Menu anchorEl={filterAnchorEl} open={filterMenuOpen} onClose={handleFilterMenuClose}>
-                    <MenuItem onClick={() => handleSelectFilter('notable', 'Notable')}>Notable</MenuItem>
-                    <MenuItem onClick={() => handleSelectFilter('rare', 'Rare')}>Rare</MenuItem>
                   </Menu>
                 </Box>
               </>
             )}
           </Box>
 
-          <MySightings sightings={sightings} header={dropdown} viewtype={setting.view} filter={setting.filter} />
+          {loading ? (
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              py: 8,
+              flexDirection: 'column',
+              gap: 2
+            }}>
+              <CircularProgress size={48} sx={{ color: '#2c5f2d' }} />
+              <Typography variant="body1" color="text.secondary">
+                Loading sightings...
+              </Typography>
+            </Box>
+          ) : (
+            <MySightings sightings={sightings} header={dropdown} viewtype={setting.view} />
+          )}
         </CardContent>
       </Card>
     </Box>

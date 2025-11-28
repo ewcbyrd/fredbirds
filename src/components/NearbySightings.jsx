@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { Card, CardContent, Typography, Grid, Box, Button, Chip, IconButton, Tooltip } from '@mui/material'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import StarIcon from '@mui/icons-material/Star'
 import { getNearbyNotableObservations } from '../services/ebirdService'
+import { isRareBird } from '../utils/rareBirdsUtils'
 
 export default function NearbySightings({ onViewAll }) {
   const [sightings, setSightings] = useState([])
@@ -86,6 +88,7 @@ export default function NearbySightings({ onViewAll }) {
           <Grid container spacing={2}>
             {sightings.map((s, index) => {
               const recency = getRecencyColor(s.obsDt)
+              const isRare = isRareBird(s.sciName)
               
               return (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={s.obsId}>
@@ -123,18 +126,31 @@ export default function NearbySightings({ onViewAll }) {
 
                     <CardContent sx={{ p: 1.5, pb: 1.25, '&:last-child': { pb: 1.25 } }}>
                       {/* Bird Name */}
-                      <Typography 
-                        variant="h6" 
-                        sx={{ 
-                          fontSize: '0.95rem',
-                          fontWeight: 600,
-                          mb: 0.75,
-                          pr: 6, // Space for badge
-                          lineHeight: 1.2
-                        }}
-                      >
-                        {s.comName}
-                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.75 }}>
+                        <Typography 
+                          variant="h6" 
+                          sx={{ 
+                            fontSize: '0.95rem',
+                            fontWeight: 600,
+                            pr: 6, // Space for badge
+                            lineHeight: 1.2,
+                            flex: 1
+                          }}
+                        >
+                          {s.comName}
+                        </Typography>
+                        {isRare && (
+                          <Tooltip title="Rare Bird Alert!" arrow>
+                            <StarIcon 
+                              sx={{ 
+                                fontSize: 16, 
+                                color: '#ff6b35',
+                                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                              }} 
+                            />
+                          </Tooltip>
+                        )}
+                      </Box>
 
                       {/* Scientific Name */}
                       {s.sciName && (

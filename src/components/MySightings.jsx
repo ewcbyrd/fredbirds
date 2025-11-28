@@ -1,16 +1,24 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Box, Card, CardHeader, CardContent, IconButton, Typography, Collapse, Divider, Grid, Button } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import NumbersIcon from '@mui/icons-material/Numbers'
 import PersonIcon from '@mui/icons-material/Person'
 import MapIcon from '@mui/icons-material/Map'
+import StarIcon from '@mui/icons-material/Star'
 import MapModal from './MapModal'
+import { isRareBird } from '../utils/rareBirdsUtils'
 
 export default function MySightings({ sightings = [], header = 'Sightings', viewtype, filter }) {
   const [openIds, setOpenIds] = useState(new Set())
   const [mapOpen, setMapOpen] = useState(false)
   const [selectedRecord, setSelectedRecord] = useState(null)
+  const [displayLimit, setDisplayLimit] = useState(20)
+
+  // Reset display limit when sightings change
+  useEffect(() => {
+    setDisplayLimit(20)
+  }, [sightings])
 
   const toggleId = (id) => {
     const s = new Set(openIds)
@@ -42,10 +50,14 @@ export default function MySightings({ sightings = [], header = 'Sightings', view
     return groups
   }
 
+  const displayedSightings = sightings.slice(0, displayLimit)
+  const hasMore = sightings.length > displayLimit
+
   return (
     <Box>
       {sightings && sightings.length > 0 ? (
-        sightings.map((s) => {
+        <>
+        {displayedSightings.map((s) => {
           const groupedSightings = groupByLocality(s.individualSightings || [])
           
           return (
@@ -57,7 +69,36 @@ export default function MySightings({ sightings = [], header = 'Sightings', view
                 '&:hover': { boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }
               }}>
                 <CardHeader
-                  title={<Typography variant="h6" sx={{ fontWeight: 600 }}>{s.name}</Typography>}
+                  title={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 600 }}>{s.name}</Typography>
+                          {(s.isRare || isRareBird(s.scientific)) && (
+                            <StarIcon 
+                              sx={{ 
+                                fontSize: 18, 
+                                color: '#ff6b35',
+                                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
+                              }} 
+                            />
+                          )}
+                        </Box>
+                        {s.scientific && (
+                          <Typography 
+                            variant="body2" 
+                            sx={{ 
+                              fontStyle: 'italic',
+                              color: 'text.secondary',
+                              fontSize: '0.85rem'
+                            }}
+                          >
+                            {s.scientific}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+                  }
                   subheader={s.locations || s.primaryLocation || ''}
                   action={
                     <IconButton onClick={() => toggleId(s.id || s.name)}>
@@ -67,7 +108,7 @@ export default function MySightings({ sightings = [], header = 'Sightings', view
                   sx={{ pb: 1 }}
                 />
                 <CardContent>
-                  {s.isRare || s.rare ? (
+                  {(s.isRare || s.rare || isRareBird(s.scientific)) ? (
                     <Box sx={{ 
                       mb: 2, 
                       p: 1.5, 
@@ -237,7 +278,27 @@ export default function MySightings({ sightings = [], header = 'Sightings', view
               </Card>
             </Box>
           )
-        })
+        })}
+        
+        {hasMore && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Button 
+              variant="outlined"
+              onClick={() => setDisplayLimit(prev => prev + 20)}
+              sx={{
+                borderColor: '#2c5f2d',
+                color: '#2c5f2d',
+                '&:hover': {
+                  borderColor: '#234d24',
+                  bgcolor: 'rgba(44, 95, 45, 0.04)'
+                }
+              }}
+            >
+              Show More ({sightings.length - displayLimit} remaining)
+            </Button>
+          </Box>
+        )}
+        </>
       ) : (
         <Typography color="text.secondary">No sightings.</Typography>
       )}
