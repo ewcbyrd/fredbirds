@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useUserRole } from '../hooks/useUserRole'
-import { getMemberByEmail, updateMember } from '../services/restdbService'
-import { 
-  Container, 
-  Typography, 
-  Box, 
-  Card, 
+import { getMemberByEmail, patchMember } from '../services/restdbService'
+import {
+  Container,
+  Typography,
+  Box,
+  Card,
   CardContent,
   Grid,
   Avatar,
@@ -20,13 +20,16 @@ import {
   ListItemText,
   FormControlLabel,
   Switch,
-  Paper
+  Paper,
+  TextField,
+  Button,
+  IconButton
 } from '@mui/material'
-import { 
-  Person, 
-  Email, 
-  CalendarToday, 
-  Verified, 
+import {
+  Person,
+  Email,
+  CalendarToday,
+  Verified,
   LocationOn,
   Home,
   Nature,
@@ -37,7 +40,11 @@ import {
   Link as LinkIcon,
   Phone,
   Facebook,
-  Launch
+  LinkedIn,
+  Launch,
+  Edit,
+  Save,
+  Cancel
 } from '@mui/icons-material'
 import RoleBadge from './RoleBadge'
 
@@ -50,6 +57,15 @@ const Profile = () => {
   const [showEmail, setShowEmail] = useState(false)
   const [showPhone, setShowPhone] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [editingCounts, setEditingCounts] = useState(false)
+  const [editUsCount, setEditUsCount] = useState('')
+  const [editWorldCount, setEditWorldCount] = useState('')
+  const [editingSocialLinks, setEditingSocialLinks] = useState(false)
+  const [editEbirdUrl, setEditEbirdUrl] = useState('')
+  const [editFacebookUrl, setEditFacebookUrl] = useState('')
+  const [editLinkedInUrl, setEditLinkedInUrl] = useState('')
+  const [editingPhone, setEditingPhone] = useState(false)
+  const [editPhone, setEditPhone] = useState('')
 
   useEffect(() => {
     const fetchMemberData = async () => {
@@ -107,16 +123,109 @@ const Profile = () => {
     if (!memberData?._id) return;
     setSaving(true);
     try {
-      const updated = { ...memberData, [field]: value };
-      await updateMember(memberData._id, updated);
-      setMemberData(updated);
+      await patchMember(memberData._id, { [field]: value });
+      setMemberData({ ...memberData, [field]: value });
       if (field === 'showEmail') setShowEmail(value);
       if (field === 'showPhone') setShowPhone(value);
     } catch (err) {
+      console.error('Error updating settings:', err);
       alert('Failed to update settings.');
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleEditCounts = () => {
+    setEditUsCount(memberData?.usCount?.toString() || '0');
+    setEditWorldCount(memberData?.worldCount?.toString() || '0');
+    setEditingCounts(true);
+  };
+
+  const handleSaveCounts = async () => {
+    if (!memberData?._id) return;
+    setSaving(true);
+    try {
+      const updates = {
+        usCount: parseInt(editUsCount) || 0,
+        worldCount: parseInt(editWorldCount) || 0
+      };
+      await patchMember(memberData._id, updates);
+      setMemberData({ ...memberData, ...updates });
+      setEditingCounts(false);
+    } catch (err) {
+      console.error('Error updating counts:', err);
+      alert('Failed to update species counts.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCounts(false);
+    setEditUsCount('');
+    setEditWorldCount('');
+  };
+
+  const handleEditSocialLinks = () => {
+    setEditEbirdUrl(memberData?.ebirdProfileUrl || '');
+    setEditFacebookUrl(memberData?.facebook || '');
+    setEditLinkedInUrl(memberData?.linkedin || '');
+    setEditingSocialLinks(true);
+  };
+
+  const handleSaveSocialLinks = async () => {
+    if (!memberData?._id) return;
+    setSaving(true);
+    try {
+      const updates = {
+        ebirdProfileUrl: editEbirdUrl.trim(),
+        facebook: editFacebookUrl.trim(),
+        linkedin: editLinkedInUrl.trim()
+      };
+      await patchMember(memberData._id, updates);
+      setMemberData({ ...memberData, ...updates });
+      setEditingSocialLinks(false);
+    } catch (err) {
+      console.error('Error updating social links:', err);
+      alert('Failed to update social links.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancelSocialEdit = () => {
+    setEditingSocialLinks(false);
+    setEditEbirdUrl('');
+    setEditFacebookUrl('');
+    setEditLinkedInUrl('');
+  };
+
+  const handleEditPhone = () => {
+    setEditPhone(memberData?.phone || '');
+    setEditingPhone(true);
+  };
+
+  const handleSavePhone = async () => {
+    if (!memberData?._id) return;
+    setSaving(true);
+    try {
+      const updates = {
+        phone: editPhone.trim()
+      };
+      await patchMember(memberData._id, updates);
+      setMemberData({ ...memberData, ...updates });
+      setEditingPhone(false);
+    } catch (err) {
+      console.error('Error updating phone:', err);
+      alert('Failed to update phone number.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancelPhoneEdit = () => {
+    setEditingPhone(false);
+    setEditPhone('');
   };
 
   return (
@@ -166,70 +275,116 @@ const Profile = () => {
           
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-              <Typography variant="h6" gutterBottom color="primary">
-                Contact Information
-              </Typography>
-              
-              <List dense>
-                <ListItem>
-                  <ListItemIcon>
-                    <Email color="action" />
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary="Email"
-                    secondary={
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        {memberData?.email || user.email}
-                        {user.email_verified && (
-                          <Chip 
-                            size="small" 
-                            icon={<Verified />} 
-                            label="Verified" 
-                            color="success"
-                            variant="outlined"
-                          />
-                        )}
-                      </Box>
-                    }
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Typography variant="h6" color="primary">
+                  Contact Information
+                </Typography>
+                {!editingPhone && (
+                  <IconButton
+                    onClick={handleEditPhone}
+                    size="small"
+                    color="primary"
+                    disabled={saving}
+                    title="Edit phone number"
+                  >
+                    <Edit fontSize="small" />
+                  </IconButton>
+                )}
+              </Box>
+
+              {editingPhone ? (
+                <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+                  <TextField
+                    fullWidth
+                    label="Phone Number"
+                    type="tel"
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                    placeholder="(555) 123-4567"
+                    disabled={saving}
+                    helperText="Enter your phone number"
                   />
-                </ListItem>
-                
-                {memberData?.address && (
+                  <Box sx={{ display: 'flex', gap: 2, mt: 2, justifyContent: 'flex-end' }}>
+                    <Button
+                      variant="outlined"
+                      onClick={handleCancelPhoneEdit}
+                      disabled={saving}
+                      startIcon={<Cancel />}
+                      size="small"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="contained"
+                      onClick={handleSavePhone}
+                      disabled={saving}
+                      startIcon={<Save />}
+                      size="small"
+                    >
+                      {saving ? 'Saving...' : 'Save'}
+                    </Button>
+                  </Box>
+                </Paper>
+              ) : (
+                <List dense>
                   <ListItem>
                     <ListItemIcon>
-                      <Home color="action" />
+                      <Email color="action" />
                     </ListItemIcon>
-                    <ListItemText 
-                      primary="Address"
-                      secondary={memberData.address}
+                    <ListItemText
+                      primary="Email"
+                      secondary={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          {memberData?.email || user.email}
+                          {user.email_verified && (
+                            <Chip
+                              size="small"
+                              icon={<Verified />}
+                              label="Verified"
+                              color="success"
+                              variant="outlined"
+                            />
+                          )}
+                        </Box>
+                      }
                     />
                   </ListItem>
-                )}
-                
-                {memberData?.city && (
-                  <ListItem>
-                    <ListItemIcon>
-                      <LocationOn color="action" />
-                    </ListItemIcon>
-                    <ListItemText 
-                      primary="City"
-                      secondary={`${memberData.city}${memberData.state ? `, ${memberData.state}` : ''}${memberData.zip ? ` ${memberData.zip}` : ''}`}
-                    />
-                  </ListItem>
-                )}
-                
-                {memberData?.phone && (
+
+                  {memberData?.address && (
+                    <ListItem>
+                      <ListItemIcon>
+                        <Home color="action" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary="Address"
+                        secondary={memberData.address}
+                      />
+                    </ListItem>
+                  )}
+
+                  {memberData?.city && (
+                    <ListItem>
+                      <ListItemIcon>
+                        <LocationOn color="action" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary="City"
+                        secondary={`${memberData.city}${memberData.state ? `, ${memberData.state}` : ''}${memberData.zip ? ` ${memberData.zip}` : ''}`}
+                      />
+                    </ListItem>
+                  )}
+
                   <ListItem>
                     <ListItemIcon>
                       <Phone color="action" />
                     </ListItemIcon>
-                    <ListItemText 
+                    <ListItemText
                       primary="Phone"
-                      secondary={memberData.phone}
+                      secondary={memberData?.phone || 'Not set'}
                     />
                   </ListItem>
-                )}
-              </List>
+                </List>
+              )}
             </Grid>
             
             <Grid item xs={12} md={6}>
@@ -353,14 +508,87 @@ const Profile = () => {
         {/* End Account Settings Section */}
 
           {/* Social Links */}
-          {(memberData?.ebirdProfileUrl || memberData?.facebook) && (
-            <>
-              <Divider sx={{ my: 3 }} />
-              <Typography variant="h6" gutterBottom color="primary">
+          <>
+            <Divider sx={{ my: 3 }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <Typography variant="h6" color="primary">
                 Social Links
               </Typography>
+              {!editingSocialLinks && (
+                <IconButton
+                  onClick={handleEditSocialLinks}
+                  size="small"
+                  color="primary"
+                  disabled={saving}
+                  title="Edit social links"
+                >
+                  <Edit fontSize="small" />
+                </IconButton>
+              )}
+            </Box>
+
+            {editingSocialLinks ? (
+              <Paper variant="outlined" sx={{ p: 3, mb: 2 }}>
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="eBird Profile URL"
+                      type="url"
+                      value={editEbirdUrl}
+                      onChange={(e) => setEditEbirdUrl(e.target.value)}
+                      placeholder="https://ebird.org/profile/..."
+                      disabled={saving}
+                      helperText="Enter your complete eBird profile URL"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Facebook URL"
+                      type="url"
+                      value={editFacebookUrl}
+                      onChange={(e) => setEditFacebookUrl(e.target.value)}
+                      placeholder="https://facebook.com/..."
+                      disabled={saving}
+                      helperText="Enter your Facebook profile or page URL"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="LinkedIn URL"
+                      type="url"
+                      value={editLinkedInUrl}
+                      onChange={(e) => setEditLinkedInUrl(e.target.value)}
+                      placeholder="https://linkedin.com/in/..."
+                      disabled={saving}
+                      helperText="Enter your LinkedIn profile URL"
+                    />
+                  </Grid>
+                </Grid>
+                <Box sx={{ display: 'flex', gap: 2, mt: 3, justifyContent: 'flex-end' }}>
+                  <Button
+                    variant="outlined"
+                    onClick={handleCancelSocialEdit}
+                    disabled={saving}
+                    startIcon={<Cancel />}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={handleSaveSocialLinks}
+                    disabled={saving}
+                    startIcon={<Save />}
+                  >
+                    {saving ? 'Saving...' : 'Save'}
+                  </Button>
+                </Box>
+              </Paper>
+            ) : (
               <Grid container spacing={2}>
-                {memberData?.ebirdProfileUrl && (
+                {(memberData?.ebirdProfileUrl || editingSocialLinks) && (
                   <Grid item xs={12} sm={6}>
                     <Card variant="outlined" sx={{ p: 2, height: '100%' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -369,29 +597,35 @@ const Profile = () => {
                           <Typography variant="subtitle1" fontWeight="bold">
                             eBird Profile
                           </Typography>
-                          <a 
-                            href={memberData.ebirdProfileUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            style={{ 
-                              color: '#1976d2', 
-                              textDecoration: 'none',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              fontSize: '14px'
-                            }}
-                          >
-                            View Profile
-                            <Launch fontSize="small" />
-                          </a>
+                          {memberData?.ebirdProfileUrl ? (
+                            <a
+                              href={memberData.ebirdProfileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                color: '#1976d2',
+                                textDecoration: 'none',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '14px'
+                              }}
+                            >
+                              View Profile
+                              <Launch fontSize="small" />
+                            </a>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">
+                              Not set
+                            </Typography>
+                          )}
                         </Box>
                       </Box>
                     </Card>
                   </Grid>
                 )}
-                
-                {memberData?.facebook && (
+
+                {(memberData?.facebook || editingSocialLinks) && (
                   <Grid item xs={12} sm={6}>
                     <Card variant="outlined" sx={{ p: 2, height: '100%' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -400,72 +634,175 @@ const Profile = () => {
                           <Typography variant="subtitle1" fontWeight="bold">
                             Facebook
                           </Typography>
-                          <a 
-                            href={memberData.facebook} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            style={{ 
-                              color: '#1976d2', 
-                              textDecoration: 'none',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              fontSize: '14px'
-                            }}
-                          >
-                            View Profile
-                            <Launch fontSize="small" />
-                          </a>
+                          {memberData?.facebook ? (
+                            <a
+                              href={memberData.facebook}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                color: '#1976d2',
+                                textDecoration: 'none',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '14px'
+                              }}
+                            >
+                              View Profile
+                              <Launch fontSize="small" />
+                            </a>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">
+                              Not set
+                            </Typography>
+                          )}
                         </Box>
                       </Box>
                     </Card>
                   </Grid>
                 )}
+
+                {(memberData?.linkedin || editingSocialLinks) && (
+                  <Grid item xs={12} sm={6}>
+                    <Card variant="outlined" sx={{ p: 2, height: '100%' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <LinkedIn color="primary" sx={{ fontSize: 32 }} />
+                        <Box>
+                          <Typography variant="subtitle1" fontWeight="bold">
+                            LinkedIn
+                          </Typography>
+                          {memberData?.linkedin ? (
+                            <a
+                              href={memberData.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                color: '#1976d2',
+                                textDecoration: 'none',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '14px'
+                              }}
+                            >
+                              View Profile
+                              <Launch fontSize="small" />
+                            </a>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">
+                              Not set
+                            </Typography>
+                          )}
+                        </Box>
+                      </Box>
+                    </Card>
+                  </Grid>
+                )}
+
+                {!memberData?.ebirdProfileUrl && !memberData?.facebook && !memberData?.linkedin && (
+                  <Grid item xs={12}>
+                    <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+                      No social links added yet. Click the edit button to add your eBird, Facebook, or LinkedIn profile.
+                    </Typography>
+                  </Grid>
+                )}
               </Grid>
-            </>
-          )}
+            )}
+          </>
           
           {/* Birding Statistics */}
-          {(memberData?.usCount || memberData?.worldCount) && (
-            <>
-              <Divider sx={{ my: 3 }} />
-              <Typography variant="h6" gutterBottom color="primary">
+          <>
+            <Divider sx={{ my: 3 }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <Typography variant="h6" color="primary">
                 Birding Activity
               </Typography>
-              
-              {(memberData?.usCount || memberData?.worldCount) && (
-                <Grid container spacing={3}>
-                  {memberData?.usCount && (
-                    <Grid item xs={12} sm={6}>
-                      <Card variant="outlined" sx={{ textAlign: 'center', p: 2 }}>
-                        <Flag color="primary" sx={{ fontSize: 40, mb: 1 }} />
-                        <Typography variant="h4" color="primary">
-                          {memberData.usCount}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Species Sighted in US
-                        </Typography>
-                      </Card>
-                    </Grid>
-                  )}
-                  
-                  {memberData?.worldCount && (
-                    <Grid item xs={12} sm={6}>
-                      <Card variant="outlined" sx={{ textAlign: 'center', p: 2 }}>
-                        <Public color="secondary" sx={{ fontSize: 40, mb: 1 }} />
-                        <Typography variant="h4" color="secondary">
-                          {memberData.worldCount}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Species Sighted Worldwide
-                        </Typography>
-                      </Card>
-                    </Grid>
-                  )}
-                </Grid>
+              {!editingCounts && (
+                <IconButton
+                  onClick={handleEditCounts}
+                  size="small"
+                  color="primary"
+                  disabled={saving}
+                  title="Edit species counts"
+                >
+                  <Edit fontSize="small" />
+                </IconButton>
               )}
-            </>
-          )}
+            </Box>
+
+            {editingCounts ? (
+              <Paper variant="outlined" sx={{ p: 3, mb: 2 }}>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="US Species Count"
+                      type="number"
+                      value={editUsCount}
+                      onChange={(e) => setEditUsCount(e.target.value)}
+                      InputProps={{ inputProps: { min: 0 } }}
+                      disabled={saving}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="World Species Count"
+                      type="number"
+                      value={editWorldCount}
+                      onChange={(e) => setEditWorldCount(e.target.value)}
+                      InputProps={{ inputProps: { min: 0 } }}
+                      disabled={saving}
+                    />
+                  </Grid>
+                </Grid>
+                <Box sx={{ display: 'flex', gap: 2, mt: 3, justifyContent: 'flex-end' }}>
+                  <Button
+                    variant="outlined"
+                    onClick={handleCancelEdit}
+                    disabled={saving}
+                    startIcon={<Cancel />}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={handleSaveCounts}
+                    disabled={saving}
+                    startIcon={<Save />}
+                  >
+                    {saving ? 'Saving...' : 'Save'}
+                  </Button>
+                </Box>
+              </Paper>
+            ) : (
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <Card variant="outlined" sx={{ textAlign: 'center', p: 2 }}>
+                    <Flag color="primary" sx={{ fontSize: 40, mb: 1 }} />
+                    <Typography variant="h4" color="primary">
+                      {memberData?.usCount || 0}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Species Sighted in US
+                    </Typography>
+                  </Card>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <Card variant="outlined" sx={{ textAlign: 'center', p: 2 }}>
+                    <Public color="secondary" sx={{ fontSize: 40, mb: 1 }} />
+                    <Typography variant="h4" color="secondary">
+                      {memberData?.worldCount || 0}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Species Sighted Worldwide
+                    </Typography>
+                  </Card>
+                </Grid>
+              </Grid>
+            )}
+          </>
         </CardContent>
       </Card>
     </Container>

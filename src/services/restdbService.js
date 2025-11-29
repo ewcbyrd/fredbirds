@@ -21,6 +21,18 @@ const post = async (url, body) => {
   return res.json ? res.json() : res;
 };
 
+const patch = async (url, body) => {
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: { 'cache-control': 'no-cache', 'content-type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  }
+  return res.json();
+};
+
 export const getEventsByYear = async (year) => {
   const url = `${api}events/${year}`;
   return get(url);
@@ -162,6 +174,11 @@ export const updateMember = async (memberId, memberData) => {
   return post(url, JSON.stringify(memberData));
 };
 
+export const patchMember = async (memberId, updates) => {
+  const url = `${api}members/${memberId}`;
+  return patch(url, updates);
+};
+
 export const getStates = async () => {
   const url = `${api}locations/states`;
   return get(url);
@@ -299,6 +316,7 @@ export default {
   getMemberByEmail,
   autoRegisterMember,
   updateMember,
+  patchMember,
   getStates,
   getCounties,
   getNewsFeeds,
