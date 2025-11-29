@@ -20,11 +20,11 @@ import {
   Button,
   IconButton
 } from '@mui/material'
-import { 
-  Person, 
-  Email, 
-  CalendarToday, 
-  Verified, 
+import {
+  Person,
+  Email,
+  CalendarToday,
+  Verified,
   LocationOn,
   Home,
   Nature,
@@ -34,6 +34,7 @@ import {
   AccountCircle,
   Phone,
   Facebook,
+  LinkedIn,
   Launch,
   ArrowBack,
   EmojiEvents,
@@ -404,7 +405,7 @@ const MemberProfile = () => {
           </Grid>
           
           {/* Social Links */}
-          {(memberData?.ebirdProfileUrl || memberData?.facebook) && (
+          {(memberData?.ebirdProfileUrl || memberData?.facebook || memberData?.linkedin) && (
             <>
               <Divider sx={{ my: 3 }} />
               <Typography variant="h6" gutterBottom color="primary">
@@ -420,12 +421,12 @@ const MemberProfile = () => {
                           <Typography variant="subtitle1" fontWeight="bold">
                             eBird Profile
                           </Typography>
-                          <a 
-                            href={memberData.ebirdProfileUrl} 
-                            target="_blank" 
+                          <a
+                            href={memberData.ebirdProfileUrl}
+                            target="_blank"
                             rel="noopener noreferrer"
-                            style={{ 
-                              color: '#1976d2', 
+                            style={{
+                              color: '#1976d2',
                               textDecoration: 'none',
                               display: 'flex',
                               alignItems: 'center',
@@ -441,7 +442,7 @@ const MemberProfile = () => {
                     </Card>
                   </Grid>
                 )}
-                
+
                 {memberData?.facebook && (
                   <Grid item xs={12} sm={6}>
                     <Card variant="outlined" sx={{ p: 2, height: '100%' }}>
@@ -451,12 +452,43 @@ const MemberProfile = () => {
                           <Typography variant="subtitle1" fontWeight="bold">
                             Facebook
                           </Typography>
-                          <a 
-                            href={memberData.facebook} 
-                            target="_blank" 
+                          <a
+                            href={memberData.facebook}
+                            target="_blank"
                             rel="noopener noreferrer"
-                            style={{ 
-                              color: '#1976d2', 
+                            style={{
+                              color: '#1976d2',
+                              textDecoration: 'none',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              fontSize: '14px'
+                            }}
+                          >
+                            View Profile
+                            <Launch fontSize="small" />
+                          </a>
+                        </Box>
+                      </Box>
+                    </Card>
+                  </Grid>
+                )}
+
+                {memberData?.linkedin && (
+                  <Grid item xs={12} sm={6}>
+                    <Card variant="outlined" sx={{ p: 2, height: '100%' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <LinkedIn color="primary" sx={{ fontSize: 32 }} />
+                        <Box>
+                          <Typography variant="subtitle1" fontWeight="bold">
+                            LinkedIn
+                          </Typography>
+                          <a
+                            href={memberData.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              color: '#1976d2',
                               textDecoration: 'none',
                               display: 'flex',
                               alignItems: 'center',
