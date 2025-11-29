@@ -280,7 +280,10 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
         memberId: selectedMember._id,
         email: selectedMember.email,
         firstName: selectedMember.first,
-        lastName: selectedMember.last
+        lastName: selectedMember.last,
+        eventTitle: selected.title,
+        eventStart: selected.resource.start,
+        eventEnd: selected.resource.end
       })
 
       // Reload attendees

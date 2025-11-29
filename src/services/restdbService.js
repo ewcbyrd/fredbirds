@@ -176,7 +176,10 @@ export const registerForEvent = async (eventId, memberData) => {
     memberId: memberData.memberId,
     email: memberData.email,
     firstName: memberData.firstName,
-    lastName: memberData.lastName
+    lastName: memberData.lastName,
+    eventTitle: memberData.eventTitle,
+    eventStart: memberData.eventStart,
+    eventEnd: memberData.eventEnd
   });
   return post(url, body);
 };
@@ -184,23 +187,6 @@ export const registerForEvent = async (eventId, memberData) => {
 export const unregisterFromEvent = async (eventId, memberId) => {
   const url = `${api}events/${eventId}/attendees/${memberId}`;
   const res = await fetch(url, { method: 'DELETE' });
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-  }
-  return res.json();
-};
-
-export const checkInToEvent = async (eventId, memberId) => {
-  const url = `${api}events/${eventId}/attendees/${memberId}`;
-  const body = JSON.stringify({
-    attended: true,
-    checkedInAt: new Date().toISOString()
-  });
-  const res = await fetch(url, {
-    method: 'PATCH',
-    headers: { 'cache-control': 'no-cache', 'content-type': 'application/json' },
-    body
-  });
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}: ${res.statusText}`);
   }
@@ -234,7 +220,6 @@ export default {
   getFeed,
   registerForEvent,
   unregisterFromEvent,
-  checkInToEvent,
   getMemberEvents,
   getEventAttendees,
 };
