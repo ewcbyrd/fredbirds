@@ -172,7 +172,7 @@ export const getFeed = async (feedUrl) => {
 
 export const registerForEvent = async (eventId, memberData) => {
   const url = `${api}events/${eventId}/attendees`;
-  const body = JSON.stringify({
+  const payload = {
     memberId: memberData.memberId,
     email: memberData.email,
     firstName: memberData.firstName,
@@ -180,7 +180,10 @@ export const registerForEvent = async (eventId, memberData) => {
     eventTitle: memberData.eventTitle,
     eventStart: memberData.eventStart,
     eventEnd: memberData.eventEnd
-  });
+  };
+  console.log('registerForEvent - URL:', url);
+  console.log('registerForEvent - Payload:', payload);
+  const body = JSON.stringify(payload);
   return post(url, body);
 };
 
