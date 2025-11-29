@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useUserRole } from '../hooks/useUserRole'
-import { getMemberByEmail, patchMember } from '../services/restdbService'
+import { getMemberByEmail, patchMember, getMemberEvents } from '../services/restdbService'
 import { getPictureUrl } from '../services/cloudinaryService'
 import {
   Container,
@@ -24,7 +24,14 @@ import {
   Paper,
   TextField,
   Button,
-  IconButton
+  IconButton,
+  Pagination,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow
 } from '@mui/material'
 import {
   Person,
@@ -45,7 +52,9 @@ import {
   Launch,
   Edit,
   Save,
-  Cancel
+  Cancel,
+  Event as EventIcon,
+  CheckCircle
 } from '@mui/icons-material'
 import RoleBadge from './RoleBadge'
 
@@ -67,6 +76,10 @@ const Profile = () => {
   const [editLinkedInUrl, setEditLinkedInUrl] = useState('')
   const [editingPhone, setEditingPhone] = useState(false)
   const [editPhone, setEditPhone] = useState('')
+  const [memberEvents, setMemberEvents] = useState([])
+  const [loadingEvents, setLoadingEvents] = useState(false)
+  const [eventsPage, setEventsPage] = useState(1)
+  const eventsPerPage = 5
 
   useEffect(() => {
     const fetchMemberData = async () => {
@@ -99,6 +112,30 @@ const Profile = () => {
 
     fetchMemberData()
   }, [user?.email])
+
+  // Fetch member events
+  useEffect(() => {
+    const fetchEvents = async () => {
+      if (!memberData?._id) return
+
+      try {
+        setLoadingEvents(true)
+        const events = await getMemberEvents(memberData._id)
+        // Sort events by start date in descending order (most recent first)
+        const sortedEvents = (events || []).sort((a, b) => {
+          return new Date(b.start) - new Date(a.start)
+        })
+        setMemberEvents(sortedEvents)
+      } catch (err) {
+        console.error('Error fetching member events:', err)
+        setMemberEvents([])
+      } finally {
+        setLoadingEvents(false)
+      }
+    }
+
+    fetchEvents()
+  }, [memberData?._id])
 
   if (!user) {
     return (
@@ -229,6 +266,27 @@ const Profile = () => {
     setEditingPhone(false);
     setEditPhone('');
   };
+
+  const formatEventDate = (dateString) => {
+    if (!dateString) return 'Date not available'
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+
+  const handleEventsPageChange = (event, value) => {
+    setEventsPage(value)
+  }
+
+  // Calculate pagination
+  const totalEventsPages = Math.ceil(memberEvents.length / eventsPerPage)
+  const paginatedEvents = memberEvents.slice(
+    (eventsPage - 1) * eventsPerPage,
+    eventsPage * eventsPerPage
+  )
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
@@ -803,6 +861,88 @@ const Profile = () => {
                   </Card>
                 </Grid>
               </Grid>
+            )}
+          </>
+
+          {/* Event Attendance History */}
+          <>
+            <Divider sx={{ my: 3 }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <EventIcon color="primary" />
+              <Typography variant="h6" color="primary">
+                Event Attendance History
+              </Typography>
+            </Box>
+
+            {loadingEvents ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+                <CircularProgress size={30} />
+                <Typography variant="body2" sx={{ ml: 2 }}>
+                  Loading events...
+                </Typography>
+              </Box>
+            ) : memberEvents.length === 0 ? (
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 3 }}>
+                No event attendance history yet.
+              </Typography>
+            ) : (
+              <>
+                <TableContainer component={Paper} variant="outlined">
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell><strong>Event</strong></TableCell>
+                        <TableCell><strong>Date</strong></TableCell>
+                        <TableCell align="center"><strong>Status</strong></TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {paginatedEvents.map((event, index) => (
+                        <TableRow key={event._id || index}>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {event.title || 'Untitled Event'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2" color="text.secondary">
+                              {formatEventDate(event.start)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            {event.attended ? (
+                              <Chip
+                                icon={<CheckCircle />}
+                                label="Attended"
+                                color="success"
+                                size="small"
+                              />
+                            ) : (
+                              <Chip
+                                label="Registered"
+                                color="default"
+                                size="small"
+                                variant="outlined"
+                              />
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+
+                {totalEventsPages > 1 && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                    <Pagination
+                      count={totalEventsPages}
+                      page={eventsPage}
+                      onChange={handleEventsPageChange}
+                      color="primary"
+                    />
+                  </Box>
+                )}
+              </>
             )}
           </>
         </CardContent>
