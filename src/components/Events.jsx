@@ -22,7 +22,17 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
-import { getEventsByYear, getFutureEvents } from '../services/restdbService'
+import PeopleIcon from '@mui/icons-material/People'
+import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import DeleteIcon from '@mui/icons-material/Delete'
+import Autocomplete from '@mui/material/Autocomplete'
+import TextField from '@mui/material/TextField'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction'
+import IconButton from '@mui/material/IconButton'
+import { getEventsByYear, getFutureEvents, getEventAttendees, registerForEvent, unregisterFromEvent, getMembers } from '../services/restdbService'
 
 const locales = {
   'en-US': enUS
@@ -144,6 +154,12 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
   const [currentIdx, setCurrentIdx] = useState(0)
   const [currentDate, setCurrentDate] = useState(new Date())
 
+  // Attendee management state
+  const [attendees, setAttendees] = useState([])
+  const [allMembers, setAllMembers] = useState([])
+  const [selectedMember, setSelectedMember] = useState(null)
+  const [loadingAttendees, setLoadingAttendees] = useState(false)
+
   useEffect(()=>{
     setLoading(true)
     if (home) {
@@ -159,7 +175,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
       for (let y = 2015; y <= currentYear + 1; y++) {
         years.push(y)
       }
-      
+
       Promise.all(years.map(y => getEventsByYear(y)))
         .then(results => {
           const combined = results.flat()
@@ -173,6 +189,17 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
         })
     }
   },[home])
+
+  // Load all members for attendee selection
+  useEffect(() => {
+    console.log('Loading members...')
+    getMembers().then(members => {
+      console.log('Members loaded:', members)
+      setAllMembers(members || [])
+    }).catch(err => {
+      console.error('Error loading members:', err)
+    })
+  }, [])
 
   function transformEvents(result){
     if (!result || result.length===0) return []
@@ -223,9 +250,65 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
 
   function handleSelectEvent(event){
     setSelected(event)
+    // Load attendees for this event
+    if (event && event.id) {
+      setLoadingAttendees(true)
+      getEventAttendees(event.id)
+        .then(data => {
+          setAttendees(data.attendees || [])
+          setLoadingAttendees(false)
+        })
+        .catch(err => {
+          console.error('Error loading attendees:', err)
+          setAttendees([])
+          setLoadingAttendees(false)
+        })
+    }
   }
 
-  function closeEvent(){ setSelected(null) }
+  function closeEvent(){
+    setSelected(null)
+    setAttendees([])
+    setSelectedMember(null)
+  }
+
+  async function handleAddAttendee() {
+    if (!selectedMember || !selected) return
+
+    try {
+      await registerForEvent(selected.id, {
+        memberId: selectedMember._id,
+        email: selectedMember.email,
+        firstName: selectedMember.first,
+        lastName: selectedMember.last
+      })
+
+      // Reload attendees
+      const data = await getEventAttendees(selected.id)
+      setAttendees(data.attendees || [])
+      setSelectedMember(null)
+    } catch (err) {
+      console.error('Error adding attendee:', err)
+      alert(err.message || 'Failed to add attendee')
+    }
+  }
+
+  async function handleRemoveAttendee(memberId) {
+    if (!selected) return
+
+    if (!confirm('Remove this attendee from the event?')) return
+
+    try {
+      await unregisterFromEvent(selected.id, memberId)
+
+      // Reload attendees
+      const data = await getEventAttendees(selected.id)
+      setAttendees(data.attendees || [])
+    } catch (err) {
+      console.error('Error removing attendee:', err)
+      alert('Failed to remove attendee')
+    }
+  }
 
   if (loading) return <Typography>Loading...</Typography>
 
@@ -765,14 +848,99 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
               </Box>
             </Box>
           )}
-          <EventMap 
-            lat={selected?.resource?.lat} 
-            lon={selected?.resource?.lon} 
+          <EventMap
+            lat={selected?.resource?.lat}
+            lon={selected?.resource?.lon}
             title={selected?.title}
           />
+
+          {/* Attendee Management Section */}
+          <Box>
+            <Divider sx={{ mb: 2 }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <PeopleIcon color="primary" fontSize="small" />
+              <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                Event Attendees ({attendees.length})
+              </Typography>
+            </Box>
+
+            {/* Add Attendee Section */}
+            <Box sx={{
+              bgcolor: 'grey.50',
+              p: 2,
+              borderRadius: 2,
+              mb: 2
+            }}>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                <Autocomplete
+                  value={selectedMember}
+                  onChange={(event, newValue) => setSelectedMember(newValue)}
+                  options={allMembers.filter(m => !attendees.some(a => a.memberId === m._id))}
+                  getOptionLabel={(option) => `${option.first} ${option.last} (${option.email})`}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Add Member"
+                      size="small"
+                      placeholder="Search members..."
+                    />
+                  )}
+                  sx={{ flex: 1 }}
+                  isOptionEqualToValue={(option, value) => option._id === value._id}
+                />
+                <Button
+                  variant="contained"
+                  startIcon={<PersonAddIcon />}
+                  onClick={handleAddAttendee}
+                  disabled={!selectedMember}
+                  sx={{ textTransform: 'none' }}
+                >
+                  Add
+                </Button>
+              </Box>
+            </Box>
+
+            {/* Attendees List */}
+            {loadingAttendees ? (
+              <Typography>Loading attendees...</Typography>
+            ) : attendees.length === 0 ? (
+              <Typography color="text.secondary" sx={{ fontStyle: 'italic', textAlign: 'center', py: 2 }}>
+                No attendees yet
+              </Typography>
+            ) : (
+              <List sx={{
+                bgcolor: 'white',
+                borderRadius: 2,
+                border: 1,
+                borderColor: 'grey.200'
+              }}>
+                {attendees.map((attendee, idx) => (
+                  <React.Fragment key={attendee.memberId || idx}>
+                    {idx > 0 && <Divider />}
+                    <ListItem>
+                      <ListItemText
+                        primary={`${attendee.firstName} ${attendee.lastName}`}
+                        secondary={attendee.email}
+                      />
+                      <ListItemSecondaryAction>
+                        <IconButton
+                          edge="end"
+                          aria-label="delete"
+                          onClick={() => handleRemoveAttendee(attendee.memberId)}
+                          color="error"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  </React.Fragment>
+                ))}
+              </List>
+            )}
+          </Box>
         </DialogContent>
         <DialogActions sx={{ p: 3, pt: 0 }}>
-          <Button 
+          <Button
             onClick={closeEvent}
             variant="contained"
             size="large"
