@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
+import { getPictureUrl } from '../services/cloudinaryService'
 import { 
   Container, 
   Typography, 
@@ -143,8 +144,8 @@ const MemberProfile = () => {
   }
 
   const getProfileImage = () => {
-    // No profile images available at this time
-    return null
+    // Return Cloudinary URL if picture exists
+    return getPictureUrl(memberData?.picture)
   }
 
   const formatAddress = (member) => {

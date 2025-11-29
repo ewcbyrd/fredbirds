@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useUserRole } from '../hooks/useUserRole'
 import { getMemberByEmail, patchMember } from '../services/restdbService'
+import { getPictureUrl } from '../services/cloudinaryService'
 import {
   Container,
   Typography,
@@ -84,6 +85,7 @@ const Profile = () => {
         
         console.log('US Count:', data?.usCount)
         console.log('World Count:', data?.worldCount)
+        console.log('Picture URL:', data?.picture)
         setMemberData(data)
         setShowEmail(data?.showEmail ?? false)
         setShowPhone(data?.showPhone ?? false)
@@ -249,7 +251,7 @@ const Profile = () => {
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 3 }}>
             <Avatar
-              src={memberData?.picture || user.picture}
+              src={getPictureUrl(memberData?.picture) || user.picture}
               alt={memberData?.first && memberData?.last ? `${memberData.first} ${memberData.last}` : user.name}
               sx={{ width: 80, height: 80 }}
             />
