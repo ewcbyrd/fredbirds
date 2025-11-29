@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
+import { getPictureUrl } from '../services/cloudinaryService'
 import {
   Container,
   Typography,
@@ -324,6 +325,7 @@ const MembersDirectory = () => {
                     >
                       <ListItemAvatar>
                         <Avatar
+                          src={getPictureUrl(member.picture)}
                           sx={{
                             bgcolor: 'primary.main',
                             width: 48,
