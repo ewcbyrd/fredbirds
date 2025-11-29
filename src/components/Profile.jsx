@@ -53,8 +53,7 @@ import {
   Edit,
   Save,
   Cancel,
-  Event as EventIcon,
-  CheckCircle
+  Event as EventIcon
 } from '@mui/icons-material'
 import RoleBadge from './RoleBadge'
 
@@ -123,7 +122,7 @@ const Profile = () => {
         const events = await getMemberEvents(memberData._id)
         // Sort events by start date in descending order (most recent first)
         const sortedEvents = (events || []).sort((a, b) => {
-          return new Date(b.start) - new Date(a.start)
+          return new Date(b.eventStart) - new Date(a.eventStart)
         })
         setMemberEvents(sortedEvents)
       } catch (err) {
@@ -267,14 +266,32 @@ const Profile = () => {
     setEditPhone('');
   };
 
-  const formatEventDate = (dateString) => {
-    if (!dateString) return 'Date not available'
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
+  const formatEventDate = (startDateString, endDateString) => {
+    if (!startDateString) return 'Date not available'
+
+    // Parse dates in UTC to avoid timezone issues
+    const startDate = new Date(startDateString)
+    const startMonth = startDate.toLocaleDateString('en-US', { month: 'long', timeZone: 'UTC' })
+    const startDay = startDate.getUTCDate()
+    const startYear = startDate.getUTCFullYear()
+
+    // No end date - single day event
+    if (!endDateString) {
+      return `${startMonth} ${startDay}, ${startYear}`
+    }
+
+    const endDate = new Date(endDateString)
+    const endMonth = endDate.toLocaleDateString('en-US', { month: 'long', timeZone: 'UTC' })
+    const endDay = endDate.getUTCDate()
+    const endYear = endDate.getUTCFullYear()
+
+    // Same month - format: September 7-10, 2010
+    if (startMonth === endMonth && startYear === endYear) {
+      return `${startMonth} ${startDay}-${endDay}, ${startYear}`
+    }
+
+    // Different months - format: September 29 - October 1, 2010
+    return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${endYear}`
   }
 
   const handleEventsPageChange = (event, value) => {
@@ -867,11 +884,23 @@ const Profile = () => {
           {/* Event Attendance History */}
           <>
             <Divider sx={{ my: 3 }} />
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
               <EventIcon color="primary" />
               <Typography variant="h6" color="primary">
                 Event Attendance History
               </Typography>
+              {!loadingEvents && memberEvents.length > 0 && (
+                <Chip
+                  label={`${memberEvents.length} ${memberEvents.length === 1 ? 'Event' : 'Events'}`}
+                  color="primary"
+                  size="medium"
+                  sx={{
+                    fontWeight: 600,
+                    fontSize: '0.875rem',
+                    height: 32
+                  }}
+                />
+              )}
             </Box>
 
             {loadingEvents ? (
@@ -891,40 +920,22 @@ const Profile = () => {
                   <Table>
                     <TableHead>
                       <TableRow>
-                        <TableCell><strong>Event</strong></TableCell>
-                        <TableCell><strong>Date</strong></TableCell>
-                        <TableCell align="center"><strong>Status</strong></TableCell>
+                        <TableCell sx={{ width: '60%' }}><strong>Event</strong></TableCell>
+                        <TableCell sx={{ width: '40%' }}><strong>Date</strong></TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {paginatedEvents.map((event, index) => (
                         <TableRow key={event._id || index}>
-                          <TableCell>
+                          <TableCell sx={{ width: '60%' }}>
                             <Typography variant="body2">
-                              {event.title || 'Untitled Event'}
+                              {event.eventTitle || 'Untitled Event'}
                             </Typography>
                           </TableCell>
-                          <TableCell>
+                          <TableCell sx={{ width: '40%' }}>
                             <Typography variant="body2" color="text.secondary">
-                              {formatEventDate(event.start)}
+                              {formatEventDate(event.eventStart, event.eventEnd)}
                             </Typography>
-                          </TableCell>
-                          <TableCell align="center">
-                            {event.attended ? (
-                              <Chip
-                                icon={<CheckCircle />}
-                                label="Attended"
-                                color="success"
-                                size="small"
-                              />
-                            ) : (
-                              <Chip
-                                label="Registered"
-                                color="default"
-                                size="small"
-                                variant="outlined"
-                              />
-                            )}
                           </TableCell>
                         </TableRow>
                       ))}
