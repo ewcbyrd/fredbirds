@@ -19,7 +19,6 @@ import MembershipList from './components/MembershipList'
 import Resources from './components/Resources'
 import Officers from './components/Officers'
 import Photos from './components/Photos'
-import RareBirds from './components/RareBirds'
 import ProtectedRoute from './components/ProtectedRoute'
 import MemberDashboard from './components/MemberDashboard'
 import Profile from './components/Profile'
@@ -32,7 +31,6 @@ import AccessControl from './components/AccessControl'
 import MemberAccessControl from './components/MemberAccessControl'
 import { ACCESS_LEVELS } from './hooks/useUserRole'
 import { Routes, Route, useNavigate } from 'react-router-dom'
-import { getRareBirds } from './services/restdbService'
 
 const theme = createTheme({
   palette: {
@@ -42,22 +40,6 @@ const theme = createTheme({
 
 export default function App() {
   const navigate = useNavigate()
-
-  useEffect(() => {
-    // Load rare birds data on app initialization
-    const loadRareBirds = async () => {
-      try {
-        const rareBirds = await getRareBirds()
-        // Store rare birds data in session storage
-        sessionStorage.setItem('rareBirds', JSON.stringify(rareBirds))
-        console.log('Rare birds data loaded and cached:', rareBirds.length, 'records')
-      } catch (error) {
-        console.error('Failed to load rare birds data:', error)
-      }
-    }
-    
-    loadRareBirds()
-  }, [])
 
   function handleNavigate(view) {
     const map = {
@@ -105,7 +87,6 @@ export default function App() {
             <Route path="/membership/list" element={<MembershipList />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/officers" element={<Officers />} />
-            <Route path="/rarebirds" element={<RareBirds />} />
             <Route path="/photos" element={<Photos />} />
             
             {/* Protected Member Routes */}
