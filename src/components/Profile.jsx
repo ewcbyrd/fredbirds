@@ -248,8 +248,8 @@ const Profile = () => {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 3 }}>
-            <Avatar 
-              src={user.picture}
+            <Avatar
+              src={memberData?.picture || user.picture}
               alt={memberData?.first && memberData?.last ? `${memberData.first} ${memberData.last}` : user.name}
               sx={{ width: 80, height: 80 }}
             />
