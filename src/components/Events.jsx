@@ -275,20 +275,16 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
   async function handleAddAttendee() {
     if (!selectedMember || !selected) return
 
-    const attendeeData = {
-      memberId: selectedMember._id,
-      email: selectedMember.email,
-      firstName: selectedMember.first,
-      lastName: selectedMember.last,
-      eventTitle: selected.title,
-      eventStart: selected.resource.start,
-      eventEnd: selected.resource.end
-    }
-
-    console.log('Adding attendee with data:', attendeeData)
-
     try {
-      await registerForEvent(selected.id, attendeeData)
+      await registerForEvent(selected.id, {
+        memberId: selectedMember._id,
+        email: selectedMember.email,
+        firstName: selectedMember.first,
+        lastName: selectedMember.last,
+        eventTitle: selected.title,
+        eventStart: selected.resource.start,
+        eventEnd: selected.resource.end
+      })
 
       // Reload attendees
       const data = await getEventAttendees(selected.id)
