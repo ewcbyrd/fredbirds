@@ -77,7 +77,7 @@ export const getFaqs = async () => {
 };
 
 export const getMembers = async () => {
-  const url = `${api}members`;
+  const url = `${api}members/active`;
   return get(url);
 };
 
@@ -168,6 +168,55 @@ export const getFeed = async (feedUrl) => {
 };
 
 
+// Event Attendance Functions
+
+export const registerForEvent = async (eventId, memberData) => {
+  const url = `${api}events/${eventId}/attendees`;
+  const body = JSON.stringify({
+    memberId: memberData.memberId,
+    email: memberData.email,
+    firstName: memberData.firstName,
+    lastName: memberData.lastName
+  });
+  return post(url, body);
+};
+
+export const unregisterFromEvent = async (eventId, memberId) => {
+  const url = `${api}events/${eventId}/attendees/${memberId}`;
+  const res = await fetch(url, { method: 'DELETE' });
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  }
+  return res.json();
+};
+
+export const checkInToEvent = async (eventId, memberId) => {
+  const url = `${api}events/${eventId}/attendees/${memberId}`;
+  const body = JSON.stringify({
+    attended: true,
+    checkedInAt: new Date().toISOString()
+  });
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: { 'cache-control': 'no-cache', 'content-type': 'application/json' },
+    body
+  });
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  }
+  return res.json();
+};
+
+export const getMemberEvents = async (memberId) => {
+  const url = `${api}members/${memberId}/events`;
+  return get(url);
+};
+
+export const getEventAttendees = async (eventId) => {
+  const url = `${api}events/${eventId}/attendees`;
+  return get(url);
+};
+
 export default {
   getEventsByYear,
   getFutureEvents,
@@ -183,4 +232,9 @@ export default {
   getNewsFeeds,
   getRareBirds,
   getFeed,
+  registerForEvent,
+  unregisterFromEvent,
+  checkInToEvent,
+  getMemberEvents,
+  getEventAttendees,
 };
