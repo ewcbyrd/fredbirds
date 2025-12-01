@@ -19,8 +19,18 @@ import MembershipList from './components/MembershipList'
 import Resources from './components/Resources'
 import Officers from './components/Officers'
 import Photos from './components/Photos'
+import ProtectedRoute from './components/ProtectedRoute'
+import MemberDashboard from './components/MemberDashboard'
+import Profile from './components/Profile'
+import MembersDirectory from './components/MembersDirectory'
+import MemberProfile from './components/MemberProfile'
+import MemberOnboarding from './components/MemberOnboarding'
+import OfficerTools from './components/OfficerTools'
+import AdminPanel from './components/AdminPanel'
+import AccessControl from './components/AccessControl'
+import MemberAccessControl from './components/MemberAccessControl'
+import { ACCESS_LEVELS } from './hooks/useUserRole'
 import { Routes, Route, useNavigate } from 'react-router-dom'
-import { getRareBirds } from './services/restdbService'
 
 const theme = createTheme({
   palette: {
@@ -30,22 +40,6 @@ const theme = createTheme({
 
 export default function App() {
   const navigate = useNavigate()
-
-  useEffect(() => {
-    // Load rare birds data on app initialization
-    const loadRareBirds = async () => {
-      try {
-        const rareBirds = await getRareBirds()
-        // Store rare birds data in session storage
-        sessionStorage.setItem('rareBirds', JSON.stringify(rareBirds))
-        console.log('Rare birds data loaded and cached:', rareBirds.length, 'records')
-      } catch (error) {
-        console.error('Failed to load rare birds data:', error)
-      }
-    }
-    
-    loadRareBirds()
-  }, [])
 
   function handleNavigate(view) {
     const map = {
@@ -63,7 +57,8 @@ export default function App() {
       newsfeed: '/newsfeed',
       resources: '/resources',
       officers: '/officers',
-      photos: '/photos'
+      photos: '/photos',
+      'members-directory': '/members-directory'
     }
     const path = map[view] || '/'
     navigate(path)
@@ -78,7 +73,11 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home onNavigate={handleNavigate} />} />
             <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/faqs" element={<FAQs />} />
             <Route path="/events" element={<Events />} />
+            
+            {/* All features public except Members Directory */}
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/sightings" element={<Resources />} />
             <Route path="/news" element={<News />} />
@@ -89,8 +88,62 @@ export default function App() {
             <Route path="/resources" element={<Resources />} />
             <Route path="/officers" element={<Officers />} />
             <Route path="/photos" element={<Photos />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/faqs" element={<FAQs />} />
+            
+            {/* Protected Member Routes */}
+            <Route path="/member-dashboard" element={
+              <ProtectedRoute title="Member Dashboard">
+                <MemberDashboard />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/members" element={
+              <ProtectedRoute title="Member Dashboard">
+                <MemberDashboard />
+              </ProtectedRoute>
+            } />
+            
+            {/* User Profile */}
+            <Route path="/profile" element={
+              <MemberAccessControl requiredLevel={ACCESS_LEVELS.MEMBER}>
+                <Profile />
+              </MemberAccessControl>
+            } />
+            
+            {/* Member Onboarding */}
+            <Route path="/member-onboarding" element={
+              <ProtectedRoute title="Complete Your Registration">
+                <MemberOnboarding />
+              </ProtectedRoute>
+            } />
+            
+            {/* Members Directory - member access required */}
+            <Route path="/members-directory" element={
+              <MemberAccessControl requiredLevel={ACCESS_LEVELS.MEMBER}>
+                <MembersDirectory />
+              </MemberAccessControl>
+            } />
+            
+            {/* Individual Member Profile */}
+            <Route path="/members/:email" element={
+              <MemberAccessControl requiredLevel={ACCESS_LEVELS.MEMBER}>
+                <MemberProfile />
+              </MemberAccessControl>
+            } />
+            
+            {/* Officer Tools */}
+            <Route path="/officer-tools" element={
+              <MemberAccessControl requiredLevel={ACCESS_LEVELS.OFFICER}>
+                <OfficerTools />
+              </MemberAccessControl>
+            } />
+            
+            {/* Admin Panel */}
+            <Route path="/admin" element={
+              <MemberAccessControl requiredLevel={ACCESS_LEVELS.ADMIN}>
+                <AdminPanel />
+              </MemberAccessControl>
+            } />
+            
             {/* fallback route */}
             <Route path="*" element={<Home onNavigate={handleNavigate} />} />
           </Routes>

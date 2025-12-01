@@ -1,5 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useAuth0 } from '@auth0/auth0-react'
+import { useUserRole, ACCESS_LEVELS } from '../hooks/useUserRole'
+import { getMemberByEmail } from '../services/restdbService'
 import { 
   AppBar, 
   Toolbar, 
@@ -15,22 +18,72 @@ import {
   Divider,
   ListSubheader,
   useMediaQuery,
-  useTheme
+  useTheme,
+  Alert,
+  Collapse
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import HomeIcon from '@mui/icons-material/Home'
 import CloseIcon from '@mui/icons-material/Close'
+import { PersonAdd, Close } from '@mui/icons-material'
+import UserProfile from './UserProfile'
 
 export default function Header({ onNavigate }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [showOnboardingBanner, setShowOnboardingBanner] = useState(false)
+  const [bannerDismissed, setBannerDismissed] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const { user, isAuthenticated } = useAuth0()
+  const { hasAccess } = useUserRole()
+
+  // Check if user needs to complete onboarding
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      if (!isAuthenticated || !user?.email || bannerDismissed) {
+        setShowOnboardingBanner(false)
+        return
+      }
+
+      try {
+        await getMemberByEmail(user.email)
+        // If we get here, member record exists
+        setShowOnboardingBanner(false)
+      } catch (error) {
+        // No member record found - show onboarding banner
+        setShowOnboardingBanner(true)
+      }
+    }
+
+    checkOnboardingStatus()
+  }, [user?.email, isAuthenticated, bannerDismissed])
+
+  const handleDismissBanner = () => {
+    setBannerDismissed(true)
+    setShowOnboardingBanner(false)
+  }
+
+  const handleCompleteOnboarding = () => {
+    navigate('/member-onboarding')
+    setDrawerOpen(false)
+  }
 
   const handleNavigate = (path) => {
     navigate(path)
     setDrawerOpen(false)
+  }
+
+  // Only Members Directory is restricted
+  const memberOnlyPaths = ['/members-directory']
+
+  // Filter function to check if menu item should be shown
+  const shouldShowMenuItem = (path) => {
+    if (memberOnlyPaths.includes(path)) {
+      return hasAccess(ACCESS_LEVELS.MEMBER)
+    }
+    return true // All other pages are public
   }
 
   const menuSections = [
@@ -40,6 +93,7 @@ export default function Header({ onNavigate }) {
         { label: 'Home', path: '/' },
         { label: 'About', path: '/about' },
         { label: 'Officers', path: '/officers' },
+        { label: 'Members Directory', path: '/members-directory' },
         { label: 'Membership', path: '/membership' },
         { label: "FAQ's", path: '/faqs' }
       ]
@@ -68,6 +122,15 @@ export default function Header({ onNavigate }) {
     { label: 'Events', path: '/events' },
     { label: 'Membership', path: '/membership' }
   ]
+
+  // Filter menu sections based on authentication
+  const filteredMenuSections = menuSections.map(section => ({
+    ...section,
+    items: section.items.filter(item => shouldShowMenuItem(item.path))
+  })).filter(section => section.items.length > 0)
+
+  // Filter primary nav items
+  const filteredPrimaryNav = primaryNav.filter(item => shouldShowMenuItem(item.path))
 
   return (
     <>
@@ -109,7 +172,7 @@ export default function Header({ onNavigate }) {
           {/* Desktop Navigation */}
           {!isMobile && (
             <Box sx={{ display: 'flex', gap: 0.5, mr: 2 }}>
-              {primaryNav.map((item) => (
+              {filteredPrimaryNav.map((item) => (
                 <Button
                   key={item.path}
                   color="inherit"
@@ -139,6 +202,7 @@ export default function Header({ onNavigate }) {
             color="inherit"
             onClick={() => setDrawerOpen(true)}
             sx={{ 
+              mr: 2,
               '&:hover': {
                 bgcolor: 'rgba(255, 255, 255, 0.1)'
               }
@@ -146,8 +210,60 @@ export default function Header({ onNavigate }) {
           >
             <MenuIcon sx={{ fontSize: 28 }} />
           </IconButton>
+
+          {/* User Profile / Login */}
+          <Box>
+            <UserProfile />
+          </Box>
         </Toolbar>
       </AppBar>
+
+      {/* Onboarding Banner */}
+      <Collapse in={showOnboardingBanner}>
+        <Alert 
+          severity="info" 
+          sx={{ 
+            borderRadius: 0,
+            bgcolor: '#e3f2fd',
+            borderColor: '#2196f3',
+            '& .MuiAlert-message': {
+              width: '100%'
+            }
+          }}
+          action={
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Button
+                size="small"
+                variant="contained"
+                startIcon={<PersonAdd />}
+                onClick={handleCompleteOnboarding}
+                sx={{
+                  bgcolor: '#1976d2',
+                  '&:hover': { bgcolor: '#1565c0' }
+                }}
+              >
+                Complete Setup
+              </Button>
+              <IconButton
+                size="small"
+                onClick={handleDismissBanner}
+                sx={{ color: 'rgba(0, 0, 0, 0.54)' }}
+              >
+                <Close fontSize="small" />
+              </IconButton>
+            </Box>
+          }
+        >
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+              Welcome to Fredericksburg Birding Club!
+            </Typography>
+            <Typography variant="body2">
+              Complete your member profile to access club features and connect with fellow birders.
+            </Typography>
+          </Box>
+        </Alert>
+      </Collapse>
 
       <Drawer
         anchor="right"
@@ -168,7 +284,7 @@ export default function Header({ onNavigate }) {
         </Box>
         
         <List>
-          {menuSections.map((section, idx) => (
+          {filteredMenuSections.map((section, idx) => (
             <React.Fragment key={section.title}>
               <ListSubheader sx={{ bgcolor: 'transparent', fontWeight: 600, color: '#2c5f2d' }}>
                 {section.title}
@@ -189,7 +305,7 @@ export default function Header({ onNavigate }) {
                   </ListItemButton>
                 </ListItem>
               ))}
-              {idx < menuSections.length - 1 && <Divider sx={{ my: 1 }} />}
+              {idx < filteredMenuSections.length - 1 && <Divider sx={{ my: 1 }} />}
             </React.Fragment>
           ))}
         </List>

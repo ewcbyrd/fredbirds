@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
+import { useUserRole, ACCESS_LEVELS } from '../hooks/useUserRole'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
@@ -22,6 +24,8 @@ const items = [
 ]
 
 export default function Home({ onNavigate }){
+  const { isAuthenticated } = useAuth0()
+  const { hasAccess } = useUserRole()
   const [announcements, setAnnouncements] = useState([])
   const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0)
   const [fadeIn, setFadeIn] = useState(true)
@@ -112,28 +116,30 @@ export default function Home({ onNavigate }){
             justifyContent: 'center', 
             flexWrap: 'wrap',
             pb: { xs: 3, md: 0 }
-          }}>
-            <Button
-              variant="outlined"
-              size="large"
-              href="/membership"
-              sx={{
-                borderColor: 'white',
-                color: 'white',
-                px: 4,
-                py: 1.5,
-                fontSize: '1.1rem',
-                fontWeight: 600,
-                borderWidth: 2,
-                '&:hover': {
+          }}>            
+            {hasAccess(ACCESS_LEVELS.MEMBER) && (
+              <Button
+                variant="outlined"
+                size="large"
+                href="/membership"
+                sx={{
                   borderColor: 'white',
-                  bgcolor: 'rgba(255, 255, 255, 0.1)',
-                  borderWidth: 2
-                }
-              }}
-            >
-              Join the Club
-            </Button>
+                  color: 'white',
+                  px: 4,
+                  py: 1.5,
+                  fontSize: '1.1rem',
+                  fontWeight: 600,
+                  borderWidth: 2,
+                  '&:hover': {
+                    borderColor: 'white',
+                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 2
+                  }
+                }}
+              >
+                Join the Club
+              </Button>
+            )}
             <Button
               variant="outlined"
               size="large"
@@ -155,27 +161,29 @@ export default function Home({ onNavigate }){
             >
               View Events
             </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              onClick={() => onNavigate('sightings')}
-              sx={{
-                borderColor: 'white',
-                color: 'white',
-                px: 4,
-                py: 1.5,
-                fontSize: '1.1rem',
-                fontWeight: 600,
-                borderWidth: 2,
-                '&:hover': {
+            {hasAccess(ACCESS_LEVELS.MEMBER) && (
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => onNavigate('sightings')}
+                sx={{
                   borderColor: 'white',
-                  bgcolor: 'rgba(255, 255, 255, 0.1)',
-                  borderWidth: 2
-                }
-              }}
-            >
-              Recent Sightings
-            </Button>
+                  color: 'white',
+                  px: 4,
+                  py: 1.5,
+                  fontSize: '1.1rem',
+                  fontWeight: 600,
+                  borderWidth: 2,
+                  '&:hover': {
+                    borderColor: 'white',
+                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 2
+                  }
+                }}
+              >
+                Recent Sightings
+              </Button>
+            )}
           </Box>
         </Box>
       </Box>
