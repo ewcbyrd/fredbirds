@@ -22,9 +22,9 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
-import { Add, Edit, Delete } from '@mui/icons-material'
 import PeopleIcon from '@mui/icons-material/People'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import PersonIcon from '@mui/icons-material/Person'
 import DeleteIcon from '@mui/icons-material/Delete'
 import Autocomplete from '@mui/material/Autocomplete'
 import TextField from '@mui/material/TextField'
@@ -33,6 +33,7 @@ import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction'
 import IconButton from '@mui/material/IconButton'
+import ReactMarkdown from 'react-markdown'
 import { getEventsByYear, getFutureEvents, getEventAttendees, registerForEvent, unregisterFromEvent, getMembers } from '../services/restdbService'
 import AccessControl from './AccessControl'
 import { ACCESS_LEVELS } from '../hooks/useUserRole'
@@ -50,101 +51,131 @@ const localizer = dateFnsLocalizer({
   locales,
 })
 
-// Function to detect URLs and render them as clickable links
-const renderTextWithLinks = (text) => {
-  if (!text) return text;
-  
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  const parts = text.split(urlRegex);
-  
-  return parts.map((part, index) => {
-    if (urlRegex.test(part)) {
-      return (
-        <Link 
-          key={index} 
-          href={part} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          sx={{ color: 'primary.main', textDecoration: 'underline' }}
-        >
-          {part}
-        </Link>
-      );
-    }
-    return part;
-  });
-};
-
-// Function to format text content with line breaks and URLs
+// Function to render event details as markdown
 const formatEventDetails = (details) => {
   if (!details) return null;
-  
-  const lines = details.split('\n');
-  
-  return lines.map((line, index) => (
-    <Box key={index} component="div" sx={{ mb: 0.5 }}>
-      {renderTextWithLinks(line)}
+
+  return (
+    <Box
+      sx={{
+        '& p': { mt: 0, mb: 2 },
+        '& h1, & h2, & h3, & h4, & h5, & h6': { mt: 2, mb: 1 },
+        '& ul, & ol': { mt: 0, mb: 2, pl: 3 },
+        '& li': { mb: 0.5 },
+        '& blockquote': {
+          borderLeft: '4px solid #ddd',
+          pl: 2,
+          ml: 0,
+          color: 'text.secondary'
+        },
+        '& code': {
+          backgroundColor: 'action.hover',
+          padding: '2px 6px',
+          borderRadius: 1,
+          fontFamily: 'monospace',
+          fontSize: '0.9em'
+        },
+        '& pre': {
+          backgroundColor: 'action.hover',
+          padding: 2,
+          borderRadius: 1,
+          overflow: 'auto'
+        },
+        '& a': {
+          color: 'primary.main',
+          textDecoration: 'none',
+          '&:hover': {
+            textDecoration: 'underline'
+          }
+        }
+      }}
+    >
+      <ReactMarkdown>{details}</ReactMarkdown>
     </Box>
-  ));
+  );
 };
 
-// Component to render event location map
-const EventMap = ({ lat, lon, title }) => {
-  if (!lat || !lon) return null;
-  
+// Component to render event location map(s)
+const EventMap = ({ lat, lon, title, locations }) => {
+  // Support both old single location format (lat/lon) and new multiple locations format
+  const eventLocations = locations && locations.length > 0
+    ? locations
+    : (lat && lon ? [{ lat, lon, name: '', address: '' }] : []);
+
+  if (eventLocations.length === 0) return null;
+
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  
-  // Use Google Maps embed with API key if available, fallback to basic embed
-  const mapSrc = apiKey 
-    ? `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${lat},${lon}&zoom=15`
-    : `https://www.google.com/maps?q=${lat},${lon}&output=embed&z=15`;
-  
+
   return (
     <Box>
       <Divider sx={{ mb: 2 }} />
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
         <LocationOnIcon color="primary" fontSize="small" />
         <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
-          Event Location
+          {eventLocations.length === 1 ? 'Event Location' : `Event Locations (${eventLocations.length})`}
         </Typography>
       </Box>
-      <Box sx={{ 
-        bgcolor: 'info.50',
-        p: 2,
-        borderRadius: 2,
-        border: 1,
-        borderColor: 'info.200',
-        mb: 3
-      }}>
-        <Box sx={{ 
-          position: 'relative',
-          width: '100%',
-          height: 250,
-          borderRadius: 2,
-          overflow: 'hidden',
-          border: 1,
-          borderColor: 'grey.300'
-        }}>
-          <iframe
-            src={mapSrc}
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title={`Map for ${title}`}
-          />
-        </Box>
-        <Typography variant="caption" sx={{ 
-          display: 'block', 
-          mt: 1, 
-          color: 'text.secondary',
-          textAlign: 'center'
-        }}>
-          {apiKey ? 'Interactive Google Maps • Click and drag to explore' : 'Basic map view • Click to open in Google Maps'}
-        </Typography>
-      </Box>
+
+      {eventLocations.map((location, idx) => {
+        const mapSrc = apiKey
+          ? `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${location.lat},${location.lon}&zoom=15`
+          : `https://www.google.com/maps?q=${location.lat},${location.lon}&output=embed&z=15`;
+
+        return (
+          <Box key={idx} sx={{
+            bgcolor: 'info.50',
+            p: 2,
+            borderRadius: 2,
+            border: 1,
+            borderColor: 'info.200',
+            mb: eventLocations.length > 1 && idx < eventLocations.length - 1 ? 2 : 3
+          }}>
+            {eventLocations.length > 1 && (
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                Location {idx + 1}{location.name ? `: ${location.name}` : ''}
+              </Typography>
+            )}
+            {eventLocations.length === 1 && location.name && (
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                {location.name}
+              </Typography>
+            )}
+            {location.address && (
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                {location.address}
+              </Typography>
+            )}
+            <Box sx={{
+              position: 'relative',
+              width: '100%',
+              height: 250,
+              borderRadius: 2,
+              overflow: 'hidden',
+              border: 1,
+              borderColor: 'grey.300'
+            }}>
+              <iframe
+                src={mapSrc}
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title={`Map for ${location.name || title} - Location ${idx + 1}`}
+              />
+            </Box>
+            <Typography variant="caption" sx={{
+              display: 'block',
+              mt: 1,
+              color: 'text.secondary',
+              textAlign: 'center'
+            }}>
+              {apiKey ? 'Interactive Google Maps • Click and drag to explore' : 'Basic map view • Click to open in Google Maps'}
+            </Typography>
+          </Box>
+        );
+      })}
     </Box>
   );
 };
@@ -234,7 +265,9 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
           species_sighted: item.species_sighted || [],
           pdfFile: item.pdfFile,
           lat: item.lat,
-          lon: item.lon
+          lon: item.lon,
+          tripLeader: item.tripLeader || null,
+          locations: item.locations || (item.lat && item.lon ? [{ lat: item.lat, lon: item.lon, name: '', address: '' }] : [])
         }
       }
     })
@@ -604,10 +637,41 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
                 </Box>
               </Box>
             )}
-            <EventMap 
-              lat={selected?.resource?.lat} 
-              lon={selected?.resource?.lon} 
+            {selected?.resource?.tripLeader && (
+              <Box sx={{ mb: 3 }}>
+                <Divider sx={{ mb: 2 }} />
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                  <PersonIcon color="primary" fontSize="small" />
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                    Trip Leader
+                  </Typography>
+                </Box>
+                <Box sx={{
+                  bgcolor: 'primary.50',
+                  p: 2,
+                  borderRadius: 2,
+                  border: 1,
+                  borderColor: 'primary.200'
+                }}>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    {selected.resource.tripLeader.name || `${selected.resource.tripLeader.firstName} ${selected.resource.tripLeader.lastName}`.trim()}
+                  </Typography>
+                  {selected.resource.tripLeader.email && (
+                    <Link
+                      href={`mailto:${selected.resource.tripLeader.email}`}
+                      sx={{ display: 'block', mt: 0.5 }}
+                    >
+                      {selected.resource.tripLeader.email}
+                    </Link>
+                  )}
+                </Box>
+              </Box>
+            )}
+            <EventMap
+              lat={selected?.resource?.lat}
+              lon={selected?.resource?.lon}
               title={selected?.title}
+              locations={selected?.resource?.locations}
             />
             <WeatherForecast 
               latitude={selected?.resource?.lat}
@@ -701,47 +765,6 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
       <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 3 }}>
         Events Calendar
       </Typography>
-      
-      {/* Officer Management Section */}
-      <AccessControl 
-        requiredLevel={ACCESS_LEVELS.OFFICER} 
-        showMessage={false}
-        fallback={null}
-      >
-        <Card sx={{ mb: 3, bgcolor: 'primary.light', color: 'primary.contrastText' }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Event Management
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              <Button
-                variant="contained"
-                startIcon={<Add />}
-                size="small"
-                sx={{ bgcolor: 'white', color: 'primary.main' }}
-              >
-                Add Event
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<Edit />}
-                size="small"
-                sx={{ bgcolor: 'white', color: 'primary.main' }}
-              >
-                Edit Events
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<Delete />}
-                size="small"
-                sx={{ bgcolor: 'white', color: 'primary.main' }}
-              >
-                Manage Events
-              </Button>
-            </Box>
-          </CardContent>
-        </Card>
-      </AccessControl>
       
       <Box sx={{ 
         height: 650, 
@@ -907,10 +930,41 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
               </Box>
             </Box>
           )}
+          {selected?.resource?.tripLeader && (
+            <Box sx={{ mb: 3 }}>
+              <Divider sx={{ mb: 2 }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <PersonIcon color="primary" fontSize="small" />
+                <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                  Trip Leader
+                </Typography>
+              </Box>
+              <Box sx={{
+                bgcolor: 'primary.50',
+                p: 2,
+                borderRadius: 2,
+                border: 1,
+                borderColor: 'primary.200'
+              }}>
+                <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                  {selected.resource.tripLeader.name || `${selected.resource.tripLeader.firstName} ${selected.resource.tripLeader.lastName}`.trim()}
+                </Typography>
+                {selected.resource.tripLeader.email && (
+                  <Link
+                    href={`mailto:${selected.resource.tripLeader.email}`}
+                    sx={{ display: 'block', mt: 0.5 }}
+                  >
+                    {selected.resource.tripLeader.email}
+                  </Link>
+                )}
+              </Box>
+            </Box>
+          )}
           <EventMap
             lat={selected?.resource?.lat}
             lon={selected?.resource?.lon}
             title={selected?.title}
+            locations={selected?.resource?.locations}
           />
 
           {/* Attendee Management Section */}
