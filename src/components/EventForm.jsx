@@ -59,13 +59,21 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
     fetchMembers()
   }, [])
 
+  // Helper function to convert UTC date string to local date with same calendar date
+  const parseUTCDate = (dateString) => {
+    if (!dateString) return null
+    const utcDate = new Date(dateString)
+    // Create a new date in local timezone with the same year/month/day as UTC
+    return new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate())
+  }
+
   // Load event data for edit mode
   useEffect(() => {
     if (event) {
       setFormData({
         event: event.event || '',
-        start: event.start ? new Date(event.start) : null,
-        end: event.end ? new Date(event.end) : null,
+        start: parseUTCDate(event.start),
+        end: parseUTCDate(event.end),
         details: event.details || '',
         cancelled: event.cancelled || false,
         pdfFile: event.pdfFile || '',

@@ -293,7 +293,23 @@ export const unregisterFromEvent = async (eventId, memberId) => {
 
 export const getMemberEvents = async (memberId) => {
   const url = `${api}members/${memberId}/events`;
-  return get(url);
+  const events = await get(url);
+
+  // Handle edge case where API might return empty or null
+  if (!events || !Array.isArray(events)) {
+    console.warn('getMemberEvents: Unexpected response format', events);
+    return [];
+  }
+
+  // Normalize the event data to ensure consistent field names
+  // Backend should return eventTitle, eventStart, eventEnd
+  // But may return event, start, end (legacy format)
+  return events.map(event => ({
+    _id: event._id,
+    eventTitle: event.eventTitle || event.event,
+    eventStart: event.eventStart || event.start,
+    eventEnd: event.eventEnd || event.end
+  }));
 };
 
 export const getEventAttendees = async (eventId) => {
