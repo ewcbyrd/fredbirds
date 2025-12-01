@@ -1,34 +1,37 @@
-import React from 'react'
-import { 
-  Container, 
-  Typography, 
-  Box, 
-  Card, 
+import React, { useState } from 'react'
+import {
+  Container,
+  Typography,
+  Box,
+  Card,
   CardContent,
   Grid,
   Button
 } from '@mui/material'
-import { 
-  EventNote, 
-  People, 
-  Assessment, 
-  Announcement 
+import {
+  EventNote,
+  People,
+  Assessment,
+  Announcement
 } from '@mui/icons-material'
 import AccessControl from './AccessControl'
 import { ACCESS_LEVELS } from '../hooks/useUserRole'
+import ManageEventsDialog from './ManageEventsDialog'
 
 const OfficerTools = () => {
+  const [manageEventsOpen, setManageEventsOpen] = useState(false)
+
   return (
     <AccessControl requiredLevel={ACCESS_LEVELS.OFFICER}>
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Typography variant="h4" gutterBottom>
           Officer Tools
         </Typography>
-        
+
         <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
           Manage club events, announcements, and member activities.
         </Typography>
-        
+
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
             <Card>
@@ -42,7 +45,11 @@ const OfficerTools = () => {
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                   Create, edit, and manage club birding events and field trips.
                 </Typography>
-                <Button variant="contained" fullWidth>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={() => setManageEventsOpen(true)}
+                >
                   Manage Events
                 </Button>
               </CardContent>
@@ -106,6 +113,11 @@ const OfficerTools = () => {
             </Card>
           </Grid>
         </Grid>
+
+        <ManageEventsDialog
+          open={manageEventsOpen}
+          onClose={() => setManageEventsOpen(false)}
+        />
       </Container>
     </AccessControl>
   )

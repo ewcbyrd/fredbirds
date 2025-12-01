@@ -301,6 +301,27 @@ export const getEventAttendees = async (eventId) => {
   return get(url);
 };
 
+// Event Management Functions
+
+export const createEvent = async (eventData) => {
+  const url = `${api}events`;
+  return post(url, JSON.stringify(eventData));
+};
+
+export const updateEvent = async (eventId, eventData) => {
+  const url = `${api}events/${eventId}`;
+  return patch(url, eventData);
+};
+
+export const deleteEvent = async (eventId) => {
+  const url = `${api}events/${eventId}`;
+  const res = await fetch(url, { method: 'DELETE' });
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  }
+  return res.json();
+};
+
 export default {
   getEventsByYear,
   getFutureEvents,
@@ -326,4 +347,7 @@ export default {
   unregisterFromEvent,
   getMemberEvents,
   getEventAttendees,
+  createEvent,
+  updateEvent,
+  deleteEvent,
 };
