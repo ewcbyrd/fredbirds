@@ -20,7 +20,7 @@ import Resources from './components/Resources'
 import Officers from './components/Officers'
 import Photos from './components/Photos'
 import ProtectedRoute from './components/ProtectedRoute'
-import MemberDashboard from './components/MemberDashboard'
+
 import Profile from './components/Profile'
 import MembersDirectory from './components/MembersDirectory'
 import MemberProfile from './components/MemberProfile'
@@ -88,19 +88,6 @@ export default function App() {
             <Route path="/resources" element={<Resources />} />
             <Route path="/officers" element={<Officers />} />
             <Route path="/photos" element={<Photos />} />
-            
-            {/* Protected Member Routes */}
-            <Route path="/member-dashboard" element={
-              <ProtectedRoute title="Member Dashboard">
-                <MemberDashboard />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/members" element={
-              <ProtectedRoute title="Member Dashboard">
-                <MemberDashboard />
-              </ProtectedRoute>
-            } />
             
             {/* User Profile */}
             <Route path="/profile" element={

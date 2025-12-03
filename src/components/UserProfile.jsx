@@ -2,7 +2,7 @@ import React from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Box, Typography, Avatar, Menu, MenuItem, Divider } from '@mui/material'
-import { AccountCircle, Login, Logout, Settings, Dashboard, People, EventNote } from '@mui/icons-material'
+import { AccountCircle, Login, Logout, Settings, EventNote } from '@mui/icons-material'
 import { useUserRole, ACCESS_LEVELS } from '../hooks/useUserRole'
 import { getMemberByEmail } from '../services/restdbService'
 import RoleBadge from './RoleBadge'
@@ -203,13 +203,6 @@ const UserProfile = () => {
           <AccountCircle fontSize="small" sx={{ mr: 1 }} />
           My Profile
         </MenuItem>
-        
-        {hasAccess(ACCESS_LEVELS.MEMBER) && (
-          <MenuItem onClick={() => handleMenuItemClick('/member-dashboard')}>
-            <Dashboard fontSize="small" sx={{ mr: 1 }} />
-            Member Dashboard
-          </MenuItem>
-        )}
         
         {hasAccess(ACCESS_LEVELS.OFFICER) && (
           <MenuItem onClick={() => handleMenuItemClick('/officer-tools')}>
