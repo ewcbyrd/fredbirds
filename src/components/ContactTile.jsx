@@ -34,6 +34,7 @@ export default function ContactTile({ contact }) {
             <Typography variant="h6">{contact.Name}</Typography>
             <Typography variant="body2" color="text.secondary">{contact.Title}</Typography>
             {contact.Email && <Typography variant="body2">{contact.Email}</Typography>}
+            {contact.Phone && <Typography variant="body2">{formatPhoneNumber(contact.Phone)}</Typography>}
           </Box>
         </Box>
       </CardContent>

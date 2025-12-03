@@ -17,6 +17,8 @@ export default function Officers() {
           Title: officer.position,
           // Only include email if member has explicitly allowed it to be shown
           Email: officer.showEmail === true ? officer.email : null,
+          // Only include phone if member has explicitly allowed it to be shown
+          Phone: officer.showPhone === true ? officer.phone : null,
           Picture: getPictureUrl(officer.picture)
         }))
         
