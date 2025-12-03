@@ -80,6 +80,7 @@ export default function Home({ onNavigate }){
             maxWidth: 800,
             mx: 'auto',
             px: { xs: 3, md: 6 },
+            pt: { xs: 3, md: 0 },
             textAlign: 'center'
           }}
         >
