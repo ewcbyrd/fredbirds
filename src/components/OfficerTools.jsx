@@ -17,9 +17,11 @@ import {
 import AccessControl from './AccessControl'
 import { ACCESS_LEVELS } from '../hooks/useUserRole'
 import ManageEventsDialog from './ManageEventsDialog'
+import ManageMembersDialog from './ManageMembersDialog'
 
 const OfficerTools = () => {
   const [manageEventsOpen, setManageEventsOpen] = useState(false)
+  const [manageMembersOpen, setManageMembersOpen] = useState(false)
 
   return (
     <AccessControl requiredLevel={ACCESS_LEVELS.OFFICER}>
@@ -81,14 +83,19 @@ const OfficerTools = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                   <People color="success" sx={{ fontSize: 32 }} />
                   <Typography variant="h6">
-                    Member Directory
+                    Member Management
                   </Typography>
                 </Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                   View and manage club membership roster.
                 </Typography>
-                <Button variant="contained" color="success" fullWidth>
-                  View Members
+                <Button
+                  variant="contained"
+                  color="success"
+                  fullWidth
+                  onClick={() => setManageMembersOpen(true)}
+                >
+                  Manage Members
                 </Button>
               </CardContent>
             </Card>
@@ -117,6 +124,11 @@ const OfficerTools = () => {
         <ManageEventsDialog
           open={manageEventsOpen}
           onClose={() => setManageEventsOpen(false)}
+        />
+
+        <ManageMembersDialog
+          open={manageMembersOpen}
+          onClose={() => setManageMembersOpen(false)}
         />
       </Container>
     </AccessControl>
