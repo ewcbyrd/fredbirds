@@ -11,18 +11,6 @@ import NearbySightings from './NearbySightings'
 import { getAnnouncements } from '../services/restdbService'
 import { getCloudinaryUrl, transformations } from '../services/cloudinaryService'
 
-const items = [
-  getCloudinaryUrl('image5.jpeg', transformations.hero),
-  getCloudinaryUrl('CBBT.jpeg', transformations.hero),
-  getCloudinaryUrl('Group.jpg', transformations.hero),
-  getCloudinaryUrl('IMG_0844.JPG', transformations.hero),
-  getCloudinaryUrl('IMG_0552.JPG', transformations.hero),
-  getCloudinaryUrl('Photo-Op.jpg', transformations.hero),
-  getCloudinaryUrl('IMG_3301.JPG', transformations.hero),
-  getCloudinaryUrl('P1020092.jpeg', transformations.hero),
-  getCloudinaryUrl('Leesylvania-Group.jpeg', transformations.hero)
-]
-
 export default function Home({ onNavigate }){
   const { isAuthenticated } = useAuth0()
   const { hasAccess } = useUserRole()
