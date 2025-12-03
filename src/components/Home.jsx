@@ -80,6 +80,7 @@ export default function Home({ onNavigate }){
             maxWidth: 800,
             mx: 'auto',
             px: { xs: 3, md: 6 },
+            py: { xs: 3, md: 0 },
             textAlign: 'center'
           }}
         >
@@ -114,8 +115,7 @@ export default function Home({ onNavigate }){
             display: 'flex', 
             gap: 2, 
             justifyContent: 'center', 
-            flexWrap: 'wrap',
-            pb: { xs: 3, md: 0 }
+            flexWrap: 'wrap'
           }}>            
             {hasAccess(ACCESS_LEVELS.MEMBER) && (
               <Button
