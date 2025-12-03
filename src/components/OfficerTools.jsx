@@ -18,10 +18,12 @@ import AccessControl from './AccessControl'
 import { ACCESS_LEVELS } from '../hooks/useUserRole'
 import ManageEventsDialog from './ManageEventsDialog'
 import ManageMembersDialog from './ManageMembersDialog'
+import ManageAnnouncementsDialog from './ManageAnnouncementsDialog'
 
 const OfficerTools = () => {
   const [manageEventsOpen, setManageEventsOpen] = useState(false)
   const [manageMembersOpen, setManageMembersOpen] = useState(false)
+  const [manageAnnouncementsOpen, setManageAnnouncementsOpen] = useState(false)
 
   return (
     <AccessControl requiredLevel={ACCESS_LEVELS.OFFICER}>
@@ -70,7 +72,12 @@ const OfficerTools = () => {
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                   Post important news and updates for club members.
                 </Typography>
-                <Button variant="contained" color="secondary" fullWidth>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  fullWidth
+                  onClick={() => setManageAnnouncementsOpen(true)}
+                >
                   Manage Announcements
                 </Button>
               </CardContent>
@@ -129,6 +136,11 @@ const OfficerTools = () => {
         <ManageMembersDialog
           open={manageMembersOpen}
           onClose={() => setManageMembersOpen(false)}
+        />
+
+        <ManageAnnouncementsDialog
+          open={manageAnnouncementsOpen}
+          onClose={() => setManageAnnouncementsOpen(false)}
         />
       </Container>
     </AccessControl>

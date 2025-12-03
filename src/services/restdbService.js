@@ -343,6 +343,27 @@ export const deleteEvent = async (eventId) => {
   return res.json();
 };
 
+// Announcement Management Functions
+
+export const createAnnouncement = async (announcementData) => {
+  const url = `${api}announcements`;
+  return post(url, JSON.stringify(announcementData));
+};
+
+export const updateAnnouncement = async (announcementId, announcementData) => {
+  const url = `${api}announcements/${announcementId}`;
+  return patch(url, announcementData);
+};
+
+export const deleteAnnouncement = async (announcementId) => {
+  const url = `${api}announcements/${announcementId}`;
+  const res = await fetch(url, { method: 'DELETE' });
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  }
+  return res.json();
+};
+
 export default {
   getEventsByYear,
   getFutureEvents,
@@ -371,4 +392,7 @@ export default {
   createEvent,
   updateEvent,
   deleteEvent,
+  createAnnouncement,
+  updateAnnouncement,
+  deleteAnnouncement,
 };
