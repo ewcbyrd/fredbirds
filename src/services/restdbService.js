@@ -98,6 +98,11 @@ export const getActiveMembers = async () => {
   return get(url);
 };
 
+export const getAllMembers = async () => {
+  const url = `${api}members`;
+  return get(url);
+};
+
 export const getUserRole = async (email, auth0Id) => {
   const url = `${api}members/role`;
   return post(url, JSON.stringify({ email, auth0Id }));
