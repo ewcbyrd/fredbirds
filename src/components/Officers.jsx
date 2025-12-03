@@ -15,8 +15,8 @@ export default function Officers() {
         const mappedOfficers = (data || []).map(officer => ({
           Name: `${officer.first} ${officer.last}`,
           Title: officer.position,
-          // Only include email if member has allowed it to be shown
-          Email: officer.showEmail !== false ? officer.email : null,
+          // Only include email if member has explicitly allowed it to be shown
+          Email: officer.showEmail === true ? officer.email : null,
           Picture: getPictureUrl(officer.picture)
         }))
         
