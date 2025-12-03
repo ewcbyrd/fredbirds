@@ -15,8 +15,10 @@ export default function Officers() {
         const mappedOfficers = (data || []).map(officer => ({
           Name: `${officer.first} ${officer.last}`,
           Title: officer.position,
-          Phone: officer.phone,
-          Email: officer.email,
+          // Only include email if member has explicitly allowed it to be shown
+          Email: officer.showEmail === true ? officer.email : null,
+          // Only include phone if member has explicitly allowed it to be shown
+          Phone: officer.showPhone === true ? officer.phone : null,
           Picture: getPictureUrl(officer.picture)
         }))
         
@@ -36,16 +38,9 @@ export default function Officers() {
         setOfficers(sortedOfficers)
         setLoading(false)
       })
-      .catch(error => {
-        console.error('Error fetching officers:', error)
-        // Fallback to hardcoded data if API fails
-        setOfficers([{
-          Name: 'Scott Byrd',
-          Title: 'Web Master',
-          Phone: '5406568078',
-          Email: 'sbyrd1968@verizon.net',
-          Picture: getPictureUrl('scott_byrd')
-        }])
+      .catch(() => {
+        // Fallback to empty list if API fails - no hardcoded personal data
+        setOfficers([])
         setLoading(false)
       })
   }, [])
