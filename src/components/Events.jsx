@@ -747,13 +747,6 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
           >
             Month
           </Button>
-          <Button 
-            size="small" 
-            variant={view === 'agenda' ? 'contained' : 'outlined'}
-            onClick={() => onView('agenda')}
-          >
-            Agenda
-          </Button>
         </Box>
       </Box>
     )
@@ -783,7 +776,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
           date={currentDate}
           onNavigate={(date) => setCurrentDate(date)}
           onSelectEvent={handleSelectEvent}
-          views={['month', 'agenda']}
+          views={['month']}
           defaultView="month"
           style={{ height: '100%' }}
           components={{
