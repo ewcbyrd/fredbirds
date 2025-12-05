@@ -700,7 +700,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
     )
   }
 
-  const CustomToolbar = ({ label, onNavigate, onView, view }) => {
+  const CustomToolbar = ({ label, onNavigate }) => {
     const goToYear = (targetYear) => {
       const newDate = new Date(targetYear, 0, 1)
       setCurrentDate(newDate)
@@ -738,23 +738,6 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
             ))}
           </Select>
         </Box>
-
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button 
-            size="small" 
-            variant={view === 'month' ? 'contained' : 'outlined'}
-            onClick={() => onView('month')}
-          >
-            Month
-          </Button>
-          <Button 
-            size="small" 
-            variant={view === 'agenda' ? 'contained' : 'outlined'}
-            onClick={() => onView('agenda')}
-          >
-            Agenda
-          </Button>
-        </Box>
       </Box>
     )
   }
@@ -783,7 +766,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
           date={currentDate}
           onNavigate={(date) => setCurrentDate(date)}
           onSelectEvent={handleSelectEvent}
-          views={['month', 'agenda']}
+          views={['month']}
           defaultView="month"
           style={{ height: '100%' }}
           components={{
