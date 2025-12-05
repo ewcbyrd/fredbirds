@@ -738,16 +738,6 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
             ))}
           </Select>
         </Box>
-
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button 
-            size="small" 
-            variant={view === 'month' ? 'contained' : 'outlined'}
-            onClick={() => onView('month')}
-          >
-            Month
-          </Button>
-        </Box>
       </Box>
     )
   }
