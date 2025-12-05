@@ -700,7 +700,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
     )
   }
 
-  const CustomToolbar = ({ label, onNavigate, onView, view }) => {
+  const CustomToolbar = ({ label, onNavigate }) => {
     const goToYear = (targetYear) => {
       const newDate = new Date(targetYear, 0, 1)
       setCurrentDate(newDate)
