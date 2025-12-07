@@ -38,7 +38,12 @@ export const uploadToCloudinary = async (file, folder = 'photos') => {
   const { cloudName, uploadUrl } = getCloudinaryConfig()
   
   if (!uploadPreset) {
-    throw new Error('Cloudinary upload preset not configured. Add VITE_CLOUDINARY_UPLOAD_PRESET to environment variables.')
+    console.error('Cloudinary configuration:', {
+      VITE_CLOUDINARY_UPLOAD_PRESET: import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+      VITE_CLOUDINARY_CLOUD_NAME: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
+      configuredCloudName: cloudName
+    })
+    throw new Error('Photo upload is not configured. Please ensure VITE_CLOUDINARY_UPLOAD_PRESET is set in environment variables or .env.local.')
   }
 
   const formData = new FormData()
