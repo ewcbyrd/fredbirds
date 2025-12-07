@@ -123,7 +123,7 @@ const MembersDirectory = () => {
     }
 
     fetchMembers()
-  }, [])
+  }, [isAdmin, isOfficer, user])
 
   useEffect(() => {
     if (!searchTerm) {
