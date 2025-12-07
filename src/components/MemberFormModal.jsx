@@ -30,7 +30,10 @@ const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
     role: 'Member',
     isActive: true,
     isOfficer: false,
-    position: null
+    position: null,
+    showInDirectory: true,
+    showEmail: false,
+    showPhone: false
   })
   
   const [loading, setLoading] = useState(false)
@@ -49,7 +52,10 @@ const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
         role: memberRole,
         isActive: member.isActive !== false,
         isOfficer: member.isOfficer === true,
-        position: member.position || null
+        position: member.position || null,
+        showInDirectory: member.showInDirectory !== false,
+        showEmail: member.showEmail === true,
+        showPhone: member.showPhone === true
       })
     } else {
       // Creating new member
@@ -61,7 +67,10 @@ const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
         role: 'Member',
         isActive: true,
         isOfficer: false,
-        position: null
+        position: null,
+        showInDirectory: true,
+        showEmail: false,
+        showPhone: false
       })
     }
     setError(null)
@@ -152,7 +161,10 @@ const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
         role: formData.role.toLowerCase(),
         isActive: formData.isActive,
         isOfficer: formData.isOfficer,
-        position: formData.position || null
+        position: formData.position || null,
+        showInDirectory: formData.showInDirectory,
+        showEmail: formData.showEmail,
+        showPhone: formData.showPhone
       }
 
       if (member && member._id) {
@@ -308,6 +320,42 @@ const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
                 />
               }
               label="Active Member"
+            />
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="showInDirectory"
+                  checked={formData.showInDirectory}
+                  onChange={handleChange}
+                  disabled={loading}
+                />
+              }
+              label="Show in Member Directory"
+            />
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="showEmail"
+                  checked={formData.showEmail}
+                  onChange={handleChange}
+                  disabled={loading}
+                />
+              }
+              label="Show Email Address"
+            />
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="showPhone"
+                  checked={formData.showPhone}
+                  onChange={handleChange}
+                  disabled={loading}
+                />
+              }
+              label="Show Phone Number"
             />
           </Stack>
         </Box>
