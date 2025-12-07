@@ -1,12 +1,20 @@
 // Cloudinary image service
-const CLOUD_NAME = 'doqy8jape'
-const BASE_URL = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload`
-const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`
+const getCloudinaryConfig = () => {
+  // Use environment variable if available (from .env.local in dev, from Heroku secrets in production)
+  // Otherwise fall back to hardcoded default
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'doqy8jape'
+  return {
+    cloudName,
+    baseUrl: `https://res.cloudinary.com/${cloudName}/image/upload`,
+    uploadUrl: `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`
+  }
+}
 
 // Helper function to build Cloudinary URLs
 export const getCloudinaryUrl = (publicId, transformations = '') => {
+  const { baseUrl } = getCloudinaryConfig()
   const transformPart = transformations ? `/${transformations}` : ''
-  return `${BASE_URL}${transformPart}/${publicId}`
+  return `${baseUrl}${transformPart}/${publicId}`
 }
 
 // Upload image to Cloudinary
@@ -27,14 +35,10 @@ export const uploadToCloudinary = async (file, folder = 'photos') => {
 
   // Check if upload preset is configured
   const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
-  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+  const { cloudName, uploadUrl } = getCloudinaryConfig()
   
   if (!uploadPreset) {
-    throw new Error('Cloudinary upload preset not configured. Add VITE_CLOUDINARY_UPLOAD_PRESET to .env.local')
-  }
-  
-  if (!cloudName) {
-    throw new Error('Cloudinary cloud name not configured. Add VITE_CLOUDINARY_CLOUD_NAME to .env.local')
+    throw new Error('Cloudinary upload preset not configured. Add VITE_CLOUDINARY_UPLOAD_PRESET to environment variables.')
   }
 
   const formData = new FormData()
@@ -51,7 +55,7 @@ export const uploadToCloudinary = async (file, folder = 'photos') => {
   })
   
   try {
-    const response = await fetch(UPLOAD_URL, {
+    const response = await fetch(uploadUrl, {
       method: 'POST',
       body: formData
     })
