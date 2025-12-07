@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
+import { useUserRole } from '../hooks/useUserRole'
 import { getPictureUrl } from '../services/cloudinaryService'
 import {
   Container,
@@ -44,6 +45,7 @@ const MembersDirectory = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const navigate = useNavigate()
   const { user } = useAuth0()
+  const { isAdmin, isOfficer } = useUserRole()
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -87,8 +89,27 @@ const MembersDirectory = () => {
             return nameA.first.localeCompare(nameB.first)
           })
           
-          setMembers(sortedMembers)
-          setFilteredMembers(sortedMembers)
+          // Filter members based on showInDirectory setting
+          // Admins and Officers can see all members
+          // Regular members can only see members who have showInDirectory enabled (or themselves)
+          const visibleMembers = sortedMembers.filter(member => {
+            // Admins and Officers see everyone
+            if (isAdmin || isOfficer) {
+              return true
+            }
+            
+            // Members can see themselves
+            if (user?.email && member.email === user.email) {
+              return true
+            }
+            
+            // Otherwise, respect the showInDirectory setting
+            // Default to true if not set (backwards compatible)
+            return member.showInDirectory !== false
+          })
+          
+          setMembers(visibleMembers)
+          setFilteredMembers(visibleMembers)
         } else {
           setMembers([])
           setFilteredMembers([])

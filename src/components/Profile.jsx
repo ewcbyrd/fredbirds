@@ -65,6 +65,7 @@ const Profile = () => {
   const [error, setError] = useState(null)
   const [showEmail, setShowEmail] = useState(false)
   const [showPhone, setShowPhone] = useState(false)
+  const [showInDirectory, setShowInDirectory] = useState(true)
   const [saving, setSaving] = useState(false)
   const [editingCounts, setEditingCounts] = useState(false)
   const [editUsCount, setEditUsCount] = useState('')
@@ -101,6 +102,7 @@ const Profile = () => {
         setMemberData(data)
         setShowEmail(data?.showEmail ?? false)
         setShowPhone(data?.showPhone ?? false)
+        setShowInDirectory(data?.showInDirectory ?? true)
       } catch (err) {
         console.error('Error fetching member data:', err)
         setError(err.message)
@@ -165,6 +167,7 @@ const Profile = () => {
       setMemberData({ ...memberData, [field]: value });
       if (field === 'showEmail') setShowEmail(value);
       if (field === 'showPhone') setShowPhone(value);
+      if (field === 'showInDirectory') setShowInDirectory(value);
     } catch (err) {
       console.error('Error updating settings:', err);
       alert('Failed to update settings.');
@@ -538,6 +541,26 @@ const Profile = () => {
         </Typography>
         <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50', mb: 2 }}>
           <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={showInDirectory}
+                    onChange={e => handleToggle('showInDirectory', e.target.checked)}
+                    color="primary"
+                    disabled={saving}
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography variant="body1">Show in Member Directory</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Allow other members to see your profile in the member directory
+                    </Typography>
+                  </Box>
+                }
+              />
+            </Grid>
             <Grid item xs={12}>
               <FormControlLabel
                 control={

@@ -168,6 +168,7 @@ export const autoRegisterMember = async (auth0User) => {
     phone: auth0User.phone || '',   // Optional phone from form
     showEmail: auth0User.showEmail !== undefined ? auth0User.showEmail : true,  // Privacy setting
     showPhone: auth0User.showPhone !== undefined ? auth0User.showPhone : false, // Privacy setting
+    showInDirectory: auth0User.showInDirectory !== undefined ? auth0User.showInDirectory : true, // Privacy setting - default true
     auth0Id: auth0User.sub,
     emailVerified: auth0User.email_verified,
     picture: auth0User.picture
