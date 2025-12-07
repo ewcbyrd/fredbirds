@@ -78,6 +78,16 @@ export const getPhotos = async () => {
   return get(url);
 };
 
+export const savePhoto = async (photoData) => {
+  const url = `${api}photos`;
+  return post(url, JSON.stringify({
+    cloudinary_public_id: photoData.publicId,
+    header: photoData.title,
+    description: photoData.description,
+    category: photoData.category
+  }));
+};
+
 export const getMember = async (member) => {
   const url = `${api}members/filter?first=${member.first}&last=${member.last}&email=${member.email}`;
   return get(url);
