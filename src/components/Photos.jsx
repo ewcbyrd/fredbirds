@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Typography, Grid, Card, CardMedia, Tabs, Tab } from '@mui/material'
+import { Box, Typography, Grid, Card, CardMedia, Tabs, Tab, Button } from '@mui/material'
 import Lightbox from 'yet-another-react-lightbox'
 import 'yet-another-react-lightbox/styles.css'
 import { getPhotos } from '../services/restdbService'
 import { getCloudinaryUrl, transformations } from '../services/cloudinaryService'
+import { useAuth0 } from '@auth0/auth0-react'
+import PhotoUploadForm from './PhotoUploadForm'
 
 export default function Photos() {
+  const { isAuthenticated } = useAuth0()
   const [index, setIndex] = useState(-1)
   const [activeTab, setActiveTab] = useState(0)
   const [photos, setPhotos] = useState([])
   const [loading, setLoading] = useState(true)
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
 
   useEffect(() => {
     loadPhotos()
@@ -59,9 +63,20 @@ export default function Photos() {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, py: 4 }}>
-      <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 3 }}>
-        Photo Gallery
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a' }}>
+          Photo Gallery
+        </Typography>
+        {isAuthenticated && (
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: '#2c5f2d', '&:hover': { backgroundColor: '#1e4620' } }}
+            onClick={() => setUploadDialogOpen(true)}
+          >
+            Upload Photo
+          </Button>
+        )}
+      </Box>
       
       <Box sx={{ 
         borderBottom: 1, 
@@ -137,6 +152,12 @@ export default function Photos() {
         index={index}
         close={() => setIndex(-1)}
         slides={photos}
+      />
+
+      <PhotoUploadForm
+        open={uploadDialogOpen}
+        onClose={() => setUploadDialogOpen(false)}
+        onUploadSuccess={loadPhotos}
       />
     </Box>
   )
