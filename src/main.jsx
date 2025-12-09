@@ -21,6 +21,12 @@ console.log('Auth0 Config:', {
 const redirectUri = window.location.origin
 console.log('Redirect URI:', redirectUri)
 
+// Determine cache location based on environment to prevent token sharing
+// Use memory cache for localhost to keep dev and prod sessions separate
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+const cacheLocation = isLocalhost ? 'memory' : 'localstorage'
+console.log('Auth0 Cache Location:', cacheLocation)
+
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Auth0Provider
@@ -42,8 +48,9 @@ createRoot(document.getElementById('root')).render(
         authKeys.forEach(key => localStorage.removeItem(key))
         sessionStorage.clear()
       }}
-      cacheLocation="localstorage"
+      cacheLocation={cacheLocation}
       useRefreshTokens={true}
+      sessionCheckExpiryFraction={0.5}
     >
       <BrowserRouter
         future={{
