@@ -24,6 +24,21 @@ export default function Photos() {
   const formatDate = (dateString) => {
     if (!dateString) return null
     try {
+      // Parse date-only strings (YYYY-MM-DD) in local timezone to avoid off-by-one errors
+      // When new Date('2025-12-09') is called, JS interprets it as UTC midnight,
+      // which can shift to previous day in negative UTC offset timezones
+      const dateMatch = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+      if (dateMatch) {
+        const [, year, month, day] = dateMatch
+        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+        return date.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })
+      }
+      
+      // Fallback to regular date parsing for other formats
       const date = new Date(dateString)
       return date.toLocaleDateString('en-US', { 
         year: 'numeric', 
