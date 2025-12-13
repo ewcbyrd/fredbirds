@@ -299,7 +299,7 @@ const EventPhotoSection = ({ eventId }) => {
                 component="img"
                 image={getCloudinaryUrl(currentPhoto.cloudinary_public_id, 'w_800,h_600,c_fill')}
                 alt={currentPhoto.header || 'Event photo'}
-                sx={{ width: '100%', height: 400, objectFit: 'cover' }}
+                sx={{ width: '100%', maxHeight: 400, objectFit: 'contain' }}
               />
 
               {photos.length > 1 && (
