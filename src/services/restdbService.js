@@ -357,6 +357,31 @@ export const deleteEvent = async (eventId) => {
   return res.json();
 };
 
+// Event Photos Management Functions
+
+export const getEventPhotos = async (eventId) => {
+  const url = `${api}events/${eventId}/photos`;
+  return get(url);
+};
+
+export const addEventPhoto = async (eventId, photoData) => {
+  const url = `${api}events/${eventId}/photos`;
+  return post(url, JSON.stringify(photoData));
+};
+
+export const removeEventPhoto = async (eventId, photoId) => {
+  const url = `${api}events/${eventId}/photos`;
+  const res = await fetch(url, {
+    method: 'DELETE',
+    headers: { 'cache-control': 'no-cache', 'content-type': 'application/json' },
+    body: JSON.stringify({ _id: photoId })
+  });
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  }
+  return res.json();
+};
+
 // Announcement Management Functions
 
 export const createAnnouncement = async (announcementData) => {
@@ -406,6 +431,9 @@ export default {
   createEvent,
   updateEvent,
   deleteEvent,
+  getEventPhotos,
+  addEventPhoto,
+  removeEventPhoto,
   createAnnouncement,
   updateAnnouncement,
   deleteAnnouncement,

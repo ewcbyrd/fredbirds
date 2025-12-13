@@ -37,6 +37,7 @@ import IconButton from '@mui/material/IconButton'
 import ReactMarkdown from 'react-markdown'
 import { getEventsByYear, getFutureEvents, getEventAttendees, registerForEvent, unregisterFromEvent, getMembers } from '../services/restdbService'
 import AccessControl from './AccessControl'
+import EventPhotoSection from './EventPhotoSection'
 import { ACCESS_LEVELS } from '../hooks/useUserRole'
 import WeatherForecast from './WeatherForecast'
 
@@ -801,6 +802,15 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
               </Link>
             </Box>
           )}
+
+          {/* Event Photos */}
+          {selected?.id && (
+            <Box sx={{ mb: 3 }}>
+              <Divider sx={{ mb: 3 }} />
+              <EventPhotoSection eventId={selected.id} />
+            </Box>
+          )}
+
           <EventMap
             lat={selected?.resource?.lat}
             lon={selected?.resource?.lon}
