@@ -21,7 +21,8 @@ When you click on a photo in the gallery, the lightbox modal should display capt
 │                                                                   │
 │  Cardinal at Feeder                    ← Title (bold, large)     │
 │  Beautiful red cardinal photographed in early spring •           │
-│  Location: Forest Park, St. Louis • Contributor: Jane Smith      │
+│  Date: 2024-03-15 • Location: Forest Park, St. Louis •           │
+│  Contributor: Jane Smith                                          │
 │  ↑ Description (regular font, with metadata separated by •)      │
 └──────────────────────────────────────────────────────────────────┘
 ```
@@ -41,8 +42,9 @@ The caption combines these fields from the photo metadata (in order):
 
 1. **Header/Title** - The photo's title
 2. **Description** - Detailed description of the photo
-3. **Location** - Where the photo was taken (prefixed with "Location: ")
-4. **Contributor** - Who contributed the photo (prefixed with "Contributor: ")
+3. **Date** - When the photo was taken (prefixed with "Date: ")
+4. **Location** - Where the photo was taken (prefixed with "Location: ")
+5. **Contributor** - Who contributed the photo (prefixed with "Contributor: ")
 
 Each field is only included if it has a value. Fields are joined with " • " separator.
 
@@ -51,14 +53,14 @@ Each field is only included if it has a value. Fields are joined with " • " se
 ### Example 1: Full Metadata
 ```
 Title: Spring Migration at Riverlands
-Description: Hundreds of birds gathering • Location: Riverlands Migratory 
-             Bird Sanctuary • Contributor: John Doe
+Description: Hundreds of birds gathering • Date: 2024-03-15 • Location: Riverlands 
+             Migratory Bird Sanctuary • Contributor: John Doe
 ```
 
-### Example 2: Partial Metadata (no location or contributor)
+### Example 2: Partial Metadata (no date or contributor)
 ```
 Title: Blue Jay at Backyard Feeder
-Description: Vibrant blue plumage visible in morning light
+Description: Vibrant blue plumage visible in morning light • Location: Forest Park
 ```
 
 ### Example 3: Title Only
@@ -80,7 +82,7 @@ Each slide object has this structure:
 {
   src: "https://cloudinary.../image.jpg",
   title: "Cardinal at Feeder",  // Bold title shown at top of captions
-  description: "Beautiful red cardinal • Location: Forest Park • Contributor: Jane Smith",
+  description: "Beautiful red cardinal • Date: 2024-03-15 • Location: Forest Park • Contributor: Jane Smith",
   category: "birds"  // Used for filtering, not shown in captions
 }
 ```
@@ -89,7 +91,7 @@ Each slide object has this structure:
 
 If you don't see captions when clicking photos:
 
-1. **Check if photos have metadata**: Existing photos in the database may not have the new `header`, `description`, `location`, or `contributor` fields yet. Upload a new photo with metadata to test.
+1. **Check if photos have metadata**: Existing photos in the database may not have the new `header`, `description`, `photoDate`, `location`, or `contributor` fields yet. Upload a new photo with metadata to test.
 
 2. **Browser console**: Open DevTools (F12) and check the Console tab for any errors.
 
@@ -110,7 +112,7 @@ To see captions in action:
 
 1. **Upload a new photo** with metadata:
    - Click "Upload Photo" button (must be logged in)
-   - Fill in: Photo Title, Description, Location, and/or Contributor
+   - Fill in: Photo Title, Description, Photo Date (using date picker), Location, and/or Contributor
    - Select a category and upload
    
 2. **Click the photo** in the gallery to open the lightbox
