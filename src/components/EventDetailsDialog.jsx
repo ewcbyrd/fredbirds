@@ -135,15 +135,6 @@ const EventDetailsDialog = ({ open, onClose, event }) => {
           </Box>
         )}
 
-        {/* Attendee Count */}
-        {event.attendeeCount > 0 && (
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="body2" color="text.secondary">
-              {event.attendeeCount} {event.attendeeCount === 1 ? 'attendee' : 'attendees'} registered
-            </Typography>
-          </Box>
-        )}
-
         {/* eBird Trip Report Link */}
         {event.ebirdTripUrl && (
           <Box sx={{ mb: 3 }}>
@@ -161,11 +152,20 @@ const EventDetailsDialog = ({ open, onClose, event }) => {
                 }
               }}
             >
-              <Typography variant="body2" color="primary">
+              <Typography variant="body1" color="primary" sx={{ fontWeight: 500 }}>
                 View eBird Trip Report
               </Typography>
               <OpenInNewIcon fontSize="small" />
             </Link>
+          </Box>
+        )}
+
+        {/* Attendee Count */}
+        {event.attendeeCount > 0 && (
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="body2" color="text.secondary">
+              {event.attendeeCount} {event.attendeeCount === 1 ? 'attendee' : 'attendees'} registered
+            </Typography>
           </Box>
         )}
 
