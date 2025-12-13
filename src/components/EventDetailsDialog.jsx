@@ -20,6 +20,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'date-fns'
+import EventPhotoSection from './EventPhotoSection'
 
 const EventDetailsDialog = ({ open, onClose, event }) => {
   if (!event) return null
@@ -180,6 +181,12 @@ const EventDetailsDialog = ({ open, onClose, event }) => {
             </Typography>
           </Box>
         )}
+
+        {/* Event Photos */}
+        <Box sx={{ mb: 3 }}>
+          <Divider sx={{ mb: 3 }} />
+          <EventPhotoSection eventId={event._id} />
+        </Box>
 
         {/* Event Details with Markdown */}
         {event.details && (
