@@ -283,10 +283,10 @@ const EventList = ({ onEditEvent, refreshTrigger }) => {
                   </Typography>
                 )}
 
-                {event.ebirdTripUrl && (
+                {(event.ebirdTripUrl || event.eBirdTripUrl || event.ebird_trip_url) && (
                   <Box sx={{ mt: 1 }}>
                     <Link
-                      href={event.ebirdTripUrl}
+                      href={event.ebirdTripUrl || event.eBirdTripUrl || event.ebird_trip_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       sx={{

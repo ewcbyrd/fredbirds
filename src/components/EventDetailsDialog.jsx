@@ -24,6 +24,11 @@ import { format } from 'date-fns'
 const EventDetailsDialog = ({ open, onClose, event }) => {
   if (!event) return null
 
+  // Debug: Log event data to console to check ebirdTripUrl field
+  console.log('EventDetailsDialog - event data:', event)
+  console.log('EventDetailsDialog - ebirdTripUrl:', event.ebirdTripUrl)
+  console.log('EventDetailsDialog - all event keys:', Object.keys(event))
+
   const formatDateRange = (start, end) => {
     const utcStart = new Date(start)
     const startDate = new Date(utcStart.getUTCFullYear(), utcStart.getUTCMonth(), utcStart.getUTCDate())
@@ -136,10 +141,10 @@ const EventDetailsDialog = ({ open, onClose, event }) => {
         )}
 
         {/* eBird Trip Report Link */}
-        {event.ebirdTripUrl && (
+        {(event.ebirdTripUrl || event.eBirdTripUrl || event.ebird_trip_url) && (
           <Box sx={{ mb: 3 }}>
             <Link
-              href={event.ebirdTripUrl}
+              href={event.ebirdTripUrl || event.eBirdTripUrl || event.ebird_trip_url}
               target="_blank"
               rel="noopener noreferrer"
               sx={{
