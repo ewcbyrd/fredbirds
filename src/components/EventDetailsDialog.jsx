@@ -10,17 +10,24 @@ import {
   Typography,
   Chip,
   Stack,
-  Divider
+  Divider,
+  Link
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import PersonIcon from '@mui/icons-material/Person'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'date-fns'
 
 const EventDetailsDialog = ({ open, onClose, event }) => {
   if (!event) return null
+
+  // Debug: Log event data to console to check ebirdTripUrl field
+  console.log('EventDetailsDialog - event data:', event)
+  console.log('EventDetailsDialog - ebirdTripUrl:', event.ebirdTripUrl)
+  console.log('EventDetailsDialog - all event keys:', Object.keys(event))
 
   const formatDateRange = (start, end) => {
     const utcStart = new Date(start)
@@ -130,6 +137,31 @@ const EventDetailsDialog = ({ open, onClose, event }) => {
                 </Typography>
               ))}
             </Stack>
+          </Box>
+        )}
+
+        {/* eBird Trip Report Link */}
+        {(event.ebirdTripUrl || event.eBirdTripUrl || event.ebird_trip_url) && (
+          <Box sx={{ mb: 3 }}>
+            <Link
+              href={event.ebirdTripUrl || event.eBirdTripUrl || event.ebird_trip_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 1,
+                textDecoration: 'none',
+                '&:hover': {
+                  textDecoration: 'underline'
+                }
+              }}
+            >
+              <Typography variant="body1" color="primary" sx={{ fontWeight: 500 }}>
+                View eBird Trip Report
+              </Typography>
+              <OpenInNewIcon fontSize="small" />
+            </Link>
           </Box>
         )}
 

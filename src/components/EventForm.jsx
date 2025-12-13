@@ -30,6 +30,7 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
     details: '',
     cancelled: false,
     pdfFile: '',
+    ebirdTripUrl: '',
     tripLeader: null,
     locations: [{ name: '', lat: '', lon: '', address: '' }]
   })
@@ -77,6 +78,7 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
         details: event.details || '',
         cancelled: event.cancelled || false,
         pdfFile: event.pdfFile || '',
+        ebirdTripUrl: event.ebirdTripUrl || '',
         tripLeader: event.tripLeader || null,
         locations: event.locations && event.locations.length > 0
           ? event.locations
@@ -116,6 +118,20 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
       )
       if (!hasValidLocation) {
         setError('If you provide location information, at least one location must have valid coordinates (latitude and longitude)')
+        return false
+      }
+    }
+
+    // Validate eBird Trip URL if provided
+    if (formData.ebirdTripUrl.trim()) {
+      try {
+        const url = new URL(formData.ebirdTripUrl.trim())
+        if (!url.protocol.match(/^https?:$/)) {
+          setError('eBird Trip Report URL must use http or https protocol')
+          return false
+        }
+      } catch (e) {
+        setError('eBird Trip Report URL is not a valid URL')
         return false
       }
     }
@@ -163,6 +179,7 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
         details: formData.details.trim(),
         cancelled: formData.cancelled,
         pdfFile: formData.pdfFile.trim(),
+        ebirdTripUrl: formData.ebirdTripUrl.trim(),
         tripLeader: formData.tripLeader ? {
           memberId: formData.tripLeader._id,
           email: formData.tripLeader.email,
@@ -189,6 +206,7 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
           details: '',
           cancelled: false,
           pdfFile: '',
+          ebirdTripUrl: '',
           tripLeader: null,
           locations: [{ name: '', lat: '', lon: '', address: '' }]
         })
@@ -354,6 +372,17 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
           margin="normal"
           placeholder="https://example.com/event-details.pdf"
           helperText="Link to a PDF with additional event information"
+        />
+
+        {/* eBird Trip Report URL */}
+        <TextField
+          fullWidth
+          label="eBird Trip Report URL (Optional)"
+          value={formData.ebirdTripUrl}
+          onChange={(e) => handleChange('ebirdTripUrl', e.target.value)}
+          margin="normal"
+          placeholder="https://ebird.org/tripreport/..."
+          helperText="Link to the eBird trip report for this event"
         />
 
         {/* Cancelled Checkbox */}
