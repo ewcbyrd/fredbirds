@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -19,19 +19,51 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material'
 import { useAuth0 } from '@auth0/auth0-react'
 import { uploadToCloudinary } from '../services/cloudinaryService'
-import { savePhoto } from '../services/restdbService'
+import { savePhoto, getMemberByEmail } from '../services/restdbService'
 
 const AUTH_ERROR_MESSAGE = 'You must be logged in to upload photos. Please log in to continue.'
 
 export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
-  const { isAuthenticated } = useAuth0()
+  const { isAuthenticated, user } = useAuth0()
   const [file, setFile] = useState(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [location, setLocation] = useState('')
+  const [contributor, setContributor] = useState('')
+  const [photoDate, setPhotoDate] = useState('')
   const [category, setCategory] = useState('people')
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
+
+  // Fetch and prefill contributor name when component opens
+  useEffect(() => {
+    const fetchMemberName = async () => {
+      if (open && isAuthenticated && user?.email && !contributor) {
+        try {
+          const memberData = await getMemberByEmail(user.email)
+          if (memberData) {
+            const fullName = `${memberData.first || ''} ${memberData.last || ''}`.trim()
+            if (fullName) {
+              setContributor(fullName)
+            } else if (user.name) {
+              setContributor(user.name)
+            }
+          } else if (user.name) {
+            setContributor(user.name)
+          }
+        } catch (error) {
+          console.error('Error fetching member data:', error)
+          // Fallback to Auth0 user name if available
+          if (user.name) {
+            setContributor(user.name)
+          }
+        }
+      }
+    }
+    
+    fetchMemberName()
+  }, [open, isAuthenticated, user, contributor])
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0]
@@ -69,6 +101,9 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
           publicId: uploadResult.publicId,
           title: title || file.name.split('.')[0],
           description: description,
+          location: location,
+          contributor: contributor,
+          photoDate: photoDate,
           category: category
         })
         console.log('Photo metadata saved to database')
@@ -96,6 +131,9 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
     setFile(null)
     setTitle('')
     setDescription('')
+    setLocation('')
+    setContributor('')
+    setPhotoDate('')
     setCategory('people')
     setError(null)
     setSuccess(false)
@@ -182,6 +220,40 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
             multiline
             rows={3}
             placeholder="Add a description (optional)"
+          />
+
+          {/* Location */}
+          <TextField
+            label="Location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            fullWidth
+            disabled={uploading || !isAuthenticated}
+            placeholder="Where was this photo taken? (optional)"
+          />
+
+          {/* Contributor */}
+          <TextField
+            label="Contributor"
+            value={contributor}
+            onChange={(e) => setContributor(e.target.value)}
+            fullWidth
+            disabled={uploading || !isAuthenticated}
+            placeholder="Who contributed this photo? (optional)"
+          />
+
+          {/* Photo Date */}
+          <TextField
+            label="Photo Date"
+            value={photoDate}
+            onChange={(e) => setPhotoDate(e.target.value)}
+            fullWidth
+            disabled={uploading || !isAuthenticated}
+            type="date"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            helperText="When was this photo taken? (optional)"
           />
 
           {/* Category */}
