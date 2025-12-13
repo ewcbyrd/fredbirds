@@ -21,6 +21,21 @@ export default function Photos() {
     loadPhotos()
   }, [])
 
+  const formatDate = (dateString) => {
+    if (!dateString) return null
+    try {
+      const date = new Date(dateString)
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      })
+    } catch (error) {
+      console.error('Error formatting date:', error)
+      return dateString
+    }
+  }
+
   const loadPhotos = async () => {
     try {
       setLoading(true)
@@ -42,7 +57,10 @@ export default function Photos() {
           }
           
           if (photo.photoDate) {
-            captionParts.push(`Date: ${photo.photoDate}`)
+            const formattedDate = formatDate(photo.photoDate)
+            if (formattedDate) {
+              captionParts.push(formattedDate)
+            }
           }
           
           if (photo.location) {

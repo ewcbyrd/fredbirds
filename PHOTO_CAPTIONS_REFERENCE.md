@@ -21,7 +21,7 @@ When you click on a photo in the gallery, the lightbox modal should display capt
 │                                                                   │
 │  Cardinal at Feeder                    ← Title (bold, large)     │
 │  Beautiful red cardinal photographed in early spring •           │
-│  Date: 2024-03-15 • Location: Forest Park, St. Louis •           │
+│  March 15, 2024 • Location: Forest Park, St. Louis •             │
 │  Contributor: Jane Smith                                          │
 │  ↑ Description (regular font, with metadata separated by •)      │
 └──────────────────────────────────────────────────────────────────┘
@@ -42,7 +42,7 @@ The caption combines these fields from the photo metadata (in order):
 
 1. **Header/Title** - The photo's title
 2. **Description** - Detailed description of the photo
-3. **Date** - When the photo was taken (prefixed with "Date: ")
+3. **Date** - When the photo was taken (formatted as "Month Day, Year", e.g., "December 11, 2025")
 4. **Location** - Where the photo was taken (prefixed with "Location: ")
 5. **Contributor** - Who contributed the photo (prefixed with "Contributor: ")
 
@@ -53,7 +53,7 @@ Each field is only included if it has a value. Fields are joined with " • " se
 ### Example 1: Full Metadata
 ```
 Title: Spring Migration at Riverlands
-Description: Hundreds of birds gathering • Date: 2024-03-15 • Location: Riverlands 
+Description: Hundreds of birds gathering • March 15, 2024 • Location: Riverlands 
              Migratory Bird Sanctuary • Contributor: John Doe
 ```
 
@@ -82,7 +82,7 @@ Each slide object has this structure:
 {
   src: "https://cloudinary.../image.jpg",
   title: "Cardinal at Feeder",  // Bold title shown at top of captions
-  description: "Beautiful red cardinal • Date: 2024-03-15 • Location: Forest Park • Contributor: Jane Smith",
+  description: "Beautiful red cardinal • March 15, 2024 • Location: Forest Park • Contributor: Jane Smith",
   category: "birds"  // Used for filtering, not shown in captions
 }
 ```
