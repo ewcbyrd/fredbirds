@@ -19,7 +19,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Link
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -27,6 +28,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import PersonIcon from '@mui/icons-material/Person'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { format } from 'date-fns'
 import { getFutureEvents, getEventsByYear, deleteEvent } from '../services/restdbService'
 import EventDetailsDialog from './EventDetailsDialog'
@@ -279,6 +281,30 @@ const EventList = ({ onEditEvent, refreshTrigger }) => {
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                     {event.attendeeCount} {event.attendeeCount === 1 ? 'attendee' : 'attendees'} registered
                   </Typography>
+                )}
+
+                {event.ebirdTripUrl && (
+                  <Box sx={{ mt: 1 }}>
+                    <Link
+                      href={event.ebirdTripUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 0.5,
+                        fontSize: '0.875rem',
+                        textDecoration: 'none',
+                        '&:hover': {
+                          textDecoration: 'underline'
+                        }
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      eBird Trip Report
+                      <OpenInNewIcon fontSize="small" />
+                    </Link>
+                  </Box>
                 )}
               </CardContent>
 
