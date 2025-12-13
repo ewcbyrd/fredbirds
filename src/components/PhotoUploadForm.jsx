@@ -21,6 +21,8 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { uploadToCloudinary } from '../services/cloudinaryService'
 import { savePhoto } from '../services/restdbService'
 
+const AUTH_ERROR_MESSAGE = 'You must be logged in to upload photos. Please log in to continue.'
+
 export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
   const { isAuthenticated } = useAuth0()
   const [file, setFile] = useState(null)
@@ -44,7 +46,7 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
 
   const handleSubmit = async () => {
     if (!isAuthenticated) {
-      setError('You must be logged in to upload photos. Please log in and try again.')
+      setError(AUTH_ERROR_MESSAGE)
       return
     }
 
@@ -118,7 +120,7 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
       <DialogContent sx={{ pt: 2 }}>
         {!isAuthenticated && (
           <Alert severity="warning" sx={{ mb: 2 }}>
-            You must be logged in to upload photos. Please log in to continue.
+            {AUTH_ERROR_MESSAGE}
           </Alert>
         )}
 
