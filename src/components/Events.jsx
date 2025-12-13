@@ -770,7 +770,12 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
             <Box sx={{ mb: 3 }}>
               <Divider sx={{ mb: 2 }} />
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                <OpenInNewIcon color="primary" fontSize="small" />
+                <Box
+                  component="img"
+                  src="/eBird+Logo.webp"
+                  alt="eBird Logo"
+                  sx={{ width: 24, height: 24, objectFit: 'contain' }}
+                />
                 <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
                   eBird Trip Report
                 </Typography>

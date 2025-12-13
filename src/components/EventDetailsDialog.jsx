@@ -139,7 +139,12 @@ const EventDetailsDialog = ({ open, onClose, event }) => {
         {(event.ebirdTripUrl || event.eBirdTripUrl || event.ebird_trip_url) && (
           <Box sx={{ mb: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <OpenInNewIcon color="action" />
+              <Box
+                component="img"
+                src="/eBird+Logo.webp"
+                alt="eBird Logo"
+                sx={{ width: 20, height: 20, objectFit: 'contain' }}
+              />
               <Typography variant="subtitle2" color="text.secondary">
                 eBird Trip Report
               </Typography>
