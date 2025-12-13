@@ -17,10 +17,14 @@ import {
   IconButton
 } from '@mui/material'
 import { Close as CloseIcon } from '@mui/icons-material'
+import { useAuth0 } from '@auth0/auth0-react'
 import { uploadToCloudinary } from '../services/cloudinaryService'
 import { savePhoto } from '../services/restdbService'
 
+const AUTH_ERROR_MESSAGE = 'You must be logged in to upload photos. Please log in to continue.'
+
 export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
+  const { isAuthenticated } = useAuth0()
   const [file, setFile] = useState(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -41,6 +45,11 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
   }
 
   const handleSubmit = async () => {
+    if (!isAuthenticated) {
+      setError(AUTH_ERROR_MESSAGE)
+      return
+    }
+
     if (!file) {
       setError('Please select a file')
       return
@@ -109,6 +118,12 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
       </DialogTitle>
 
       <DialogContent sx={{ pt: 2 }}>
+        {!isAuthenticated && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            {AUTH_ERROR_MESSAGE}
+          </Alert>
+        )}
+
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
@@ -131,7 +146,7 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              disabled={uploading}
+              disabled={uploading || !isAuthenticated}
               style={{
                 width: '100%',
                 padding: '8px',
@@ -153,7 +168,7 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             fullWidth
-            disabled={uploading}
+            disabled={uploading || !isAuthenticated}
             placeholder="Enter photo title (optional)"
           />
 
@@ -163,14 +178,14 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             fullWidth
-            disabled={uploading}
+            disabled={uploading || !isAuthenticated}
             multiline
             rows={3}
             placeholder="Add a description (optional)"
           />
 
           {/* Category */}
-          <FormControl fullWidth disabled={uploading}>
+          <FormControl fullWidth disabled={uploading || !isAuthenticated}>
             <InputLabel>Category</InputLabel>
             <Select
               value={category}
@@ -192,7 +207,7 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={!file || uploading}
+          disabled={!file || uploading || !isAuthenticated}
           sx={{ position: 'relative', minWidth: 120 }}
         >
           {uploading ? (
