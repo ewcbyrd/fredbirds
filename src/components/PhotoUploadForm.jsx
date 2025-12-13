@@ -28,6 +28,8 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
   const [file, setFile] = useState(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [location, setLocation] = useState('')
+  const [contributor, setContributor] = useState('')
   const [category, setCategory] = useState('people')
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState(null)
@@ -69,6 +71,8 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
           publicId: uploadResult.publicId,
           title: title || file.name.split('.')[0],
           description: description,
+          location: location,
+          contributor: contributor,
           category: category
         })
         console.log('Photo metadata saved to database')
@@ -96,6 +100,8 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
     setFile(null)
     setTitle('')
     setDescription('')
+    setLocation('')
+    setContributor('')
     setCategory('people')
     setError(null)
     setSuccess(false)
@@ -182,6 +188,26 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
             multiline
             rows={3}
             placeholder="Add a description (optional)"
+          />
+
+          {/* Location */}
+          <TextField
+            label="Location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            fullWidth
+            disabled={uploading || !isAuthenticated}
+            placeholder="Where was this photo taken? (optional)"
+          />
+
+          {/* Contributor */}
+          <TextField
+            label="Contributor"
+            value={contributor}
+            onChange={(e) => setContributor(e.target.value)}
+            fullWidth
+            disabled={uploading || !isAuthenticated}
+            placeholder="Who contributed this photo? (optional)"
           />
 
           {/* Category */}

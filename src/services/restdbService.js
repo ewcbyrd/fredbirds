@@ -84,6 +84,8 @@ export const savePhoto = async (photoData) => {
     cloudinary_public_id: photoData.publicId,
     header: photoData.title,
     description: photoData.description,
+    location: photoData.location,
+    contributor: photoData.contributor,
     category: photoData.category
   }));
 };

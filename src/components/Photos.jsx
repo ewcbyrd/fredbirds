@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Typography, Grid, Card, CardMedia, Tabs, Tab, Button } from '@mui/material'
 import Lightbox from 'yet-another-react-lightbox'
+import Captions from 'yet-another-react-lightbox/plugins/captions'
 import 'yet-another-react-lightbox/styles.css'
+import 'yet-another-react-lightbox/plugins/captions.css'
 import { getPhotos } from '../services/restdbService'
 import { getCloudinaryUrl, transformations } from '../services/cloudinaryService'
 import { useAuth0 } from '@auth0/auth0-react'
@@ -27,12 +29,33 @@ export default function Photos() {
       // Transform API data to match component format
       const transformedPhotos = data
         .filter(photo => photo.cloudinary_public_id)
-        .map(photo => ({
-          src: getCloudinaryUrl(photo.cloudinary_public_id, transformations.optimized),
-          category: (photo.category || 'people').toLowerCase(),
-          title: photo.header || 'Photo',
-          description: photo.description || ''
-        }))
+        .map(photo => {
+          // Build caption from available metadata
+          const captionParts = []
+          
+          if (photo.header) {
+            captionParts.push(photo.header)
+          }
+          
+          if (photo.description) {
+            captionParts.push(photo.description)
+          }
+          
+          if (photo.location) {
+            captionParts.push(`Location: ${photo.location}`)
+          }
+          
+          if (photo.contributor) {
+            captionParts.push(`Contributor: ${photo.contributor}`)
+          }
+          
+          return {
+            src: getCloudinaryUrl(photo.cloudinary_public_id, transformations.optimized),
+            category: (photo.category || 'people').toLowerCase(),
+            title: photo.header || 'Photo',
+            description: captionParts.join(' • ') || undefined
+          }
+        })
       
       setPhotos(transformedPhotos)
     } catch (error) {
@@ -152,6 +175,7 @@ export default function Photos() {
         index={index}
         close={() => setIndex(-1)}
         slides={photos}
+        plugins={[Captions]}
       />
 
       <PhotoUploadForm
