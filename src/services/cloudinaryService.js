@@ -27,10 +27,10 @@ export const uploadToCloudinary = async (file, folder = 'photos') => {
     throw new Error('Invalid file type. Please upload an image (JPEG, PNG, GIF, or WebP).')
   }
   
-  // Validate file size (5MB max)
-  const maxSize = 5 * 1024 * 1024
+  // Validate file size (10MB max)
+  const maxSize = 10 * 1024 * 1024
   if (file.size > maxSize) {
-    throw new Error('File size exceeds 5MB limit')
+    throw new Error('File size exceeds 10MB limit')
   }
 
   // Check if upload preset is configured
