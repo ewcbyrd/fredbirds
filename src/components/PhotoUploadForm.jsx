@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -19,12 +19,12 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material'
 import { useAuth0 } from '@auth0/auth0-react'
 import { uploadToCloudinary } from '../services/cloudinaryService'
-import { savePhoto } from '../services/restdbService'
+import { savePhoto, getMemberByEmail } from '../services/restdbService'
 
 const AUTH_ERROR_MESSAGE = 'You must be logged in to upload photos. Please log in to continue.'
 
 export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
-  const { isAuthenticated } = useAuth0()
+  const { isAuthenticated, user } = useAuth0()
   const [file, setFile] = useState(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -35,6 +35,35 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
+
+  // Fetch and prefill contributor name when component opens
+  useEffect(() => {
+    const fetchMemberName = async () => {
+      if (open && isAuthenticated && user?.email && !contributor) {
+        try {
+          const memberData = await getMemberByEmail(user.email)
+          if (memberData) {
+            const fullName = `${memberData.first || ''} ${memberData.last || ''}`.trim()
+            if (fullName) {
+              setContributor(fullName)
+            } else if (user.name) {
+              setContributor(user.name)
+            }
+          } else if (user.name) {
+            setContributor(user.name)
+          }
+        } catch (error) {
+          console.error('Error fetching member data:', error)
+          // Fallback to Auth0 user name if available
+          if (user.name) {
+            setContributor(user.name)
+          }
+        }
+      }
+    }
+    
+    fetchMemberName()
+  }, [open, isAuthenticated, user, contributor])
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0]

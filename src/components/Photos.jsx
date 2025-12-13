@@ -56,15 +56,15 @@ export default function Photos() {
             captionParts.push(photo.description)
           }
           
+          if (photo.location) {
+            captionParts.push(photo.location)
+          }
+          
           if (photo.photoDate) {
             const formattedDate = formatDate(photo.photoDate)
             if (formattedDate) {
               captionParts.push(formattedDate)
             }
-          }
-          
-          if (photo.location) {
-            captionParts.push(`Location: ${photo.location}`)
           }
           
           if (photo.contributor) {
