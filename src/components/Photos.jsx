@@ -53,7 +53,7 @@ export default function Photos() {
             src: getCloudinaryUrl(photo.cloudinary_public_id, transformations.optimized),
             category: (photo.category || 'people').toLowerCase(),
             title: photo.header || 'Photo',
-            description: captionParts.join(' • ') || undefined
+            description: captionParts.length > 0 ? captionParts.join(' • ') : undefined
           }
         })
       
