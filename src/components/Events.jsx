@@ -26,6 +26,7 @@ import PeopleIcon from '@mui/icons-material/People'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import PersonIcon from '@mui/icons-material/Person'
 import DeleteIcon from '@mui/icons-material/Delete'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import Autocomplete from '@mui/material/Autocomplete'
 import TextField from '@mui/material/TextField'
 import List from '@mui/material/List'
@@ -236,6 +237,14 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
     })
   }, [])
 
+  // Debug: Log selected event
+  useEffect(() => {
+    if (selected) {
+      console.log('Selected event:', selected)
+      console.log('Selected resource:', selected.resource)
+    }
+  }, [selected])
+
   function transformEvents(result){
     if (!result || result.length===0) return []
     // Map to React Big Calendar format
@@ -264,6 +273,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
           participants: item.participants || [],
           species_sighted: item.species_sighted || [],
           pdfFile: item.pdfFile,
+          ebirdTripUrl: item.ebirdTripUrl,
           lat: item.lat,
           lon: item.lon,
           tripLeader: item.tripLeader || null,
@@ -509,193 +519,6 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
           View Full Calendar
         </Button>
         
-        <Dialog 
-          open={!!selected} 
-          onClose={closeEvent} 
-          fullWidth 
-          maxWidth="sm"
-          PaperProps={{
-            sx: {
-              borderRadius: 3,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.12)'
-            }
-          }}
-        >
-          <DialogTitle 
-            sx={{ 
-              bgcolor: 'primary.main', 
-              color: 'white', 
-              py: 3,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2
-            }}
-          >
-            <CalendarTodayIcon />
-            <Box>
-              <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-                {selected?.title}
-              </Typography>
-              {selected?.resource?.cancelled && (
-                <Chip 
-                  label="CANCELLED" 
-                  size="small" 
-                  sx={{ 
-                    bgcolor: 'error.main', 
-                    color: 'white', 
-                    fontWeight: 600,
-                    mt: 1
-                  }} 
-                />
-              )}
-            </Box>
-          </DialogTitle>
-          <DialogContent sx={{ p: 3 }}>
-            <Box sx={{ 
-              bgcolor: 'grey.50', 
-              p: 2, 
-              borderRadius: 2, 
-              mb: 3,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1
-            }}>
-              <CalendarTodayIcon color="primary" fontSize="small" />
-              <Typography variant="body1" sx={{ fontWeight: 500, color: 'text.primary' }}>
-                {selected?.start?.toLocaleDateString('en-US', { 
-                  weekday: 'long',
-                  month: 'long', 
-                  day: 'numeric', 
-                  year: 'numeric' 
-                })}
-                {selected?.end && (() => {
-                  // Subtract 1 day from end since we added 1 day for calendar display
-                  const actualEnd = new Date(selected.end)
-                  actualEnd.setDate(actualEnd.getDate() - 1)
-                  // Only show range if actual end is different from start
-                  if (actualEnd.toDateString() !== selected.start.toDateString()) {
-                    return ` - ${actualEnd.toLocaleDateString('en-US', { 
-                      weekday: 'long',
-                      month: 'long', 
-                      day: 'numeric', 
-                      year: 'numeric' 
-                    })}`
-                  }
-                  return ''
-                })()}
-              </Typography>
-            </Box>
-            {selected?.resource?.details && (
-              <Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <InfoOutlinedIcon color="primary" fontSize="small" />
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                    Event Details
-                  </Typography>
-                </Box>
-                <Box sx={{ 
-                  bgcolor: 'white',
-                  p: 2,
-                  borderRadius: 2,
-                  border: 1,
-                  borderColor: 'grey.200',
-                  mb: 3
-                }}>
-                  {formatEventDetails(selected.resource.details)}
-                </Box>
-              </Box>
-            )}
-            {selected?.resource?.species_sighted?.length > 0 && (
-              <Box>
-                <Divider sx={{ mb: 2 }} />
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <VisibilityIcon color="primary" fontSize="small" />
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                    Species Sighted
-                  </Typography>
-                </Box>
-                <Box sx={{ 
-                  bgcolor: 'success.50',
-                  p: 2,
-                  borderRadius: 2,
-                  border: 1,
-                  borderColor: 'success.200'
-                }}>
-                  <Box component="ul" sx={{ 
-                    m: 0, 
-                    pl: 2,
-                    '& li': {
-                      mb: 0.5,
-                      color: 'success.800',
-                      fontWeight: 500
-                    }
-                  }}>
-                    {selected.resource.species_sighted.map(s=> 
-                      <li key={s.common}>{s.common}</li>
-                    )}
-                  </Box>
-                </Box>
-              </Box>
-            )}
-            {selected?.resource?.tripLeader && (
-              <Box sx={{ mb: 3 }}>
-                <Divider sx={{ mb: 2 }} />
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <PersonIcon color="primary" fontSize="small" />
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                    Trip Leader
-                  </Typography>
-                </Box>
-                <Box sx={{
-                  bgcolor: 'primary.50',
-                  p: 2,
-                  borderRadius: 2,
-                  border: 1,
-                  borderColor: 'primary.200'
-                }}>
-                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    {selected.resource.tripLeader.name || `${selected.resource.tripLeader.firstName} ${selected.resource.tripLeader.lastName}`.trim()}
-                  </Typography>
-                  {selected.resource.tripLeader.email && (
-                    <Link
-                      href={`mailto:${selected.resource.tripLeader.email}`}
-                      sx={{ display: 'block', mt: 0.5 }}
-                    >
-                      {selected.resource.tripLeader.email}
-                    </Link>
-                  )}
-                </Box>
-              </Box>
-            )}
-            <EventMap
-              lat={selected?.resource?.lat}
-              lon={selected?.resource?.lon}
-              title={selected?.title}
-              locations={selected?.resource?.locations}
-            />
-            <WeatherForecast 
-              latitude={selected?.resource?.lat}
-              longitude={selected?.resource?.lon}
-              eventDate={selected?.start}
-              eventTitle={selected?.title}
-            />
-          </DialogContent>
-          <DialogActions sx={{ p: 3, pt: 0 }}>
-            <Button 
-              onClick={closeEvent}
-              variant="contained"
-              size="large"
-              sx={{
-                minWidth: 120,
-                textTransform: 'none',
-                fontWeight: 600,
-                borderRadius: 2
-              }}
-            >
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
       </Box>
     )
   }
@@ -941,6 +764,36 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
                   </Link>
                 )}
               </Box>
+            </Box>
+          )}
+          {(selected?.resource?.ebirdTripUrl || selected?.resource?.eBirdTripUrl || selected?.resource?.ebird_trip_url) && (
+            <Box sx={{ mb: 3 }}>
+              <Divider sx={{ mb: 2 }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <OpenInNewIcon color="primary" fontSize="small" />
+                <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                  eBird Trip Report
+                </Typography>
+              </Box>
+              <Link
+                href={selected.resource.ebirdTripUrl || selected.resource.eBirdTripUrl || selected.resource.ebird_trip_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  textDecoration: 'none',
+                  '&:hover': {
+                    textDecoration: 'underline'
+                  }
+                }}
+              >
+                <Typography variant="body1" color="primary" sx={{ fontWeight: 500 }}>
+                  View Report
+                </Typography>
+                <OpenInNewIcon fontSize="small" />
+              </Link>
             </Box>
           )}
           <EventMap

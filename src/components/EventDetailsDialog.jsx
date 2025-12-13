@@ -24,11 +24,6 @@ import { format } from 'date-fns'
 const EventDetailsDialog = ({ open, onClose, event }) => {
   if (!event) return null
 
-  // Debug: Log event data to console to check ebirdTripUrl field
-  console.log('EventDetailsDialog - event data:', event)
-  console.log('EventDetailsDialog - ebirdTripUrl:', event.ebirdTripUrl)
-  console.log('EventDetailsDialog - all event keys:', Object.keys(event))
-
   const formatDateRange = (start, end) => {
     const utcStart = new Date(start)
     const startDate = new Date(utcStart.getUTCFullYear(), utcStart.getUTCMonth(), utcStart.getUTCDate())
@@ -143,6 +138,12 @@ const EventDetailsDialog = ({ open, onClose, event }) => {
         {/* eBird Trip Report Link */}
         {(event.ebirdTripUrl || event.eBirdTripUrl || event.ebird_trip_url) && (
           <Box sx={{ mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <OpenInNewIcon color="action" />
+              <Typography variant="subtitle2" color="text.secondary">
+                eBird Trip Report
+              </Typography>
+            </Box>
             <Link
               href={event.ebirdTripUrl || event.eBirdTripUrl || event.ebird_trip_url}
               target="_blank"
@@ -152,13 +153,14 @@ const EventDetailsDialog = ({ open, onClose, event }) => {
                 alignItems: 'center',
                 gap: 1,
                 textDecoration: 'none',
+                ml: 4,
                 '&:hover': {
                   textDecoration: 'underline'
                 }
               }}
             >
               <Typography variant="body1" color="primary" sx={{ fontWeight: 500 }}>
-                View eBird Trip Report
+                View Report
               </Typography>
               <OpenInNewIcon fontSize="small" />
             </Link>
