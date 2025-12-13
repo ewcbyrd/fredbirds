@@ -41,6 +41,10 @@ export default function Photos() {
             captionParts.push(photo.description)
           }
           
+          if (photo.photoDate) {
+            captionParts.push(`Date: ${photo.photoDate}`)
+          }
+          
           if (photo.location) {
             captionParts.push(`Location: ${photo.location}`)
           }

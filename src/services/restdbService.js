@@ -86,6 +86,7 @@ export const savePhoto = async (photoData) => {
     description: photoData.description,
     location: photoData.location,
     contributor: photoData.contributor,
+    photoDate: photoData.photoDate,
     category: photoData.category
   }));
 };

@@ -30,6 +30,7 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
   const [description, setDescription] = useState('')
   const [location, setLocation] = useState('')
   const [contributor, setContributor] = useState('')
+  const [photoDate, setPhotoDate] = useState('')
   const [category, setCategory] = useState('people')
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState(null)
@@ -73,6 +74,7 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
           description: description,
           location: location,
           contributor: contributor,
+          photoDate: photoDate,
           category: category
         })
         console.log('Photo metadata saved to database')
@@ -102,6 +104,7 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
     setDescription('')
     setLocation('')
     setContributor('')
+    setPhotoDate('')
     setCategory('people')
     setError(null)
     setSuccess(false)
@@ -208,6 +211,20 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
             fullWidth
             disabled={uploading || !isAuthenticated}
             placeholder="Who contributed this photo? (optional)"
+          />
+
+          {/* Photo Date */}
+          <TextField
+            label="Photo Date"
+            value={photoDate}
+            onChange={(e) => setPhotoDate(e.target.value)}
+            fullWidth
+            disabled={uploading || !isAuthenticated}
+            type="date"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            helperText="When was this photo taken? (optional)"
           />
 
           {/* Category */}
