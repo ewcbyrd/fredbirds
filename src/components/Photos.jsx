@@ -30,7 +30,7 @@ export default function Photos() {
       const dateMatch = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/)
       if (dateMatch) {
         const [, year, month, day] = dateMatch
-        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+        const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10))
         return date.toLocaleDateString('en-US', { 
           year: 'numeric', 
           month: 'long', 
