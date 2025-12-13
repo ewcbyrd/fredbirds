@@ -301,7 +301,7 @@ const EventList = ({ onEditEvent, refreshTrigger }) => {
                       }}
                       onClick={(e) => e.stopPropagation()}
                     >
-                      eBird Trip Report
+                      View eBird Trip Report
                       <OpenInNewIcon fontSize="small" />
                     </Link>
                   </Box>

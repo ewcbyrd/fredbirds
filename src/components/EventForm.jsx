@@ -122,6 +122,20 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
       }
     }
 
+    // Validate eBird Trip URL if provided
+    if (formData.ebirdTripUrl.trim()) {
+      try {
+        const url = new URL(formData.ebirdTripUrl.trim())
+        if (!url.protocol.match(/^https?:$/)) {
+          setError('eBird Trip Report URL must use http or https protocol')
+          return false
+        }
+      } catch (e) {
+        setError('eBird Trip Report URL is not a valid URL')
+        return false
+      }
+    }
+
     return true
   }
 
