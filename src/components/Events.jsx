@@ -182,7 +182,7 @@ const EventMap = ({ lat, lon, title, locations }) => {
   );
 };
 
-export default function Events({ home = false, singleEvent = false, onViewAll }){
+export default function Events({ home = false, singleEvent = false, maxEvents = 5, onViewAll }) {
   const [year, setYear] = useState(new Date().getFullYear())
   const [yearEvents, setYearEvents] = useState([])
   const [allEvents, setAllEvents] = useState([])
@@ -197,13 +197,13 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
   const [selectedMember, setSelectedMember] = useState(null)
   const [loadingAttendees, setLoadingAttendees] = useState(false)
 
-  useEffect(()=>{
+  useEffect(() => {
     setLoading(true)
     if (home) {
-      getFutureEvents(new Date(), 3).then(res=>{
+      getFutureEvents(new Date(), 3).then(res => {
         setYearEvents(transformEvents(res))
         setLoading(false)
-      }).catch(()=>setLoading(false))
+      }).catch(() => setLoading(false))
     } else {
       // Load events for multiple years to cover past and future
       const currentYear = new Date().getFullYear()
@@ -221,11 +221,11 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
           setYearEvents(transformed)
           setLoading(false)
         })
-        .catch(()=>{
+        .catch(() => {
           setLoading(false)
         })
     }
-  },[home])
+  }, [home])
 
   // Load all members for attendee selection
   useEffect(() => {
@@ -246,22 +246,22 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
     }
   }, [selected])
 
-  function transformEvents(result){
-    if (!result || result.length===0) return []
+  function transformEvents(result) {
+    if (!result || result.length === 0) return []
     // Map to React Big Calendar format
-    return result.map(item=>{
+    return result.map(item => {
       // Parse date strings and adjust for timezone to avoid off-by-one day issues
       const startDate = new Date(item.start)
       const endDate = item.end ? new Date(item.end) : new Date(item.start)
-      
+
       // Create date in local timezone by using year, month, day components from UTC
       const localStart = new Date(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate())
       const localEnd = new Date(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate())
-      
+
       // React Big Calendar treats end date as exclusive, so add 1 day to include the final day
       // Since we're displaying the actual last day of the event, we need to set end to the day after
       localEnd.setDate(localEnd.getDate() + 1)
-      
+
       return {
         id: item._id,
         title: item.event,
@@ -284,7 +284,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
     })
   }
 
-  function formatEventDate(start, end){
+  function formatEventDate(start, end) {
     if (!start) return ''
     const s = new Date(start)
     if (!end) return s.toLocaleDateString(undefined, { month: 'long', day: 'numeric' })
@@ -296,7 +296,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
     return `${s.toLocaleDateString(undefined, opts)} - ${e.toLocaleDateString(undefined, opts)}`
   }
 
-  function handleSelectEvent(event){
+  function handleSelectEvent(event) {
     setSelected(event)
     // Load attendees for this event
     if (event && event.id) {
@@ -314,7 +314,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
     }
   }
 
-  function closeEvent(){
+  function closeEvent() {
     setSelected(null)
     setAttendees([])
     setSelectedMember(null)
@@ -363,146 +363,258 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
 
   if (loading) return <Typography>Loading...</Typography>
 
-  if (singleEvent){
-    const upcomingEvents = yearEvents.slice(0, 5)
+  if (singleEvent) {
+    const upcomingEvents = yearEvents.slice(0, maxEvents)
     if (upcomingEvents.length === 0) return <Typography>No upcoming events</Typography>
-    
+
+    const showInGrid = maxEvents === 3 && upcomingEvents.length >= 3
+
     return (
       <Box>
-        <Typography 
-          variant="h4" 
-          sx={{ 
-            mb: 3, 
+        <Typography
+          variant="h4"
+          sx={{
+            mb: 3,
             fontWeight: 700,
             color: '#1a1a1a'
           }}
         >
           Upcoming Events
         </Typography>
-        {upcomingEvents.map((event, idx) => {
-          // Calculate actual end date for display
-          const actualEnd = event.end ? new Date(event.end) : null
-          if (actualEnd) actualEnd.setDate(actualEnd.getDate() - 1)
-          const isMultiDay = actualEnd && actualEnd.toDateString() !== event.start.toDateString()
-          
-          return (
-            <Card 
-              key={event.id || idx} 
-              sx={{ 
-                mb: 2, 
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                borderRadius: 2,
-                overflow: 'hidden',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                '&:hover': {
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-                  transform: 'translateY(-2px)'
-                }
-              }} 
-              onClick={() => handleSelectEvent(event)}
-            >
-              <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                  {/* Date box */}
-                  <Box 
-                    sx={{ 
-                      minWidth: 70,
-                      textAlign: 'center',
-                      bgcolor: event.resource?.cancelled ? '#d32f2f' : '#2c5f2d',
-                      color: 'white',
-                      borderRadius: 1,
-                      p: 1,
-                      flexShrink: 0
+
+        {showInGrid ? (
+          <Grid container spacing={3}>
+            {upcomingEvents.map((event, idx) => {
+              // Calculate actual end date for display
+              const actualEnd = event.end ? new Date(event.end) : null
+              if (actualEnd) actualEnd.setDate(actualEnd.getDate() - 1)
+              const isMultiDay = actualEnd && actualEnd.toDateString() !== event.start.toDateString()
+
+              return (
+                <Grid item xs={12} md={4} key={event.id || idx}>
+                  <Card
+                    sx={{
+                      height: '100%',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                      '&:hover': {
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                        transform: 'translateY(-2px)'
+                      }
                     }}
+                    onClick={() => handleSelectEvent(event)}
                   >
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', lineHeight: 1 }}>
-                      {event.start.getDate()}
-                    </Typography>
-                    <Typography variant="caption" sx={{ textTransform: 'uppercase', fontSize: '0.65rem' }}>
-                      {event.start.toLocaleDateString('en-US', { month: 'short' })}
-                    </Typography>
-                  </Box>
-                  
-                  {/* Event details */}
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 0.5, flexWrap: 'wrap' }}>
-                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {event.title}
-                      </Typography>
-                      {isMultiDay && (
-                        <Typography 
-                          component="span" 
-                          variant="caption" 
-                          sx={{ 
-                            bgcolor: '#e3f2fd', 
-                            color: '#1976d2',
-                            px: 1, 
-                            py: 0.25, 
+                    <CardContent sx={{ py: 2, height: '100%', display: 'flex', flexDirection: 'column', '&:last-child': { pb: 2 } }}>
+                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', mb: 2 }}>
+                        {/* Date box */}
+                        <Box
+                          sx={{
+                            minWidth: 60,
+                            textAlign: 'center',
+                            bgcolor: event.resource?.cancelled ? '#d32f2f' : '#2c5f2d',
+                            color: 'white',
                             borderRadius: 1,
-                            fontWeight: 500
+                            p: 1,
+                            flexShrink: 0
                           }}
                         >
-                          Multi-day
+                          <Typography variant="h5" sx={{ fontWeight: 'bold', lineHeight: 1 }}>
+                            {event.start.getDate()}
+                          </Typography>
+                          <Typography variant="caption" sx={{ textTransform: 'uppercase', fontSize: '0.65rem' }}>
+                            {event.start.toLocaleDateString('en-US', { month: 'short' })}
+                          </Typography>
+                        </Box>
+
+                        {/* Event details */}
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', mb: 0.5, flexWrap: 'wrap' }}>
+                            <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem' }}>
+                              {event.title}
+                            </Typography>
+                          </Box>
+                          {isMultiDay && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                              {event.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {actualEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </Typography>
+                          )}
+                          {event.resource?.cancelled && (
+                            <Typography
+                              component="span"
+                              variant="caption"
+                              sx={{
+                                bgcolor: '#ffebee',
+                                color: '#d32f2f',
+                                px: 1,
+                                py: 0.25,
+                                borderRadius: 1,
+                                fontWeight: 500,
+                                display: 'inline-block'
+                              }}
+                            >
+                              Cancelled
+                            </Typography>
+                          )}
+                        </Box>
+                      </Box>
+
+                      {event.resource?.details && (
+                        <Typography
+                          variant="body2"
+                          component="div"
+                          color="text.secondary"
+                          sx={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            '& > div': {
+                              margin: 0,
+                              fontSize: '0.875rem',
+                              color: 'text.secondary'
+                            }
+                          }}
+                        >
+                          {formatEventDetails(event.resource.details)}
                         </Typography>
                       )}
-                      {event.resource?.cancelled && (
-                        <Typography 
-                          component="span" 
-                          variant="caption" 
-                          sx={{ 
-                            bgcolor: '#ffebee', 
-                            color: '#d32f2f',
-                            px: 1, 
-                            py: 0.25, 
-                            borderRadius: 1,
-                            fontWeight: 500
+                    </CardContent>
+                  </Card>
+                </Grid>
+              )
+            })}
+          </Grid>
+        ) : (
+          // Original vertical list layout
+          upcomingEvents.map((event, idx) => {
+            // Calculate actual end date for display
+            const actualEnd = event.end ? new Date(event.end) : null
+            if (actualEnd) actualEnd.setDate(actualEnd.getDate() - 1)
+            const isMultiDay = actualEnd && actualEnd.toDateString() !== event.start.toDateString()
+
+            return (
+              <Card
+                key={event.id || idx}
+                sx={{
+                  mb: 2,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  borderRadius: 2,
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  '&:hover': {
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                    transform: 'translateY(-2px)'
+                  }
+                }}
+                onClick={() => handleSelectEvent(event)}
+              >
+                <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    {/* Date box */}
+                    <Box
+                      sx={{
+                        minWidth: 70,
+                        textAlign: 'center',
+                        bgcolor: event.resource?.cancelled ? '#d32f2f' : '#2c5f2d',
+                        color: 'white',
+                        borderRadius: 1,
+                        p: 1,
+                        flexShrink: 0
+                      }}
+                    >
+                      <Typography variant="h5" sx={{ fontWeight: 'bold', lineHeight: 1 }}>
+                        {event.start.getDate()}
+                      </Typography>
+                      <Typography variant="caption" sx={{ textTransform: 'uppercase', fontSize: '0.65rem' }}>
+                        {event.start.toLocaleDateString('en-US', { month: 'short' })}
+                      </Typography>
+                    </Box>
+
+                    {/* Event details */}
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 0.5, flexWrap: 'wrap' }}>
+                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                          {event.title}
+                        </Typography>
+                        {isMultiDay && (
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            sx={{
+                              bgcolor: '#e3f2fd',
+                              color: '#1976d2',
+                              px: 1,
+                              py: 0.25,
+                              borderRadius: 1,
+                              fontWeight: 500
+                            }}
+                          >
+                            Multi-day
+                          </Typography>
+                        )}
+                        {event.resource?.cancelled && (
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            sx={{
+                              bgcolor: '#ffebee',
+                              color: '#d32f2f',
+                              px: 1,
+                              py: 0.25,
+                              borderRadius: 1,
+                              fontWeight: 500
+                            }}
+                          >
+                            Cancelled
+                          </Typography>
+                        )}
+                      </Box>
+
+                      {isMultiDay && (
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                          {event.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {actualEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </Typography>
+                      )}
+
+                      {event.resource?.details && (
+                        <Typography
+                          variant="body2"
+                          component="div"
+                          color="text.secondary"
+                          sx={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            '& > div': {
+                              margin: 0,
+                              fontSize: '0.875rem',
+                              color: 'text.secondary'
+                            }
                           }}
                         >
-                          Cancelled
+                          {formatEventDetails(event.resource.details)}
                         </Typography>
                       )}
                     </Box>
-                    
-                    {isMultiDay && (
-                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                        {event.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {actualEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                      </Typography>
-                    )}
-                    
-                    {event.resource?.details && (
-                      <Typography
-                        variant="body2"
-                        component="div"
-                        color="text.secondary"
-                        sx={{
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          '& > div': {
-                            margin: 0,
-                            fontSize: '0.875rem',
-                            color: 'text.secondary'
-                          }
-                        }}
-                      >
-                        {formatEventDetails(event.resource.details)}
-                      </Typography>
-                    )}
                   </Box>
-                </Box>
-              </CardContent>
-            </Card>
-          )
-        })}
-        
-        <Button 
+                </CardContent>
+              </Card>
+            )
+          })
+        )}
+
+        <Button
           variant="contained"
           fullWidth
           size="large"
-          sx={{ 
+          sx={{
             mt: 3,
             bgcolor: '#2c5f2d',
             py: 1.5,
@@ -519,7 +631,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
         >
           View Full Calendar
         </Button>
-        
+
       </Box>
     )
   }
@@ -544,7 +656,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
             &gt;
           </Button>
         </Box>
-        
+
         <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
           {label}
         </Typography>
@@ -572,11 +684,11 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
       <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 3 }}>
         Events Calendar
       </Typography>
-      
-      <Box sx={{ 
-        height: 650, 
-        bgcolor: 'white', 
-        p: 2, 
+
+      <Box sx={{
+        height: 650,
+        bgcolor: 'white',
+        p: 2,
         borderRadius: 2,
         boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
         transition: 'box-shadow 0.3s ease',
@@ -608,11 +720,11 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
           })}
         />
       </Box>
-      
-      <Dialog 
-        open={!!selected} 
-        onClose={closeEvent} 
-        fullWidth 
+
+      <Dialog
+        open={!!selected}
+        onClose={closeEvent}
+        fullWidth
         maxWidth="sm"
         PaperProps={{
           sx: {
@@ -621,10 +733,10 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
           }
         }}
       >
-        <DialogTitle 
-          sx={{ 
-            bgcolor: 'primary.main', 
-            color: 'white', 
+        <DialogTitle
+          sx={{
+            bgcolor: 'primary.main',
+            color: 'white',
             py: 3,
             display: 'flex',
             alignItems: 'center',
@@ -637,24 +749,24 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
               {selected?.title}
             </Typography>
             {selected?.resource?.cancelled && (
-              <Chip 
-                label="CANCELLED" 
-                size="small" 
-                sx={{ 
-                  bgcolor: 'error.main', 
-                  color: 'white', 
+              <Chip
+                label="CANCELLED"
+                size="small"
+                sx={{
+                  bgcolor: 'error.main',
+                  color: 'white',
                   fontWeight: 600,
                   mt: 1
-                }} 
+                }}
               />
             )}
           </Box>
         </DialogTitle>
         <DialogContent sx={{ p: 3 }}>
-          <Box sx={{ 
-            bgcolor: 'grey.50', 
-            p: 2, 
-            borderRadius: 2, 
+          <Box sx={{
+            bgcolor: 'grey.50',
+            p: 2,
+            borderRadius: 2,
             mb: 3,
             display: 'flex',
             alignItems: 'center',
@@ -662,11 +774,11 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
           }}>
             <CalendarTodayIcon color="primary" fontSize="small" />
             <Typography variant="body1" sx={{ fontWeight: 500, color: 'text.primary' }}>
-              {selected?.start?.toLocaleDateString('en-US', { 
+              {selected?.start?.toLocaleDateString('en-US', {
                 weekday: 'long',
-                month: 'long', 
-                day: 'numeric', 
-                year: 'numeric' 
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
               })}
               {selected?.end && (() => {
                 // Subtract 1 day from end since we added 1 day for calendar display
@@ -674,11 +786,11 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
                 actualEnd.setDate(actualEnd.getDate() - 1)
                 // Only show range if actual end is different from start
                 if (actualEnd.toDateString() !== selected.start.toDateString()) {
-                  return ` - ${actualEnd.toLocaleDateString('en-US', { 
+                  return ` - ${actualEnd.toLocaleDateString('en-US', {
                     weekday: 'long',
-                    month: 'long', 
-                    day: 'numeric', 
-                    year: 'numeric' 
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
                   })}`
                 }
                 return ''
@@ -693,7 +805,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
                   Event Details
                 </Typography>
               </Box>
-              <Box sx={{ 
+              <Box sx={{
                 bgcolor: 'white',
                 p: 2,
                 borderRadius: 2,
@@ -714,15 +826,15 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
                   Species Sighted
                 </Typography>
               </Box>
-              <Box sx={{ 
+              <Box sx={{
                 bgcolor: 'success.50',
                 p: 2,
                 borderRadius: 2,
                 border: 1,
                 borderColor: 'success.200'
               }}>
-                <Box component="ul" sx={{ 
-                  m: 0, 
+                <Box component="ul" sx={{
+                  m: 0,
                   pl: 2,
                   '& li': {
                     mb: 0.5,
@@ -730,7 +842,7 @@ export default function Events({ home = false, singleEvent = false, onViewAll })
                     fontWeight: 500
                   }
                 }}>
-                  {selected.resource.species_sighted.map(s=> 
+                  {selected.resource.species_sighted.map(s =>
                     <li key={s.common}>{s.common}</li>
                   )}
                 </Box>
