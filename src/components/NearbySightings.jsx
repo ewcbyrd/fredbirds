@@ -32,25 +32,25 @@ export default function NearbySightings({ onViewAll }) {
     const now = new Date()
     const diffTime = Math.abs(now - date)
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-    
+
     // Green for today, yellow for yesterday, red for anything else
-    if (diffDays === 0) return { 
-      bg: '#e8f5e9', 
-      text: '#2e7d32', 
+    if (diffDays === 0) return {
+      bg: '#e8f5e9',
+      text: '#2e7d32',
       label: 'Today',
       border: '#2e7d32',
       cardBg: '#f1f8f4'
     }
-    if (diffDays === 1) return { 
-      bg: '#fff9c4', 
-      text: '#f57f17', 
+    if (diffDays === 1) return {
+      bg: '#fff9c4',
+      text: '#f57f17',
       label: 'Yesterday',
       border: '#f57f17',
       cardBg: '#fffef0'
     }
-    return { 
-      bg: '#ffebee', 
-      text: '#c62828', 
+    return {
+      bg: '#ffebee',
+      text: '#c62828',
       label: `${diffDays} days ago`,
       border: '#c62828',
       cardBg: '#fef5f5'
@@ -59,12 +59,14 @@ export default function NearbySightings({ onViewAll }) {
 
   return (
     <Box>
-      <Typography 
-        variant="h4" 
-        sx={{ 
-          mb: 3, 
-          fontWeight: 700,
-          color: '#1a1a1a'
+      <Typography
+        variant="h4"
+        sx={{
+          mb: 4,
+          fontWeight: 800,
+          color: 'white',
+          textAlign: 'center',
+          textShadow: '0 2px 4px rgba(0,0,0,0.2)'
         }}
       >
         Notable Regional Sightings
@@ -89,132 +91,139 @@ export default function NearbySightings({ onViewAll }) {
             {sightings.map((s, index) => {
               const recency = getRecencyColor(s.obsDt)
               const isRare = isRareBird(s.sciName)
-              
+
               return (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={s.obsId}>
-                  <Card 
-                    sx={{ 
+                  <Card
+                    sx={{
                       height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
                       position: 'relative',
-                      transition: 'all 0.2s',
-                      borderLeft: `4px solid ${recency.border}`,
-                      bgcolor: 'white',
-                      borderRadius: 2,
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      bgcolor: 'rgba(255, 255, 255, 0.95)', // Slightly translucent
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: 3,
+                      overflow: 'hidden',
+                      border: 'none',
+                      boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
                       '&:hover': {
-                        boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-                        transform: 'translateY(-2px)'
+                        transform: 'translateY(-8px)',
+                        boxShadow: '0 12px 24px rgba(0,0,0,0.2)',
+                        bgcolor: 'white'
                       }
                     }}
                   >
+                    {/* Top colored bar based on recency */}
+                    <Box sx={{ height: 6, bgcolor: recency.border, width: '100%' }} />
+
                     {/* Recency Badge */}
-                    <Chip 
+                    <Chip
                       label={recency.label}
                       size="small"
-                      sx={{ 
+                      sx={{
                         position: 'absolute',
-                        top: 6,
-                        right: 6,
+                        top: 14,
+                        right: 12,
                         bgcolor: recency.bg,
                         color: recency.text,
-                        fontWeight: 600,
-                        fontSize: '0.65rem',
-                        height: 18,
-                        zIndex: 1
+                        fontWeight: 700,
+                        fontSize: '0.7rem',
+                        height: 22,
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
                       }}
                     />
 
-                    <CardContent sx={{ p: 1.5, pb: 1.25, '&:last-child': { pb: 1.25 } }}>
-                      {/* Bird Name */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.75 }}>
-                        <Typography 
-                          variant="h6" 
-                          sx={{ 
-                            fontSize: '0.95rem',
-                            fontWeight: 600,
-                            pr: 6, // Space for badge
-                            lineHeight: 1.2,
-                            flex: 1
-                          }}
-                        >
-                          {s.comName}
-                        </Typography>
-                        {isRare && (
-                          <Tooltip title="Rare Bird Alert!" arrow>
-                            <StarIcon 
-                              sx={{ 
-                                fontSize: 16, 
-                                color: '#ff6b35',
-                                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
-                              }} 
-                            />
-                          </Tooltip>
+                    <CardContent sx={{ p: 2.5, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      {/* Bird Name & Rare Star */}
+                      <Box sx={{ pr: isRare ? 4 : 0, mb: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          {isRare && (
+                            <Tooltip title="Rare Bird Alert!" arrow>
+                              <StarIcon
+                                sx={{
+                                  fontSize: 20,
+                                  color: '#ff9800', // Amber
+                                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+                                  animation: 'pulse 2s infinite'
+                                }}
+                              />
+                            </Tooltip>
+                          )}
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              fontSize: '1.1rem',
+                              fontWeight: 700,
+                              lineHeight: 1.2,
+                              color: '#2c3e50'
+                            }}
+                          >
+                            {s.comName}
+                          </Typography>
+                        </Box>
+
+                        {s.sciName && (
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontStyle: 'italic',
+                              color: '#7f8c8d',
+                              fontSize: '0.85rem',
+                              mt: 0.5
+                            }}
+                          >
+                            {s.sciName}
+                          </Typography>
                         )}
                       </Box>
 
-                      {/* Scientific Name */}
-                      {s.sciName && (
-                        <Typography 
-                          variant="caption" 
-                          sx={{ 
-                            display: 'block',
-                            fontStyle: 'italic',
-                            color: 'text.secondary',
-                            mb: 0.75,
-                            fontSize: '0.7rem'
-                          }}
-                        >
-                          {s.sciName}
-                        </Typography>
-                      )}
-
-                      {/* Location */}
-                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5, mb: 0.75 }}>
-                        <LocationOnIcon sx={{ fontSize: 14, color: recency.border, mt: 0.25, flexShrink: 0 }} />
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography 
-                            variant="body2" 
-                            sx={{ 
-                              fontWeight: 500, 
-                              lineHeight: 1.3,
-                              fontSize: '0.8rem',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap'
-                            }}
-                          >
-                            {s.locName || s.subnational2Name}
-                          </Typography>
-                          {s.locName && (
-                            <Typography 
-                              variant="caption" 
-                              color="text.secondary"
-                              sx={{ fontSize: '0.7rem' }}
+                      {/* Location with Icon - Vertically Centered */}
+                      <Box sx={{
+                        flex: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        py: 1
+                      }}>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <LocationOnIcon sx={{ fontSize: 18, color: '#95a5a6', mt: 0.2 }} />
+                          <Box>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontWeight: 600,
+                                color: '#34495e',
+                                lineHeight: 1.4
+                              }}
                             >
-                              {s.subnational2Name}
+                              {s.locName || s.subnational2Name}
                             </Typography>
-                          )}
+                            {s.locName && (
+                              <Typography variant="caption" color="text.secondary">
+                                {s.subnational2Name}
+                              </Typography>
+                            )}
+                          </Box>
                         </Box>
                       </Box>
 
-                      {/* Observer */}
-                      {s.userDisplayName && (
-                        <Typography 
-                          variant="caption" 
-                          color="text.secondary"
-                          sx={{ 
-                            display: 'block',
-                            fontSize: '0.7rem',
-                            mb: 0.5
-                          }}
-                        >
-                          Observer: {s.userDisplayName}
-                        </Typography>
-                      )}
 
-                      {/* eBird Link - Always Visible */}
-                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0.5 }}>
-                        <Tooltip title="View on eBird">
+
+                      {/* Footer: Observer & eBird Link */}
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: '#95a5a6',
+                            fontWeight: 500,
+                            maxWidth: '80%'
+                          }}
+                          noWrap
+                        >
+                          {s.userDisplayName || 'Anonymous'}
+                        </Typography>
+
+                        <Tooltip title="View Checklist">
                           <IconButton
                             size="small"
                             component="a"
@@ -222,15 +231,13 @@ export default function NearbySightings({ onViewAll }) {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            sx={{ 
-                              p: 0.5,
-                              color: recency.border,
-                              '&:hover': {
-                                bgcolor: 'rgba(0, 0, 0, 0.04)'
-                              }
+                            sx={{
+                              color: '#3498db',
+                              bgcolor: '#e3f2fd',
+                              '&:hover': { bgcolor: '#bbdefb' }
                             }}
                           >
-                            <OpenInNewIcon sx={{ fontSize: 14 }} />
+                            <OpenInNewIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                         </Tooltip>
                       </Box>
@@ -241,27 +248,31 @@ export default function NearbySightings({ onViewAll }) {
             })}
           </Grid>
 
-          <Button 
-            variant="contained"
-            fullWidth
-            size="large"
-            sx={{ 
-              mt: 4,
-              bgcolor: '#2c5f2d',
-              py: 1.5,
-              fontSize: '1rem',
-              fontWeight: 600,
-              textTransform: 'none',
-              boxShadow: '0 4px 12px rgba(44, 95, 45, 0.3)',
-              '&:hover': {
-                bgcolor: '#1e4620',
-                boxShadow: '0 6px 16px rgba(44, 95, 45, 0.4)'
-              }
-            }}
-            onClick={() => onViewAll && onViewAll('resources')}
-          >
-            View All Sightings
-          </Button>
+          <Box sx={{ textAlign: 'center', mt: 5 }}>
+            <Button
+              variant="outlined"
+              size="large"
+              sx={{
+                py: 1.5,
+                px: 4,
+                fontSize: '1rem',
+                fontWeight: 600,
+                textTransform: 'none',
+                color: 'white',
+                borderColor: 'rgba(255,255,255,0.5)',
+                borderWidth: 2,
+                borderRadius: 50,
+                '&:hover': {
+                  borderColor: 'white',
+                  bgcolor: 'rgba(255,255,255,0.1)',
+                  borderWidth: 2
+                }
+              }}
+              onClick={() => onViewAll && onViewAll('sightings')}
+            >
+              View More Sightings
+            </Button>
+          </Box>
         </>
       )}
     </Box>
