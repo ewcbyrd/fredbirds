@@ -14,7 +14,6 @@ import AnnouncementIcon from '@mui/icons-material/Announcement'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary'
-import MenuBookIcon from '@mui/icons-material/MenuBook'
 import GroupsIcon from '@mui/icons-material/Groups'
 import BadgeIcon from '@mui/icons-material/Badge'
 import Events from './Events'
@@ -264,10 +263,10 @@ export default function Home({ onNavigate }) {
               </Card>
             </Grid>
 
-            {/* Resources - Earthy Brown */}
+            {/* Membership - Earthy Brown */}
             <Grid item xs={6} sm={4} md={2}>
               <Card
-                onClick={() => onNavigate('resources')}
+                onClick={() => onNavigate('membership')}
                 sx={{
                   background: 'linear-gradient(135deg, #8b6f47 0%, #a08968 100%)',
                   textAlign: 'center',
@@ -284,9 +283,9 @@ export default function Home({ onNavigate }) {
                 }}
               >
                 <CardContent>
-                  <MenuBookIcon sx={{ fontSize: 56, color: 'white', mb: 2, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }} />
+                  <BadgeIcon sx={{ fontSize: 56, color: 'white', mb: 2, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }} />
                   <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
-                    Resources
+                    Membership
                   </Typography>
                 </CardContent>
               </Card>
