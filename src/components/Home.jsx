@@ -179,7 +179,7 @@ export default function Home({ onNavigate }) {
             Explore Our Community
           </Typography>
 
-          <Grid container spacing={3}>
+          <Grid container spacing={3} justifyContent="center">
             {/* Upcoming Events - Forest Green */}
             <Grid item xs={6} sm={4} md={2}>
               <Card
