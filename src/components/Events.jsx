@@ -610,27 +610,32 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
           })
         )}
 
-        <Button
-          variant="contained"
-          fullWidth
-          size="large"
-          sx={{
-            mt: 3,
-            bgcolor: '#2c5f2d',
-            py: 1.5,
-            fontSize: '1rem',
-            fontWeight: 600,
-            textTransform: 'none',
-            boxShadow: '0 4px 12px rgba(44, 95, 45, 0.3)',
-            '&:hover': {
-              bgcolor: '#1e4620',
-              boxShadow: '0 6px 16px rgba(44, 95, 45, 0.4)'
-            }
-          }}
-          onClick={() => onViewAll && onViewAll('events')}
-        >
-          View Full Calendar
-        </Button>
+        <Box sx={{ textAlign: 'center', mt: 4 }}>
+          <Button
+            variant="outlined"
+            size="large"
+            sx={{
+              py: 1.5,
+              px: 4,
+              fontSize: '1rem',
+              fontWeight: 600,
+              textTransform: 'none',
+              color: '#2c5f2d',
+              borderColor: '#2c5f2d',
+              borderWidth: 2,
+              borderRadius: 50,
+              '&:hover': {
+                bgcolor: '#2c5f2d',
+                color: 'white',
+                borderColor: '#2c5f2d',
+                borderWidth: 2
+              }
+            }}
+            onClick={() => onViewAll && onViewAll('events')}
+          >
+            View Full Calendar
+          </Button>
+        </Box>
 
       </Box>
     )
