@@ -444,7 +444,7 @@ export default function Home({ onNavigate }) {
             left: 0,
             right: 0,
             height: '4px',
-            background: 'linear-gradient(90deg, #2ecc71 0%, #3498db 50%, #9b59b6 100%)',
+            background: 'linear-gradient(90deg, #4A7C59 0%, #87CEEB 50%, #8B5A2B 100%)', // Forest -> Sky -> Earth
           }
         }}
       >
@@ -457,7 +457,7 @@ export default function Home({ onNavigate }) {
       <Box
         ref={sightingsAnimation.ref}
         sx={{
-          background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+          background: 'linear-gradient(135deg, #2D5A27 0%, #5D9C6C 100%)', // Deep Forest Green
           py: 8,
           opacity: sightingsAnimation.isVisible ? 1 : 0,
           transform: sightingsAnimation.isVisible ? 'translateY(0)' : 'translateY(30px)',
