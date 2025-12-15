@@ -58,7 +58,6 @@ function ScrollHandler(props) {
 }
 
 export default function Header(props) {
-  const { onNavigate } = props
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [showOnboardingBanner, setShowOnboardingBanner] = useState(false)
   const [bannerDismissed, setBannerDismissed] = useState(false)
