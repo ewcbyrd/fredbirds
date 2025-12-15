@@ -29,7 +29,6 @@ import CloseIcon from '@mui/icons-material/Close'
 import InfoIcon from '@mui/icons-material/Info'
 import GroupsIcon from '@mui/icons-material/Groups'
 import BadgeIcon from '@mui/icons-material/Badge' // For Membership/Card
-import MenuBookIcon from '@mui/icons-material/MenuBook' // Generic Resources/Membership
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday' // Events
 import AnnouncementIcon from '@mui/icons-material/Announcement' // News
 import AutoStoriesIcon from '@mui/icons-material/AutoStories' // Newsletters
