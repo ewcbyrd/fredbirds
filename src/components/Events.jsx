@@ -374,9 +374,11 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
         <Typography
           variant="h4"
           sx={{
-            mb: 3,
-            fontWeight: 700,
-            color: '#1a1a1a'
+            mb: 4,
+            fontWeight: 800,
+            color: '#2c3e50',
+            textAlign: 'center',
+            textShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}
         >
           Upcoming Events

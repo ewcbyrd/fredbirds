@@ -3,32 +3,65 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useUserRole, ACCESS_LEVELS } from '../hooks/useUserRole'
 import { getMemberByEmail } from '../services/restdbService'
-import { 
-  AppBar, 
-  Toolbar, 
-  Typography, 
-  Button, 
-  IconButton, 
-  Drawer, 
-  List, 
-  ListItem, 
-  ListItemButton, 
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
   ListItemText,
+  ListItemIcon,
   Box,
   Divider,
   ListSubheader,
   useMediaQuery,
   useTheme,
   Alert,
-  Collapse
+  Collapse,
+  useScrollTrigger,
+  Slide
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import HomeIcon from '@mui/icons-material/Home'
 import CloseIcon from '@mui/icons-material/Close'
+import InfoIcon from '@mui/icons-material/Info'
+import GroupsIcon from '@mui/icons-material/Groups'
+import BadgeIcon from '@mui/icons-material/Badge' // For Membership/Card
+import MenuBookIcon from '@mui/icons-material/MenuBook' // Generic Resources/Membership
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday' // Events
+import AnnouncementIcon from '@mui/icons-material/Announcement' // News
+import AutoStoriesIcon from '@mui/icons-material/AutoStories' // Newsletters
+import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary' // Photos
+import VisibilityIcon from '@mui/icons-material/Visibility' // Sightings
+import RssFeedIcon from '@mui/icons-material/RssFeed' // Birding News
+import ContactSupportIcon from '@mui/icons-material/ContactSupport' // FAQs
 import { PersonAdd, Close } from '@mui/icons-material'
 import UserProfile from './UserProfile'
 
-export default function Header({ onNavigate }) {
+// Component to handle scroll transparency effect
+// Component to handle scroll transparency effect
+function ScrollHandler(props) {
+  const { children } = props
+
+  return React.cloneElement(children, {
+    elevation: 4,
+    sx: {
+      ...children.props.sx,
+      bgcolor: 'rgba(30, 70, 32, 0.95)', // Deep Forest with transparency
+      backdropFilter: 'blur(12px)',
+      borderBottom: '1px solid rgba(255,255,255,0.1)',
+      transition: 'all 0.3s ease-in-out',
+      py: 0.5 // Consistent comfortable height
+    }
+  })
+}
+
+export default function Header(props) {
+  const { onNavigate } = props
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [showOnboardingBanner, setShowOnboardingBanner] = useState(false)
   const [bannerDismissed, setBannerDismissed] = useState(false)
@@ -86,6 +119,24 @@ export default function Header({ onNavigate }) {
     return true // All other pages are public
   }
 
+  const getIconForPath = (path) => {
+    switch (path) {
+      case '/': return <HomeIcon />
+      case '/about': return <InfoIcon />
+      case '/officers': return <GroupsIcon />
+      case '/members-directory': return <GroupsIcon />
+      case '/membership': return <BadgeIcon />
+      case '/faqs': return <ContactSupportIcon />
+      case '/events': return <CalendarTodayIcon />
+      case '/announcements': return <AnnouncementIcon />
+      case '/newsletters': return <AutoStoriesIcon />
+      case '/photos': return <PhotoLibraryIcon />
+      case '/sightings': return <VisibilityIcon />
+      case '/newsfeed': return <RssFeedIcon />
+      default: return <HomeIcon />
+    }
+  }
+
   const menuSections = [
     {
       title: 'Club Information',
@@ -134,136 +185,159 @@ export default function Header({ onNavigate }) {
 
   return (
     <>
-      <AppBar position="sticky" sx={{ bgcolor: '#2c5f2d', boxShadow: 2 }}>
-        <Toolbar sx={{ maxWidth: 1400, width: '100%', mx: 'auto', px: { xs: 2, md: 3 } }}>
-          {/* Logo/Home Button */}
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={() => handleNavigate('/')}
-            sx={{ 
-              mr: 2,
-              '&:hover': {
-                bgcolor: 'rgba(255, 255, 255, 0.1)'
+      <ScrollHandler {...props}>
+        <AppBar position="fixed" sx={{ bgcolor: 'transparent', boxShadow: 0 }}>
+          <Toolbar sx={{ width: '100%', mx: 'auto', px: { xs: 2, md: 6, lg: 10 } }}>
+            {/* Logo/Home Button */}
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={() => handleNavigate('/')}
+              sx={{
+                mr: 1,
+                bgcolor: 'rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(4px)',
+                '&:hover': {
+                  bgcolor: 'rgba(255, 255, 255, 0.2)'
+                }
+              }}
+            >
+              <HomeIcon sx={{ fontSize: 24 }} />
+            </IconButton>
+
+            {/* Club Name - with subtle text shadow for readability on hero */}
+            <Typography
+              variant={isMobile ? "subtitle1" : "h6"}
+              component="div"
+              sx={{
+                fontWeight: 700,
+                cursor: 'pointer',
+                letterSpacing: 0.5,
+                textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                '&:hover': {
+                  opacity: 0.9
+                }
+              }}
+              onClick={() => handleNavigate('/')}
+            >
+              {isMobile ? 'FBC' : 'Fredericksburg Birding Club'}
+            </Typography>
+
+            <Box sx={{ flexGrow: 1 }} />
+
+            {/* Desktop Navigation */}
+            {!isMobile && (
+              <Box sx={{ display: 'flex', gap: 1, mr: 2 }}>
+                {filteredPrimaryNav.map((item) => (
+                  <Button
+                    key={item.path}
+                    color="inherit"
+                    onClick={() => handleNavigate(item.path)}
+                    sx={{
+                      textTransform: 'none',
+                      px: 2,
+                      py: 0.8,
+                      fontSize: '0.95rem',
+                      fontWeight: 600,
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        width: location.pathname === item.path ? '100%' : '0%',
+                        height: '3px',
+                        bgcolor: '#c17817', // Golden amber accent
+                        transition: 'width 0.3s ease-in-out'
+                      },
+                      '&:hover': {
+                        bgcolor: 'rgba(255, 255, 255, 0.1)',
+                        '&::after': {
+                          width: '100%'
+                        }
+                      }
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
+              </Box>
+            )}
+
+            {/* Menu Icon */}
+            <IconButton
+              edge="end"
+              color="inherit"
+              onClick={() => setDrawerOpen(true)}
+              sx={{
+                mr: 2,
+                bgcolor: 'rgba(255,255,255,0.1)', // Glass background
+                backdropFilter: 'blur(4px)',
+                '&:hover': {
+                  bgcolor: 'rgba(255, 255, 255, 0.2)'
+                }
+              }}
+            >
+              <MenuIcon sx={{ fontSize: 26 }} />
+            </IconButton>
+
+            {/* User Profile / Login */}
+            <Box>
+              <UserProfile />
+            </Box>
+          </Toolbar>
+        </AppBar>
+      </ScrollHandler>
+
+      {/* Onboarding Banner - Pushed down by fixed header */}
+      <Box sx={{ pt: 10 }}>
+        <Collapse in={showOnboardingBanner}>
+          <Alert
+            severity="info"
+            sx={{
+              borderRadius: 0,
+              bgcolor: '#e3f2fd',
+              borderColor: '#2196f3',
+              '& .MuiAlert-message': {
+                width: '100%'
               }
             }}
-          >
-            <HomeIcon sx={{ fontSize: 28 }} />
-          </IconButton>
-          
-          {/* Club Name */}
-          <Typography 
-            variant={isMobile ? "subtitle1" : "h6"} 
-            component="div" 
-            sx={{ 
-              fontWeight: 600,
-              cursor: 'pointer',
-              '&:hover': {
-                opacity: 0.9
-              }
-            }}
-            onClick={() => handleNavigate('/')}
-          >
-            {isMobile ? 'FBC' : 'Fredericksburg Birding Club'}
-          </Typography>
-
-          <Box sx={{ flexGrow: 1 }} />
-
-          {/* Desktop Navigation */}
-          {!isMobile && (
-            <Box sx={{ display: 'flex', gap: 0.5, mr: 2 }}>
-              {filteredPrimaryNav.map((item) => (
+            action={
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 <Button
-                  key={item.path}
-                  color="inherit"
-                  onClick={() => handleNavigate(item.path)}
+                  size="small"
+                  variant="contained"
+                  startIcon={<PersonAdd />}
+                  onClick={handleCompleteOnboarding}
                   sx={{
-                    textTransform: 'none',
-                    px: 2,
-                    py: 1,
-                    fontSize: '0.95rem',
-                    fontWeight: location.pathname === item.path ? 600 : 500,
-                    bgcolor: location.pathname === item.path ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
-                    borderRadius: 1,
-                    '&:hover': {
-                      bgcolor: 'rgba(255, 255, 255, 0.2)'
-                    }
+                    bgcolor: '#1976d2',
+                    '&:hover': { bgcolor: '#1565c0' }
                   }}
                 >
-                  {item.label}
+                  Complete Setup
                 </Button>
-              ))}
-            </Box>
-          )}
-
-          {/* Menu Icon */}
-          <IconButton
-            edge="end"
-            color="inherit"
-            onClick={() => setDrawerOpen(true)}
-            sx={{ 
-              mr: 2,
-              '&:hover': {
-                bgcolor: 'rgba(255, 255, 255, 0.1)'
-              }
-            }}
-          >
-            <MenuIcon sx={{ fontSize: 28 }} />
-          </IconButton>
-
-          {/* User Profile / Login */}
-          <Box>
-            <UserProfile />
-          </Box>
-        </Toolbar>
-      </AppBar>
-
-      {/* Onboarding Banner */}
-      <Collapse in={showOnboardingBanner}>
-        <Alert 
-          severity="info" 
-          sx={{ 
-            borderRadius: 0,
-            bgcolor: '#e3f2fd',
-            borderColor: '#2196f3',
-            '& .MuiAlert-message': {
-              width: '100%'
+                <IconButton
+                  size="small"
+                  onClick={handleDismissBanner}
+                  sx={{ color: 'rgba(0, 0, 0, 0.54)' }}
+                >
+                  <Close fontSize="small" />
+                </IconButton>
+              </Box>
             }
-          }}
-          action={
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              <Button
-                size="small"
-                variant="contained"
-                startIcon={<PersonAdd />}
-                onClick={handleCompleteOnboarding}
-                sx={{
-                  bgcolor: '#1976d2',
-                  '&:hover': { bgcolor: '#1565c0' }
-                }}
-              >
-                Complete Setup
-              </Button>
-              <IconButton
-                size="small"
-                onClick={handleDismissBanner}
-                sx={{ color: 'rgba(0, 0, 0, 0.54)' }}
-              >
-                <Close fontSize="small" />
-              </IconButton>
+          >
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                Welcome to Fredericksburg Birding Club!
+              </Typography>
+              <Typography variant="body2">
+                Complete your member profile to access club features and connect with fellow birders.
+              </Typography>
             </Box>
-          }
-        >
-          <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
-              Welcome to Fredericksburg Birding Club!
-            </Typography>
-            <Typography variant="body2">
-              Complete your member profile to access club features and connect with fellow birders.
-            </Typography>
-          </Box>
-        </Alert>
-      </Collapse>
+          </Alert>
+        </Collapse>
+      </Box>
 
       <Drawer
         anchor="right"
@@ -271,22 +345,39 @@ export default function Header({ onNavigate }) {
         onClose={() => setDrawerOpen(false)}
         sx={{
           '& .MuiDrawer-paper': {
-            width: 280,
-            bgcolor: '#f5f5f5'
-          }
+            width: 300,
+            bgcolor: '#f8f9fa' // Light grey clean background
+          },
+          zIndex: (theme) => theme.zIndex.drawer + 2
         }}
       >
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: '#2c5f2d', color: 'white' }}>
-          <Typography variant="h6">Menu</Typography>
-          <IconButton color="inherit" onClick={() => setDrawerOpen(false)}>
+        <Box sx={{
+          p: 3,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          background: 'linear-gradient(135deg, #1e4620 0%, #2c5f2d 100%)', // Deep Forest Gradient
+          color: 'white',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+        }}>
+          <Typography variant="h6" sx={{ fontWeight: 700 }}>Menu</Typography>
+          <IconButton onClick={() => setDrawerOpen(false)} sx={{ color: 'white' }}>
             <CloseIcon />
           </IconButton>
         </Box>
-        
-        <List>
+
+        <List sx={{ pb: 4 }}>
           {filteredMenuSections.map((section, idx) => (
             <React.Fragment key={section.title}>
-              <ListSubheader sx={{ bgcolor: 'transparent', fontWeight: 600, color: '#2c5f2d' }}>
+              <ListSubheader sx={{
+                bgcolor: 'transparent',
+                fontWeight: 700,
+                color: '#2c5f2d',
+                textTransform: 'uppercase',
+                fontSize: '0.75rem',
+                letterSpacing: 1,
+                mt: idx === 0 ? 0 : 2
+              }}>
                 {section.title}
               </ListSubheader>
               {section.items.map((item) => (
@@ -295,17 +386,34 @@ export default function Header({ onNavigate }) {
                     onClick={() => handleNavigate(item.path)}
                     selected={location.pathname === item.path}
                     sx={{
+                      mx: 1,
+                      borderRadius: 2,
+                      mb: 0.5,
                       '&.Mui-selected': {
                         bgcolor: '#e8f5e9',
-                        borderLeft: '4px solid #2c5f2d'
+                        color: '#1e4620',
+                        '& .MuiListItemIcon-root': {
+                          color: '#2e7d32'
+                        }
+                      },
+                      '&:hover': {
+                        bgcolor: '#f1f8f4'
                       }
                     }}
                   >
-                    <ListItemText primary={item.label} />
+                    <ListItemIcon sx={{ minWidth: 40, color: '#757575' }}>
+                      {getIconForPath(item.path)}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={item.label}
+                      primaryTypographyProps={{
+                        fontWeight: location.pathname === item.path ? 700 : 500
+                      }}
+                    />
                   </ListItemButton>
                 </ListItem>
               ))}
-              {idx < filteredMenuSections.length - 1 && <Divider sx={{ my: 1 }} />}
+              {idx < filteredMenuSections.length - 1 && <Divider variant="middle" sx={{ my: 1, borderColor: '#eee' }} />}
             </React.Fragment>
           ))}
         </List>

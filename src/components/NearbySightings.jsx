@@ -3,12 +3,16 @@ import { Card, CardContent, Typography, Grid, Box, Button, Chip, IconButton, Too
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import StarIcon from '@mui/icons-material/Star'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import { getNearbyNotableObservations } from '../services/ebirdService'
 import { isRareBird } from '../utils/rareBirdsUtils'
 
 export default function NearbySightings({ onViewAll }) {
   const [sightings, setSightings] = useState([])
   const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(0)
+  const itemsPerPage = 4
 
   useEffect(() => {
     const opts = { lat: 38.31, long: -77.46, daysBack: 7, dist: 30 }
@@ -22,7 +26,8 @@ export default function NearbySightings({ onViewAll }) {
           const existing = sightingsMap.get(key)
           if (!existing || item.obsDt > existing.obsDt) sightingsMap.set(key, item)
         })
-        setSightings(Array.from(sightingsMap.values()).slice(0, 8)) // Limit to 8 for cleaner display
+        // Increased limit for carousel
+        setSightings(Array.from(sightingsMap.values()).slice(0, 12))
       })
       .catch(() => setSightings([]))
       .finally(() => setLoading(false))
@@ -57,6 +62,21 @@ export default function NearbySightings({ onViewAll }) {
     }
   }
 
+  const totalPages = Math.ceil(sightings.length / itemsPerPage)
+
+  const handleNext = () => {
+    setPage((prev) => (prev + 1) % totalPages)
+  }
+
+  const handlePrev = () => {
+    setPage((prev) => (prev - 1 + totalPages) % totalPages)
+  }
+
+  const visibleSightings = sightings.slice(
+    page * itemsPerPage,
+    (page + 1) * itemsPerPage
+  )
+
   return (
     <Box>
       <Typography
@@ -86,14 +106,53 @@ export default function NearbySightings({ onViewAll }) {
           </Typography>
         </Card>
       ) : (
-        <>
+        <Box sx={{ position: 'relative', px: { xs: 0, md: 6 } }}>
+          {/* Navigation Buttons for Desktop */}
+          {totalPages > 1 && (
+            <>
+              <IconButton
+                onClick={handlePrev}
+                sx={{
+                  position: 'absolute',
+                  left: 0,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  bgcolor: 'rgba(255,255,255,0.2)',
+                  color: 'white',
+                  display: { xs: 'none', md: 'flex' },
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.4)' },
+                  zIndex: 2
+                }}
+              >
+                <ArrowBackIosNewIcon />
+              </IconButton>
+
+              <IconButton
+                onClick={handleNext}
+                sx={{
+                  position: 'absolute',
+                  right: 0,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  bgcolor: 'rgba(255,255,255,0.2)',
+                  color: 'white',
+                  display: { xs: 'none', md: 'flex' },
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.4)' },
+                  zIndex: 2
+                }}
+              >
+                <ArrowForwardIosIcon />
+              </IconButton>
+            </>
+          )}
+
           <Grid container spacing={2}>
-            {sightings.map((s, index) => {
+            {visibleSightings.map((s, index) => {
               const recency = getRecencyColor(s.obsDt)
               const isRare = isRareBird(s.sciName)
 
               return (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={s.obsId}>
+                <Grid item xs={12} sm={6} md={3} key={s.obsId}>
                   <Card
                     sx={{
                       height: '100%',
@@ -248,6 +307,25 @@ export default function NearbySightings({ onViewAll }) {
             })}
           </Grid>
 
+          {/* Mobile Navigation (Dots) */}
+          {totalPages > 1 && (
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, justifyContent: 'center', mt: 2, gap: 1 }}>
+              {Array.from({ length: totalPages }).map((_, idx) => (
+                <Box
+                  key={idx}
+                  onClick={() => setPage(idx)}
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    bgcolor: page === idx ? 'white' : 'rgba(255,255,255,0.3)',
+                    cursor: 'pointer'
+                  }}
+                />
+              ))}
+            </Box>
+          )}
+
           <Box sx={{ textAlign: 'center', mt: 5 }}>
             <Button
               variant="outlined"
@@ -273,7 +351,7 @@ export default function NearbySightings({ onViewAll }) {
               View More Sightings
             </Button>
           </Box>
-        </>
+        </Box>
       )}
     </Box>
   )

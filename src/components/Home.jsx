@@ -25,25 +25,8 @@ export default function Home({ onNavigate }) {
   const { isAuthenticated } = useAuth0()
   const { hasAccess } = useUserRole()
   const location = useLocation()
-  // Default announcements data to ensure immediate render
-  const defaultAnnouncements = [
-    {
-      "_id": "69303967e8f64c30e9c9fe0b",
-      "headline": "It's Time for the Annual Christmas Bird Count Events",
-      "details": "It’s that special time of year again—the Christmas Bird Count is here! Join fellow birders..."
-    },
-    {
-      "_id": "6925ca524fdde50b85357238",
-      "headline": "Caledon State Park Expands - New Birding Opportunities Ahead!",
-      "details": "Exciting news for birders in our region! Caledon State Park has expanded..."
-    },
-    {
-      "_id": "6925a2254fdde50b85357237",
-      "headline": "New Birding 101 Series at Widewater State Park - Winter 2025/2026",
-      "details": "Join experienced birders for guided walks at Widewater State Park this winter!..."
-    }
-  ]
-  const [announcements, setAnnouncements] = useState(defaultAnnouncements)
+
+  const [announcements, setAnnouncements] = useState([])
   const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0)
   const [fadeIn, setFadeIn] = useState(true)
 
@@ -59,10 +42,13 @@ export default function Home({ onNavigate }) {
       .then(data => {
         if (data && data.length > 0) {
           setAnnouncements(data)
+        } else {
+          setAnnouncements([])
         }
       })
       .catch(err => {
         console.error('Error fetching announcements:', err)
+        setAnnouncements([])
       })
   }, [location.pathname])
 
@@ -353,49 +339,49 @@ export default function Home({ onNavigate }) {
       </Box>
 
       {/* Announcements Headlines Section - Nature Theme */}
-      {announcements.length > 0 && (
-        <Box
-          ref={announcementsAnimation.ref}
-          sx={{
-            background: 'linear-gradient(135deg, #c17817 0%, #d4a574 100%)',
-            py: 5,
-            position: 'relative',
-            overflow: 'hidden',
-            minHeight: { xs: 120, md: 140 },
-            opacity: announcementsAnimation.isVisible ? 1 : 0,
-            transform: announcementsAnimation.isVisible ? 'translateY(0)' : 'translateY(30px)',
-            transition: 'all 0.8s ease-out',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'radial-gradient(circle at 80% 50%, rgba(255,255,255,0.15) 0%, transparent 50%)',
-              pointerEvents: 'none'
-            }
+      <Box
+        ref={announcementsAnimation.ref}
+        sx={{
+          background: 'linear-gradient(135deg, #c17817 0%, #d4a574 100%)',
+          py: 5,
+          position: 'relative',
+          overflow: 'hidden',
+          minHeight: { xs: 120, md: 140 },
+          opacity: announcementsAnimation.isVisible ? 1 : 0,
+          transform: announcementsAnimation.isVisible ? 'translateY(0)' : 'translateY(30px)',
+          transition: 'all 0.8s ease-out',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'radial-gradient(circle at 80% 50%, rgba(255,255,255,0.15) 0%, transparent 50%)',
+            pointerEvents: 'none'
+          }
+        }}>
+        <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, position: 'relative', zIndex: 1 }}>
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 2,
+            height: { xs: 72, md: 92 }
           }}>
-          <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, position: 'relative', zIndex: 1 }}>
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 2,
-              height: { xs: 72, md: 92 }
-            }}>
-              <AnnouncementIcon sx={{ fontSize: { xs: 32, md: 40 }, color: 'white', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))' }} />
-              <Box sx={{ flex: 1, textAlign: 'center', overflow: 'hidden' }}>
-                <Box sx={{
-                  height: { xs: 72, md: 92 },
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  px: 2,
-                  opacity: fadeIn ? 1 : 0,
-                  transition: 'opacity 0.6s ease-in-out'
-                }}>
+            <AnnouncementIcon sx={{ fontSize: { xs: 32, md: 40 }, color: 'white', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))' }} />
+            <Box sx={{ flex: 1, textAlign: 'center', overflow: 'hidden' }}>
+              <Box sx={{
+                height: { xs: 72, md: 92 },
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                px: 2,
+                opacity: fadeIn ? 1 : 0,
+                transition: 'opacity 0.6s ease-in-out'
+              }}>
+                {announcements.length > 0 ? (
                   <Typography
                     variant="h5"
                     sx={{
@@ -416,15 +402,27 @@ export default function Home({ onNavigate }) {
                     }}
                     onClick={() => onNavigate('announcements')}
                   >
-                    {announcements[currentAnnouncementIndex]?.headline || "Club Announcements"}
+                    {announcements[currentAnnouncementIndex]?.headline}
                   </Typography>
-                </Box>
+                ) : (
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 700,
+                      color: 'white',
+                      opacity: 0.9,
+                      fontStyle: 'italic',
+                      textShadow: '0 1px 4px rgba(0,0,0,0.2)'
+                    }}
+                  >
+                    No current club announcements
+                  </Typography>
+                )}
               </Box>
             </Box>
           </Box>
-        </Box >
-      )
-      }
+        </Box>
+      </Box >
 
       {/* Events Section - Modern Design */}
       <Box
@@ -436,15 +434,6 @@ export default function Home({ onNavigate }) {
           transform: eventsAnimation.isVisible ? 'translateY(0)' : 'translateY(30px)',
           transition: 'all 0.8s ease-out 0.2s',
           position: 'relative',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '4px',
-            background: 'linear-gradient(90deg, #4A7C59 0%, #87CEEB 50%, #8B5A2B 100%)', // Forest -> Sky -> Earth
-          }
         }}
       >
         <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 } }}>
