@@ -65,10 +65,12 @@ export default function NearbySightings({ onViewAll }) {
   const totalPages = Math.ceil(sightings.length / itemsPerPage)
 
   const handleNext = () => {
+    if (totalPages <= 1) return
     setPage((prev) => (prev + 1) % totalPages)
   }
 
   const handlePrev = () => {
+    if (totalPages <= 1) return
     setPage((prev) => (prev - 1 + totalPages) % totalPages)
   }
 
