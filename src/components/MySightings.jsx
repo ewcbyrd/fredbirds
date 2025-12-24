@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Card, CardHeader, CardContent, IconButton, Typography, Collapse, Divider, Grid, Button } from '@mui/material'
+import { Box, Card, CardHeader, CardContent, IconButton, Typography, Collapse, Divider, Grid, Button, Chip } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import NumbersIcon from '@mui/icons-material/Numbers'
@@ -57,252 +57,188 @@ export default function MySightings({ sightings = [], header = 'Sightings', view
     <Box>
       {sightings && sightings.length > 0 ? (
         <>
-        {displayedSightings.map((s) => {
-          const groupedSightings = groupByLocality(s.individualSightings || [])
-          
-          return (
-            <Box key={s.id || s.name} sx={{ mb: 2 }}>
-              <Card sx={{ 
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)', 
-                borderRadius: 2,
-                transition: 'box-shadow 0.3s ease',
-                '&:hover': { boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }
-              }}>
-                <CardHeader
-                  title={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="h6" sx={{ fontWeight: 600 }}>{s.name}</Typography>
-                          {(s.isRare || isRareBird(s.scientific)) && (
-                            <StarIcon 
-                              sx={{ 
-                                fontSize: 18, 
-                                color: '#ff6b35',
-                                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
-                              }} 
+          <Grid container spacing={3}>
+            {displayedSightings.map((s) => {
+              const groupedSightings = groupByLocality(s.individualSightings || [])
+              const isRare = s.isRare || isRareBird(s.scientific)
+
+              return (
+                <Grid item xs={12} md={6} lg={4} key={s.id || s.name}>
+                  <Card sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 12px 24px rgba(0,0,0,0.1)'
+                    }
+                  }}>
+                    <CardHeader
+                      title={
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2, fontSize: '1.1rem' }}>
+                            {s.name}
+                          </Typography>
+                          {isRare && (
+                            <Chip
+                              label="Rare"
+                              size="small"
+                              icon={<StarIcon sx={{ fontSize: '1rem !important' }} />}
+                              sx={{
+                                bgcolor: '#fff3e0',
+                                color: '#e65100',
+                                fontWeight: 700,
+                                border: '1px solid #ffe0b2',
+                                height: 24
+                              }}
                             />
                           )}
                         </Box>
-                        {s.scientific && (
-                          <Typography 
-                            variant="body2" 
-                            sx={{ 
-                              fontStyle: 'italic',
-                              color: 'text.secondary',
-                              fontSize: '0.85rem'
-                            }}
-                          >
-                            {s.scientific}
+                      }
+                      subheader={
+                        <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary', mt: 0.5 }}>
+                          {s.scientific}
+                        </Typography>
+                      }
+                      sx={{ pb: 1 }}
+                    />
+
+                    <CardContent sx={{ pt: 1, flexGrow: 1 }}>
+                      <Box sx={{ mb: 2 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: '#2c5f2d' }}>
+                            Locations:
                           </Typography>
-                        )}
+                          <Typography variant="body2" color="text.secondary" noWrap>
+                            {s.locations || s.primaryLocation || 'Various'}
+                          </Typography>
+                        </Box>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: '#2c5f2d' }}>
+                            Most Recent:
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {s.mostRecent ? new Date(s.mostRecent).toLocaleDateString() : 'Unknown'}
+                          </Typography>
+                        </Box>
                       </Box>
-                    </Box>
-                  }
-                  subheader={s.locations || s.primaryLocation || ''}
-                  action={
-                    <IconButton onClick={() => toggleId(s.id || s.name)}>
-                      <ExpandMoreIcon />
-                    </IconButton>
-                  }
-                  sx={{ pb: 1 }}
-                />
-                <CardContent>
-                  {(s.isRare || s.rare || isRareBird(s.scientific)) ? (
-                    <Box sx={{ 
-                      mb: 2, 
-                      p: 1.5, 
-                      bgcolor: '#e8f5e9', 
-                      borderRadius: 1.5,
-                      borderLeft: '4px solid #2e7d32',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
-                    }}>
-                      <Typography variant="body2" sx={{ fontWeight: 500, color: '#1b5e20' }}>
-                        This is considered a rare species in this region.
-                      </Typography>
-                    </Box>
-                  ) : null}
 
-                  <Collapse in={openIds.has(s.id || s.name)}>
-                    <Box sx={{ mt: 1 }}>
-                      {Object.entries(groupedSightings).map(([locality, records]) => {
-                        const localityId = `${s.id || s.name}-${locality}`
-                        const mostRecentDate = records.reduce((latest, record) => {
-                          const recordDate = new Date(record.date)
-                          return recordDate > latest ? recordDate : latest
-                        }, new Date(0))
-                        const formattedDate = mostRecentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                        
-                        return (
-                          <Box key={locality} sx={{ mb: 1.5 }}>
-                            <Card sx={{ 
-                              bgcolor: '#f7faf7',
-                              boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-                              borderRadius: 1.5
-                            }}>
-                              <CardHeader
-                                title={
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Typography variant="subtitle1">{locality}</Typography>
-                                    <Typography variant="body2" color="text.secondary">• {formattedDate}</Typography>
-                                  </Box>
-                                }
-                                subheader={`${records.length} sighting${records.length !== 1 ? 's' : ''}`}
-                                action={
-                                  <IconButton onClick={() => toggleId(localityId)} size="small">
-                                    <ExpandMoreIcon />
-                                  </IconButton>
-                                }
-                                sx={{ py: 1 }}
-                              />
-                              <Collapse in={openIds.has(localityId)}>
-                                <CardContent sx={{ pt: 0 }}>
-                                  {records.map((record) => (
-                                    <Card 
-                                      key={record.id || record.date} 
-                                      sx={{ 
-                                        mb: 1,
-                                        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-                                        borderRadius: 1,
-                                        transition: 'all 0.2s ease',
-                                        '&:hover': { 
-                                          boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-                                        }
-                                      }}
-                                    >
-                                      <CardContent>
-                                        <Grid container spacing={3}>
-                                          {/* Left Column - Location */}
-                                          <Grid item xs={12} md={6}>
-                                            <Box sx={{ 
-                                              height: '100%', 
-                                              display: 'flex', 
-                                              flexDirection: 'column',
-                                              pr: { md: 2 },
-                                              borderRight: { md: '1px solid #e0e0e0' }
-                                            }}>
-                                              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5, color: '#1a1a1a' }}>
-                                                {record.location}
-                                              </Typography>
-                                              <Box sx={{ mt: 'auto' }}>
-                                                <Button 
-                                                  variant="contained" 
-                                                  size="medium"
-                                                  startIcon={<MapIcon />}
-                                                  onClick={(e) => handleIndividualClick(record, e)}
-                                                  sx={{
-                                                    bgcolor: '#2c5f2d',
-                                                    py: 1,
-                                                    px: 3,
-                                                    fontSize: '0.95rem',
-                                                    fontWeight: 600,
-                                                    textTransform: 'none',
-                                                    boxShadow: '0 2px 4px rgba(44, 95, 45, 0.3)',
-                                                    '&:hover': {
-                                                      bgcolor: '#234d24',
-                                                      boxShadow: '0 4px 8px rgba(44, 95, 45, 0.4)'
-                                                    }
-                                                  }}
-                                                >
-                                                  View Map
-                                                </Button>
-                                              </Box>
-                                            </Box>
-                                          </Grid>
+                      <Button
+                        variant="outlined"
+                        fullWidth
+                        endIcon={openIds.has(s.id || s.name) ? <ExpandMoreIcon sx={{ transform: 'rotate(180deg)' }} /> : <ExpandMoreIcon />}
+                        onClick={() => toggleId(s.id || s.name)}
+                        sx={{
+                          color: '#2c5f2d',
+                          borderColor: 'rgba(44, 95, 45, 0.3)',
+                          '&:hover': {
+                            borderColor: '#2c5f2d',
+                            bgcolor: 'rgba(44, 95, 45, 0.04)'
+                          }
+                        }}
+                      >
+                        {openIds.has(s.id || s.name) ? 'Hide Details' : 'View Reports'}
+                      </Button>
 
-                                          {/* Right Column - Details */}
-                                          <Grid item xs={12} md={6}>
-                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                              {/* Date */}
-                                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                <CalendarTodayIcon sx={{ fontSize: 20, color: '#2c5f2d' }} />
-                                                <Box>
-                                                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.2 }}>
-                                                    Date
-                                                  </Typography>
-                                                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                                    {new Date(record.date).toLocaleString('en-US', { 
-                                                      month: 'short', 
-                                                      day: 'numeric', 
-                                                      year: 'numeric',
-                                                      hour: 'numeric',
-                                                      minute: '2-digit',
-                                                      hour12: true
-                                                    })}
-                                                  </Typography>
-                                                </Box>
-                                              </Box>
+                      <Collapse in={openIds.has(s.id || s.name)}>
+                        <Box sx={{ mt: 2, maxHeight: 300, overflowY: 'auto', pr: 0.5 }}>
+                          {Object.entries(groupedSightings).map(([locality, records]) => {
+                            const localityId = `${s.id || s.name}-${locality}`
 
-                                              {/* Count */}
-                                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                <NumbersIcon sx={{ fontSize: 20, color: '#2c5f2d' }} />
-                                                <Box>
-                                                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.2 }}>
-                                                    Count
-                                                  </Typography>
-                                                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                                    {record.quantity || 'Unknown'}
-                                                  </Typography>
-                                                </Box>
-                                              </Box>
+                            return (
+                              <Box key={locality} sx={{ mb: 1.5, '&:last-child': { mb: 0 } }}>
+                                <Box sx={{
+                                  bgcolor: '#f8f9fa',
+                                  p: 1.5,
+                                  borderRadius: 2,
+                                  border: '1px solid #eee'
+                                }}>
+                                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: '#1a1a1a' }}>
+                                    {locality}
+                                  </Typography>
 
-                                              {/* Observer */}
-                                              {viewtype !== 'nearby' && (
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                  <PersonIcon sx={{ fontSize: 20, color: '#2c5f2d' }} />
-                                                  <Box>
-                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.2 }}>
-                                                      Observer
-                                                    </Typography>
-                                                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                                      {record.by}
-                                                    </Typography>
-                                                  </Box>
-                                                </Box>
-                                              )}
-                                            </Box>
-                                          </Grid>
-                                        </Grid>
-                                      </CardContent>
-                                    </Card>
+                                  {records.map((record, idx) => (
+                                    <Box key={idx} sx={{
+                                      display: 'flex',
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center',
+                                      mb: 1,
+                                      pb: 1,
+                                      borderBottom: idx < records.length - 1 ? '1px dashed #e0e0e0' : 'none',
+                                      '&:last-child': { mb: 0, pb: 0 }
+                                    }}>
+                                      <Box>
+                                        <Typography variant="caption" sx={{ display: 'block', fontWeight: 600, color: '#555' }}>
+                                          {new Date(record.date).toLocaleDateString()}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                          Qty: {record.quantity || '?'} • {record.by}
+                                        </Typography>
+                                      </Box>
+                                      <IconButton
+                                        size="small"
+                                        onClick={(e) => handleIndividualClick(record, e)}
+                                        sx={{
+                                          color: '#2c5f2d',
+                                          bgcolor: 'white',
+                                          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                                          '&:hover': { bgcolor: '#f1f8f4' }
+                                        }}
+                                      >
+                                        <MapIcon fontSize="small" />
+                                      </IconButton>
+                                    </Box>
                                   ))}
-                                </CardContent>
-                              </Collapse>
-                            </Card>
-                          </Box>
-                        )
-                      })}
-                    </Box>
-                  </Collapse>
-                </CardContent>
-              </Card>
+                                </Box>
+                              </Box>
+                            )
+                          })}
+                        </Box>
+                      </Collapse>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              )
+            })}
+          </Grid>
+
+          {hasMore && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={() => setDisplayLimit(prev => prev + 20)}
+                sx={{
+                  bgcolor: '#2c5f2d',
+                  color: 'white',
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: 50,
+                  boxShadow: '0 4px 12px rgba(44, 95, 45, 0.2)',
+                  '&:hover': {
+                    bgcolor: '#1b4d24',
+                    boxShadow: '0 6px 16px rgba(44, 95, 45, 0.3)'
+                  }
+                }}
+              >
+                Load More Sightings ({sightings.length - displayLimit} remaining)
+              </Button>
             </Box>
-          )
-        })}
-        
-        {hasMore && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-            <Button 
-              variant="outlined"
-              onClick={() => setDisplayLimit(prev => prev + 20)}
-              sx={{
-                borderColor: '#2c5f2d',
-                color: '#2c5f2d',
-                '&:hover': {
-                  borderColor: '#234d24',
-                  bgcolor: 'rgba(44, 95, 45, 0.04)'
-                }
-              }}
-            >
-              Show More ({sightings.length - displayLimit} remaining)
-            </Button>
-          </Box>
-        )}
+          )}
         </>
       ) : (
-        <Typography color="text.secondary">No sightings.</Typography>
+        <Box sx={{ textAlign: 'center', py: 8, bgcolor: '#f8f9fa', borderRadius: 4 }}>
+          <Typography variant="h6" color="text.secondary" gutterBottom>
+            No sightings found for this view.
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Try adjusting availability settings or checking back later.
+          </Typography>
+        </Box>
       )}
-      
+
       <MapModal open={mapOpen} onClose={handleCloseMap} record={selectedRecord} />
     </Box>
   )
