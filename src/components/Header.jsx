@@ -40,7 +40,6 @@ import { PersonAdd, Close } from '@mui/icons-material'
 import UserProfile from './UserProfile'
 
 // Component to handle scroll transparency effect
-// Component to handle scroll transparency effect
 function ScrollHandler(props) {
   const { children } = props
 
@@ -48,8 +47,8 @@ function ScrollHandler(props) {
     elevation: 4,
     sx: {
       ...children.props.sx,
-      bgcolor: 'rgba(30, 70, 32, 0.95)', // Deep Forest with transparency
-      backdropFilter: 'blur(12px)',
+      bgcolor: 'rgba(45, 80, 22, 0.85)', // Deep Forest Green with transparency
+      backdropFilter: 'blur(16px) saturate(180%)',
       borderBottom: '1px solid rgba(255,255,255,0.1)',
       transition: 'all 0.3s ease-in-out',
       py: 0.5 // Consistent comfortable height
@@ -193,8 +192,10 @@ export default function Header(props) {
                 mr: 1,
                 bgcolor: 'rgba(255,255,255,0.1)',
                 backdropFilter: 'blur(4px)',
+                transition: 'all 0.2s',
                 '&:hover': {
-                  bgcolor: 'rgba(255, 255, 255, 0.2)'
+                  bgcolor: 'rgba(255, 255, 255, 0.25)',
+                  transform: 'scale(1.05)'
                 }
               }}
             >
@@ -206,7 +207,8 @@ export default function Header(props) {
               variant={isMobile ? "subtitle1" : "h6"}
               component="div"
               sx={{
-                fontWeight: 700,
+                fontWeight: 800,
+                fontFamily: 'Outfit, sans-serif',
                 cursor: 'pointer',
                 letterSpacing: 0.5,
                 textShadow: '0 2px 4px rgba(0,0,0,0.3)',
@@ -237,6 +239,7 @@ export default function Header(props) {
                       fontWeight: 600,
                       position: 'relative',
                       overflow: 'hidden',
+                      borderRadius: '50px',
                       '&::after': {
                         content: '""',
                         position: 'absolute',
@@ -244,13 +247,14 @@ export default function Header(props) {
                         left: 0,
                         width: location.pathname === item.path ? '100%' : '0%',
                         height: '3px',
-                        bgcolor: '#c17817', // Golden amber accent
+                        bgcolor: theme.palette.secondary.main, // Dynamic theme usage
                         transition: 'width 0.3s ease-in-out'
                       },
                       '&:hover': {
-                        bgcolor: 'rgba(255, 255, 255, 0.1)',
+                        bgcolor: 'rgba(255, 255, 255, 0.15)',
                         '&::after': {
-                          width: '100%'
+                          width: '80%',
+                          opacity: 0.7
                         }
                       }
                     }}
@@ -342,7 +346,8 @@ export default function Header(props) {
         sx={{
           '& .MuiDrawer-paper': {
             width: 300,
-            bgcolor: '#f8f9fa' // Light grey clean background
+            bgcolor: theme.palette.background.default,
+            borderLeft: `1px solid ${theme.palette.divider}`
           },
           zIndex: (theme) => theme.zIndex.drawer + 2
         }}
@@ -352,7 +357,7 @@ export default function Header(props) {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          background: 'linear-gradient(135deg, #1e4620 0%, #2c5f2d 100%)', // Deep Forest Gradient
+          background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
           color: 'white',
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
         }}>
@@ -368,7 +373,7 @@ export default function Header(props) {
               <ListSubheader sx={{
                 bgcolor: 'transparent',
                 fontWeight: 700,
-                color: '#2c5f2d',
+                color: theme.palette.primary.main,
                 textTransform: 'uppercase',
                 fontSize: '0.75rem',
                 letterSpacing: 1,
@@ -386,14 +391,14 @@ export default function Header(props) {
                       borderRadius: 2,
                       mb: 0.5,
                       '&.Mui-selected': {
-                        bgcolor: '#e8f5e9',
-                        color: '#1e4620',
+                        bgcolor: `${theme.palette.primary.light}20`, // 20% opacity using hex
+                        color: theme.palette.primary.main,
                         '& .MuiListItemIcon-root': {
-                          color: '#2e7d32'
+                          color: theme.palette.primary.main
                         }
                       },
                       '&:hover': {
-                        bgcolor: '#f1f8f4'
+                        bgcolor: `${theme.palette.primary.light}10`
                       }
                     }}
                   >

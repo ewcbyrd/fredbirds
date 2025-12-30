@@ -34,3 +34,8 @@ src/resources/pdf/*
 .env
 .env.local
 .env.*.local
+
+# Presentation artifacts
+presentation.html
+presentation.pdf
+presentation_assets/
