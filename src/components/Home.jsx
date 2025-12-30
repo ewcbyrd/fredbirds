@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useUserRole, ACCESS_LEVELS } from '../hooks/useUserRole'
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
+import { useTheme } from '@mui/material/styles'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
@@ -25,6 +26,7 @@ export default function Home({ onNavigate }) {
   const { isAuthenticated } = useAuth0()
   const { hasAccess } = useUserRole()
   const location = useLocation()
+  const theme = useTheme()
 
   const [announcements, setAnnouncements] = useState([])
   const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0)
@@ -130,7 +132,7 @@ export default function Home({ onNavigate }) {
       <Box
         ref={quickLinksAnimation.ref}
         sx={{
-          background: 'linear-gradient(135deg, #2d5016 0%, #4a7c59 100%)',
+          background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
           py: 8,
           opacity: quickLinksAnimation.isVisible ? 1 : 0,
           transform: quickLinksAnimation.isVisible ? 'translateY(0)' : 'translateY(30px)',
@@ -170,17 +172,17 @@ export default function Home({ onNavigate }) {
               <Card
                 onClick={() => onNavigate('events')}
                 sx={{
-                  background: 'linear-gradient(135deg, #4a7c59 0%, #5d9c6c 100%)',
+                  background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
                   textAlign: 'center',
                   py: 4,
                   cursor: 'pointer',
                   borderRadius: 3,
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
                   transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  border: 'none',
+                  border: '1px solid rgba(255,255,255,0.1)',
                   '&:hover': {
                     transform: 'translateY(-12px) scale(1.05)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
                   }
                 }}
               >
@@ -193,22 +195,22 @@ export default function Home({ onNavigate }) {
               </Card>
             </Grid>
 
-            {/* Recent Sightings - Sky Blue */}
+            {/* Recent Sightings - Sky Blue (Info) */}
             <Grid item xs={6} sm={4} md={2}>
               <Card
                 onClick={() => onNavigate('sightings')}
                 sx={{
-                  background: 'linear-gradient(135deg, #5b9bd5 0%, #70b5e8 100%)',
+                  background: 'linear-gradient(135deg, #5b9bd5 0%, #70b5e8 100%)', // Keeping custom blue as accent
                   textAlign: 'center',
                   py: 4,
                   cursor: 'pointer',
                   borderRadius: 3,
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
                   transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  border: 'none',
+                  border: '1px solid rgba(255,255,255,0.1)',
                   '&:hover': {
                     transform: 'translateY(-12px) scale(1.05)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
                   }
                 }}
               >
@@ -221,22 +223,22 @@ export default function Home({ onNavigate }) {
               </Card>
             </Grid>
 
-            {/* Photo Gallery - Sunset Orange */}
+            {/* Photo Gallery - Sunset Orange (Secondary) */}
             <Grid item xs={6} sm={4} md={2}>
               <Card
                 onClick={() => onNavigate('photos')}
                 sx={{
-                  background: 'linear-gradient(135deg, #d4895c 0%, #e69f6f 100%)',
+                  background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.light} 100%)`,
                   textAlign: 'center',
                   py: 4,
                   cursor: 'pointer',
                   borderRadius: 3,
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
                   transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  border: 'none',
+                  border: '1px solid rgba(255,255,255,0.1)',
                   '&:hover': {
                     transform: 'translateY(-12px) scale(1.05)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
                   }
                 }}
               >
@@ -342,7 +344,7 @@ export default function Home({ onNavigate }) {
       <Box
         ref={announcementsAnimation.ref}
         sx={{
-          background: 'linear-gradient(135deg, #c17817 0%, #d4a574 100%)',
+          background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.light} 100%)`,
           py: 5,
           position: 'relative',
           overflow: 'hidden',
@@ -445,7 +447,7 @@ export default function Home({ onNavigate }) {
       <Box
         ref={sightingsAnimation.ref}
         sx={{
-          background: 'linear-gradient(135deg, #2D5A27 0%, #5D9C6C 100%)', // Deep Forest Green
+          background: `linear-gradient(135deg, #1e3910 0%, ${theme.palette.primary.dark} 100%)`, // Deepest Forest Green
           py: 8,
           opacity: sightingsAnimation.isVisible ? 1 : 0,
           transform: sightingsAnimation.isVisible ? 'translateY(0)' : 'translateY(30px)',

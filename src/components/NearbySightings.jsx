@@ -160,9 +160,8 @@ export default function NearbySightings({ onViewAll }) {
                       height: '100%',
                       display: 'flex',
                       flexDirection: 'column',
-                      position: 'relative',
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      bgcolor: 'rgba(255, 255, 255, 0.95)', // Slightly translucent
+                      bgcolor: 'rgba(255, 255, 255, 0.95)',
                       backdropFilter: 'blur(10px)',
                       borderRadius: 3,
                       overflow: 'hidden',
@@ -175,109 +174,114 @@ export default function NearbySightings({ onViewAll }) {
                       }
                     }}
                   >
-                    {/* Top colored bar based on recency */}
-                    <Box sx={{ height: 6, bgcolor: recency.border, width: '100%' }} />
+                    {/* Top Top Border */}
+                    <Box sx={{ height: 6, bgcolor: recency.border, width: '100%', flexShrink: 0 }} />
 
-                    {/* Recency Badge */}
-                    <Chip
-                      label={recency.label}
-                      size="small"
-                      sx={{
-                        position: 'absolute',
-                        top: 14,
-                        right: 12,
-                        bgcolor: recency.bg,
-                        color: recency.text,
-                        fontWeight: 700,
-                        fontSize: '0.7rem',
-                        height: 22,
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                      }}
-                    />
+                    <CardContent sx={{ p: 2.5, flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
 
-                    <CardContent sx={{ p: 2.5, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                      {/* Bird Name & Rare Star */}
-                      <Box sx={{ pr: isRare ? 4 : 0, mb: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          {isRare && (
-                            <Tooltip title="Rare Bird Alert!" arrow>
-                              <StarIcon
-                                sx={{
-                                  fontSize: 20,
-                                  color: '#ff9800', // Amber
-                                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
-                                  animation: 'pulse 2s infinite'
-                                }}
-                              />
-                            </Tooltip>
-                          )}
-                          <Typography
-                            variant="h6"
-                            sx={{
-                              fontSize: '1.1rem',
-                              fontWeight: 700,
-                              lineHeight: 1.2,
-                              color: '#2c3e50'
-                            }}
-                          >
-                            {s.comName}
-                          </Typography>
-                        </Box>
-
-                        {s.sciName && (
-                          <Typography
-                            variant="subtitle2"
-                            sx={{
-                              fontStyle: 'italic',
-                              color: '#7f8c8d',
-                              fontSize: '0.85rem',
-                              mt: 0.5
-                            }}
-                          >
-                            {s.sciName}
-                          </Typography>
-                        )}
-                      </Box>
-
-                      {/* Location with Icon - Vertically Centered */}
-                      <Box sx={{
-                        flex: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        py: 1
-                      }}>
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                          <LocationOnIcon sx={{ fontSize: 18, color: '#95a5a6', mt: 0.2 }} />
-                          <Box>
+                      {/* Header Row: Title & Badge */}
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1 }}>
+                        <Box sx={{ flex: 1, minWidth: 0 }}> {/* minWidth 0 allows text truncation if needed */}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
+                            {isRare && (
+                              <Tooltip title="Rare Bird Alert!" arrow>
+                                <StarIcon
+                                  sx={{
+                                    fontSize: 18,
+                                    color: '#ff9800',
+                                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+                                    animation: 'pulse 2s infinite'
+                                  }}
+                                />
+                              </Tooltip>
+                            )}
                             <Typography
-                              variant="body2"
+                              variant="h6"
                               sx={{
-                                fontWeight: 600,
-                                color: '#34495e',
-                                lineHeight: 1.4
+                                fontSize: '1.05rem',
+                                fontWeight: 700,
+                                lineHeight: 1.2,
+                                color: '#2c3e50',
+                                wordBreak: 'break-word'
                               }}
                             >
-                              {s.locName || s.subnational2Name}
+                              {s.comName}
                             </Typography>
-                            {s.locName && (
-                              <Typography variant="caption" color="text.secondary">
-                                {s.subnational2Name}
-                              </Typography>
-                            )}
                           </Box>
+
+                          {s.sciName && (
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                fontStyle: 'italic',
+                                color: '#7f8c8d',
+                                display: 'block',
+                                mt: 0.5,
+                                fontSize: '0.8rem',
+                                lineHeight: 1.3
+                              }}
+                            >
+                              {s.sciName}
+                            </Typography>
+                          )}
+                        </Box>
+
+                        <Chip
+                          label={recency.label}
+                          size="small"
+                          sx={{
+                            bgcolor: recency.bg,
+                            color: recency.text,
+                            fontWeight: 700,
+                            fontSize: '0.7rem',
+                            height: 22,
+                            flexShrink: 0 // Prevent badge from squishing
+                          }}
+                        />
+                      </Box>
+
+                      {/* Location Section - with truncation */}
+                      <Box sx={{ display: 'flex', gap: 1, flex: 1 }}>
+                        <LocationOnIcon sx={{ fontSize: 18, color: '#95a5a6', mt: 0.2, flexShrink: 0 }} />
+                        <Box>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: 600,
+                              color: '#34495e',
+                              lineHeight: 1.4,
+                              display: '-webkit-box',
+                              overflow: 'hidden',
+                              WebkitBoxOrient: 'vertical',
+                              WebkitLineClamp: 2, // Limit to 2 lines
+                            }}
+                            title={s.locName || s.subnational2Name} // Tooltip on hover for full text
+                          >
+                            {s.locName || s.subnational2Name}
+                          </Typography>
+                          {s.locName && (
+                            <Typography variant="caption" color="text.secondary" display="block" noWrap>
+                              {s.subnational2Name}
+                            </Typography>
+                          )}
                         </Box>
                       </Box>
 
-
-
-                      {/* Footer: Observer & eBird Link */}
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      {/* Footer: Observer & Link */}
+                      <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        mt: 'auto', // Push to bottom
+                        pt: 1,
+                        borderTop: '1px solid rgba(0,0,0,0.05)'
+                      }}>
                         <Typography
                           variant="caption"
                           sx={{
                             color: '#95a5a6',
                             fontWeight: 500,
-                            maxWidth: '80%'
+                            maxWidth: '70%'
                           }}
                           noWrap
                         >
@@ -295,6 +299,7 @@ export default function NearbySightings({ onViewAll }) {
                             sx={{
                               color: '#3498db',
                               bgcolor: '#e3f2fd',
+                              p: 0.5,
                               '&:hover': { bgcolor: '#bbdefb' }
                             }}
                           >
@@ -302,6 +307,7 @@ export default function NearbySightings({ onViewAll }) {
                           </IconButton>
                         </Tooltip>
                       </Box>
+
                     </CardContent>
                   </Card>
                 </Grid>

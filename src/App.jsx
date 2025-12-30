@@ -34,7 +34,74 @@ import { Routes, Route, useNavigate } from 'react-router-dom'
 
 const theme = createTheme({
   palette: {
-    mode: 'light'
+    mode: 'light',
+    primary: {
+      main: '#2d5016', // Deep Forest Green
+      light: '#4a7c59',
+      dark: '#1e3910',
+      contrastText: '#ffffff',
+    },
+    secondary: {
+      main: '#c17817', // Golden Amber
+      light: '#d4a574',
+      dark: '#8f570f',
+      contrastText: '#ffffff',
+    },
+    background: {
+      default: '#f8f9fa',
+      paper: '#ffffff',
+    },
+    text: {
+      primary: '#1a1a1a',
+      secondary: '#5c5c5c',
+    }
+  },
+  typography: {
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    h1: { fontFamily: '"Outfit", sans-serif', fontWeight: 700 },
+    h2: { fontFamily: '"Outfit", sans-serif', fontWeight: 700 },
+    h3: { fontFamily: '"Outfit", sans-serif', fontWeight: 700 },
+    h4: { fontFamily: '"Outfit", sans-serif', fontWeight: 600 },
+    h5: { fontFamily: '"Outfit", sans-serif', fontWeight: 600 },
+    h6: { fontFamily: '"Outfit", sans-serif', fontWeight: 600 },
+    button: { fontFamily: '"Inter", sans-serif', fontWeight: 600, textTransform: 'none' },
+  },
+  shape: {
+    borderRadius: 16,
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 50, // Pill shape for buttons
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          },
+        },
+        containedPrimary: {
+          background: 'linear-gradient(135deg, #2d5016 0%, #4a7c59 100%)',
+        },
+        containedSecondary: {
+          background: 'linear-gradient(135deg, #c17817 0%, #d4a574 100%)',
+        }
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 24,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+        }
+      }
+    },
+    MuiPaper: {
+      styleOverrides: {
+        rounded: {
+          borderRadius: 24,
+        }
+      }
+    }
   }
 })
 
@@ -76,7 +143,7 @@ export default function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/faqs" element={<FAQs />} />
             <Route path="/events" element={<Events />} />
-            
+
             {/* All features public except Members Directory */}
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/sightings" element={<Resources />} />
@@ -88,49 +155,49 @@ export default function App() {
             <Route path="/resources" element={<Resources />} />
             <Route path="/officers" element={<Officers />} />
             <Route path="/photos" element={<Photos />} />
-            
+
             {/* User Profile */}
             <Route path="/profile" element={
               <MemberAccessControl requiredLevel={ACCESS_LEVELS.MEMBER}>
                 <Profile />
               </MemberAccessControl>
             } />
-            
+
             {/* Member Onboarding */}
             <Route path="/member-onboarding" element={
               <ProtectedRoute title="Complete Your Registration">
                 <MemberOnboarding />
               </ProtectedRoute>
             } />
-            
+
             {/* Members Directory - member access required */}
             <Route path="/members-directory" element={
               <MemberAccessControl requiredLevel={ACCESS_LEVELS.MEMBER}>
                 <MembersDirectory />
               </MemberAccessControl>
             } />
-            
+
             {/* Individual Member Profile */}
             <Route path="/members/:email" element={
               <MemberAccessControl requiredLevel={ACCESS_LEVELS.MEMBER}>
                 <MemberProfile />
               </MemberAccessControl>
             } />
-            
+
             {/* Officer Tools */}
             <Route path="/officer-tools" element={
               <MemberAccessControl requiredLevel={ACCESS_LEVELS.OFFICER}>
                 <OfficerTools />
               </MemberAccessControl>
             } />
-            
+
             {/* Admin Panel */}
             <Route path="/admin" element={
               <MemberAccessControl requiredLevel={ACCESS_LEVELS.ADMIN}>
                 <AdminPanel />
               </MemberAccessControl>
             } />
-            
+
             {/* fallback route */}
             <Route path="*" element={<Home onNavigate={handleNavigate} />} />
           </Routes>
