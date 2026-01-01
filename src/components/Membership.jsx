@@ -104,19 +104,23 @@ export default function Membership() {
             </Box>
 
             <Button
-              variant="contained"
+              variant="outlined"
               fullWidth
               size="large"
               sx={{
-                bgcolor: '#2c5f2d',
-                py: 2,
+                py: 1.5,
                 fontSize: '1.1rem',
                 fontWeight: 600,
                 textTransform: 'none',
-                boxShadow: '0 4px 6px rgba(44, 95, 45, 0.3)',
+                color: '#2c5f2d',
+                borderColor: '#2c5f2d',
+                borderWidth: 2,
+                borderRadius: 50,
                 '&:hover': {
-                  bgcolor: '#1e4620',
-                  boxShadow: '0 6px 12px rgba(44, 95, 45, 0.4)'
+                  bgcolor: '#2c5f2d',
+                  color: 'white',
+                  borderColor: '#2c5f2d',
+                  borderWidth: 2
                 }
               }}
               onClick={handleOpenJoinDialog}
@@ -129,7 +133,7 @@ export default function Membership() {
 
       {/* Join Dialog */}
       <Dialog open={openJoinDialog} onClose={handleCloseJoinDialog} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ bgcolor: '#2c5f2d', color: 'white' }}>
+        <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>
           How to Join
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
@@ -158,28 +162,23 @@ export default function Membership() {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-            <EmailIcon sx={{ color: '#2c5f2d' }} />
+            <EmailIcon sx={{ color: 'primary.main' }} />
             <Typography variant="body2">
               <strong>Questions?</strong> Email us at{' '}
-              <a href="mailto:admin@fredbirds.com" style={{ color: '#2c5f2d', fontWeight: 600, textDecoration: 'none' }}>
+              <a href="mailto:admin@fredbirds.com" style={{ color: '#2d5016', fontWeight: 600, textDecoration: 'none' }}>
                 admin@fredbirds.com
               </a>
             </Typography>
           </Box>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button onClick={handleCloseJoinDialog} variant="outlined" color="inherit">
+          <Button onClick={handleCloseJoinDialog} variant="outlined" color="primary">
             Close
           </Button>
           <Button
             href="mailto:admin@fredbirds.com?subject=Membership Inquiry"
             variant="contained"
-            sx={{
-              bgcolor: '#2c5f2d',
-              '&:hover': {
-                bgcolor: '#1e4620'
-              }
-            }}
+            color="primary"
           >
             Email Us
           </Button>
