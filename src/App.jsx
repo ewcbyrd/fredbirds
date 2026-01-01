@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
+import { useIdleTimeout } from './hooks/useIdleTimeout'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import Box from '@mui/material/Box'
@@ -130,6 +132,27 @@ export default function App() {
     const path = map[view] || '/'
     navigate(path)
   }
+
+  const { logout, isAuthenticated } = useAuth0()
+
+  // Handle idle timeout - auto logout after 30 minutes of inactivity
+  useIdleTimeout({
+    onIdle: () => {
+      if (isAuthenticated) {
+        console.log('User inactive for 30 minutes, logging out...')
+        // Clear local storage auth items just to be safe
+        const authKeys = Object.keys(localStorage).filter(key => key.startsWith('auth0'))
+        authKeys.forEach(key => localStorage.removeItem(key))
+
+        logout({
+          logoutParams: {
+            returnTo: window.location.origin
+          }
+        })
+      }
+    },
+    idleTime: 1000 * 60 * 30 // 30 minutes
+  })
 
   return (
     <ThemeProvider theme={theme}>
