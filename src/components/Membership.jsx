@@ -14,10 +14,10 @@ export default function Membership() {
       <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 3 }}>
         Membership
       </Typography>
-      
+
       {/* Introduction */}
-      <Card sx={{ 
-        mb: 3,
+      <Card sx={{
+        mb: 4,
         boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
         borderRadius: 2,
         transition: 'box-shadow 0.3s ease',
@@ -28,193 +28,120 @@ export default function Membership() {
             Join the Fredericksburg Birding Club
           </Typography>
           <Typography variant="body1" paragraph>
-            Are you a new birder looking to gain experience? Are you a veteran
-            birder looking for a group to share your love of birding with? Or, are
-            you just looking to get outdoors with nice people? We have some great
-            news! The Fredericksburg Birding Club delivers all of this and more.
+            Whether you're just starting to notice the birds in your backyard or you're
+            a seasoned birder with a long life list, the Fredericksburg Birding Club
+            welcomes you. We are a community dedicated to the appreciation, conservation,
+            and study of birds in our region. Join us to explore local hotspots, learn
+            from experienced leaders, and connect with fellow nature enthusiasts.
           </Typography>
           <Typography variant="body1">
-            There are two levels of membership in the club, Basic and Full. Both
-            allow full participation in field trips and access to the club web site.
+            While not required to participate in events and meetings,
+            we encourage you to join as a supporting member to help fund our mission and
+            gain voting rights. We welcome everyone to come birding with us!
+          </Typography>
+          <Typography variant="body1" sx={{ mt: 2, fontStyle: 'italic', fontSize: '0.95rem' }}>
+            Note: Membership is for the calendar year and serves as a donation to the club. Dues are not prorated.
           </Typography>
         </CardContent>
       </Card>
 
-      {/* Membership Comparison Cards */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        {/* Basic Membership */}
-        <Grid item xs={12} md={6}>
-          <Card 
-            sx={{ 
-              height: '100%',
-              bgcolor: '#f5f5f5',
-              border: '2px solid #e0e0e0',
-              position: 'relative',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              borderRadius: 2,
-              transition: 'box-shadow 0.3s ease',
-              '&:hover': { boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }
-            }}
-          >
-            <Box sx={{ bgcolor: '#757575', color: 'white', p: 2, textAlign: 'center' }}>
-              <Chip 
-                label="FREE" 
-                size="small"
-                sx={{ 
-                  bgcolor: 'white', 
-                  color: '#757575',
-                  fontWeight: 'bold',
-                  mb: 1
-                }} 
-              />
-              <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                Basic Membership
+      {/* Membership Card */}
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+        <Card
+          sx={{
+            maxWidth: 600,
+            width: '100%',
+            bgcolor: '#e8f5e9',
+            border: '3px solid #2c5f2d',
+            position: 'relative',
+            boxShadow: '0 4px 12px rgba(44, 95, 45, 0.2)',
+            borderRadius: 2,
+            transition: 'box-shadow 0.3s ease',
+            '&:hover': { boxShadow: '0 6px 20px rgba(44, 95, 45, 0.3)' }
+          }}
+        >
+          <Box sx={{ bgcolor: '#2c5f2d', color: 'white', p: 3, textAlign: 'center' }}>
+            <Typography variant="h4" sx={{ fontWeight: 600 }}>
+              Membership
+            </Typography>
+            <Typography variant="h6" sx={{ mt: 1, opacity: 0.9 }}>
+              $20 Individual / $25 Family
+            </Typography>
+          </Box>
+          <CardContent sx={{ p: 4 }}>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 4, textAlign: 'center' }}>
+              Support the club and gain full voting rights by becoming a member.
+            </Typography>
+
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+                Membership Benefits:
               </Typography>
-            </Box>
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Perfect for individuals who will occasionally participate in club events.
-              </Typography>
-              
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-                  What's Included:
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                <CheckCircleIcon sx={{ color: '#2c5f2d', mr: 2, mt: 0.5 }} />
+                <Typography variant="body1">
+                  Voting rights at club meetings and officer elections
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
-                  <CheckCircleIcon sx={{ color: '#757575', mr: 1, fontSize: 20 }} />
-                  <Typography variant="body2">
-                    Participation in regular club field trips
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
-                  <CheckCircleIcon sx={{ color: '#757575', mr: 1, fontSize: 20 }} />
-                  <Typography variant="body2">
-                    Access to club website and resources
-                  </Typography>
-                </Box>
               </Box>
-
-              <Button 
-                variant="outlined" 
-                fullWidth
-                size="large"
-                href="mailto:admin@fredbirds.com?subject=Basic Membership"
-                sx={{ 
-                  borderColor: '#757575',
-                  color: '#757575',
-                  py: 1.5,
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  '&:hover': {
-                    borderColor: '#616161',
-                    bgcolor: 'rgba(117, 117, 117, 0.04)'
-                  }
-                }}
-              >
-                Join for Free
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Full Membership */}
-        <Grid item xs={12} md={6}>
-          <Card 
-            sx={{ 
-              height: '100%',
-              bgcolor: '#e8f5e9',
-              border: '3px solid #2c5f2d',
-              position: 'relative',
-              boxShadow: '0 4px 12px rgba(44, 95, 45, 0.2)',
-              borderRadius: 2,
-              transition: 'box-shadow 0.3s ease',
-              '&:hover': { boxShadow: '0 6px 20px rgba(44, 95, 45, 0.3)' }
-            }}
-          >
-            <Box sx={{ bgcolor: '#2c5f2d', color: 'white', p: 2, textAlign: 'center' }}>
-              <Chip 
-                label="RECOMMENDED" 
-                size="small"
-                sx={{ 
-                  bgcolor: '#66bb6a', 
-                  color: 'white',
-                  fontWeight: 'bold',
-                  mb: 1
-                }} 
-              />
-              <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                Full Membership
-              </Typography>
-              <Typography variant="h6" sx={{ mt: 1 }}>
-                $20 Individual / $25 Family
-              </Typography>
-            </Box>
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                For regular participants who want full access and voting rights in the club.
-              </Typography>
-              
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-                  Everything in Basic, plus:
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                <CheckCircleIcon sx={{ color: '#2c5f2d', mr: 2, mt: 0.5 }} />
+                <Typography variant="body1">
+                  Eligibility to hold club officer positions
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
-                  <CheckCircleIcon sx={{ color: '#2c5f2d', mr: 1, fontSize: 20 }} />
-                  <Typography variant="body2">
-                    Voting rights at club meetings
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
-                  <CheckCircleIcon sx={{ color: '#2c5f2d', mr: 1, fontSize: 20 }} />
-                  <Typography variant="body2">
-                    Eligibility for club officer positions
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
-                  <CheckCircleIcon sx={{ color: '#2c5f2d', mr: 1, fontSize: 20 }} />
-                  <Typography variant="body2">
-                    Support the club's activities and mission
-                  </Typography>
-                </Box>
               </Box>
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                <CheckCircleIcon sx={{ color: '#2c5f2d', mr: 2, mt: 0.5 }} />
+                <Typography variant="body1">
+                  Direct support for the club's conservation and education mission
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                <CheckCircleIcon sx={{ color: '#2c5f2d', mr: 2, mt: 0.5 }} />
+                <Typography variant="body1">
+                  Participation in all club activities and web resources
+                </Typography>
+              </Box>
+            </Box>
 
-              <Button 
-                variant="contained" 
-                fullWidth
-                size="large"
-                sx={{ 
+            <Button
+              variant="outlined"
+              fullWidth
+              size="large"
+              sx={{
+                py: 1.5,
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                textTransform: 'none',
+                color: '#2c5f2d',
+                borderColor: '#2c5f2d',
+                borderWidth: 2,
+                borderRadius: 50,
+                '&:hover': {
                   bgcolor: '#2c5f2d',
-                  py: 1.5,
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  boxShadow: '0 2px 4px rgba(44, 95, 45, 0.3)',
-                  '&:hover': {
-                    bgcolor: '#1e4620',
-                    boxShadow: '0 4px 8px rgba(44, 95, 45, 0.4)'
-                  }
-                }}
-                onClick={handleOpenJoinDialog}
-              >
-                Become a Full Member
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+                  color: 'white',
+                  borderColor: '#2c5f2d',
+                  borderWidth: 2
+                }
+              }}
+              onClick={handleOpenJoinDialog}
+            >
+              Become a Member
+            </Button>
+          </CardContent>
+        </Card>
+      </Box>
 
       {/* Join Dialog */}
       <Dialog open={openJoinDialog} onClose={handleCloseJoinDialog} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ bgcolor: '#2c5f2d', color: 'white' }}>
-          How to Join as a Full Member
+        <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>
+          How to Join
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
           <Typography variant="body1" paragraph sx={{ mt: 1 }}>
-            Our club is open to anyone who would like to join. To become a paid Full Member, 
+            Our club is open to anyone who would like to join. To become a paid Member,
             send a check made out to <strong>Fredericksburg Birding Club</strong> to:
           </Typography>
-          
+
           <Box sx={{ bgcolor: '#f5f5f5', p: 3, borderRadius: 1, mb: 3, textAlign: 'center' }}>
             <Typography variant="body1" sx={{ lineHeight: 2, fontWeight: 500 }}>
               Jeannie Hartzell<br />
@@ -235,28 +162,23 @@ export default function Membership() {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-            <EmailIcon sx={{ color: '#2c5f2d' }} />
+            <EmailIcon sx={{ color: 'primary.main' }} />
             <Typography variant="body2">
               <strong>Questions?</strong> Email us at{' '}
-              <a href="mailto:admin@fredbirds.com" style={{ color: '#2c5f2d', fontWeight: 600, textDecoration: 'none' }}>
+              <a href="mailto:admin@fredbirds.com" style={{ color: '#2d5016', fontWeight: 600, textDecoration: 'none' }}>
                 admin@fredbirds.com
               </a>
             </Typography>
           </Box>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button onClick={handleCloseJoinDialog} variant="outlined">
+          <Button onClick={handleCloseJoinDialog} variant="outlined" color="primary">
             Close
           </Button>
-          <Button 
-            href="mailto:admin@fredbirds.com?subject=Full Membership Inquiry"
+          <Button
+            href="mailto:admin@fredbirds.com?subject=Membership Inquiry"
             variant="contained"
-            sx={{ 
-              bgcolor: '#2c5f2d',
-              '&:hover': {
-                bgcolor: '#1e4620'
-              }
-            }}
+            color="primary"
           >
             Email Us
           </Button>
