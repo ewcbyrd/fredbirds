@@ -734,6 +734,6 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
         onClose={closeEvent}
         event={selected ? { ...selected, ...selected.resource } : null}
       />
-    </Box >
+    </Box>
   )
 }
