@@ -28,7 +28,7 @@ import MapIcon from '@mui/icons-material/Map'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'date-fns'
 import EventPhotoSection from './EventPhotoSection'
-import { getEventPhotos, getEventAttendees, registerForEvent, unregisterFromEvent, getMembers } from '../services/restdbService'
+import { getEventAttendees, registerForEvent, unregisterFromEvent, getMembers } from '../services/restdbService'
 import { useAuth0 } from '@auth0/auth0-react'
 
 const EventDetailsDialog = ({ open, onClose, event }) => {
