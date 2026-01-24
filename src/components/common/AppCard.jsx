@@ -5,7 +5,6 @@ import {
     CardContent,
     CardActionArea,
     Typography,
-    Box,
     useTheme
 } from '@mui/material'
 
