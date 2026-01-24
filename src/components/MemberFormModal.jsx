@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
   Button,
   Box,
@@ -15,11 +11,10 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem,
-  IconButton
+  MenuItem
 } from '@mui/material'
-import Close from '@mui/icons-material/Close'
 import { saveMember, patchMember, getMember } from '../services/restdbService'
+import AppDialog from './common/AppDialog'
 
 const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -35,7 +30,7 @@ const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
     showEmail: false,
     showPhone: false
   })
-  
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
@@ -80,21 +75,21 @@ const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
     let finalValue = type === 'checkbox' ? checked : value
-    
+
     // Format phone number if it's the phone field
     if (name === 'phone' && type !== 'checkbox') {
       finalValue = formatPhoneInput(value)
     }
-    
+
     const updates = {
       [name]: finalValue
     }
-    
+
     // If unchecking isOfficer, clear the position
     if (name === 'isOfficer' && !checked) {
       updates.position = null
     }
-    
+
     setFormData(prev => ({
       ...prev,
       ...updates
@@ -104,7 +99,7 @@ const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
   const formatPhoneInput = (value) => {
     // Remove all non-digit characters
     const cleaned = value.replace(/\D/g, '')
-    
+
     // Format as ###-###-#### (up to 10 digits)
     if (cleaned.length === 0) return ''
     if (cleaned.length <= 3) return cleaned
@@ -191,191 +186,178 @@ const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
 
   const title = member ? 'Edit Member' : 'Add New Member'
 
+  const actions = (
+    <>
+      <Button onClick={onClose} disabled={loading}>
+        Cancel
+      </Button>
+      <Button
+        onClick={handleSubmit}
+        variant="contained"
+        disabled={loading}
+        sx={{ position: 'relative' }}
+      >
+        {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
+        {member ? 'Update Member' : 'Create Member'}
+      </Button>
+    </>
+  )
+
   return (
-    <Dialog
+    <AppDialog
       open={open}
       onClose={onClose}
+      title={title}
+      actions={actions}
+      loading={loading}
       maxWidth="sm"
-      fullWidth
     >
-      <DialogTitle>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          {title}
-          <IconButton
-            edge="end"
-            color="inherit"
-            onClick={onClose}
-            aria-label="close"
+      <Box sx={{ pt: 1 }}>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        {success && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            Member {member ? 'updated' : 'created'} successfully!
+          </Alert>
+        )}
+
+        <Stack spacing={2}>
+          <TextField
+            label="First Name"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            fullWidth
             disabled={loading}
-          >
-            <Close />
-          </IconButton>
-        </Box>
-      </DialogTitle>
+            required
+          />
 
-      <DialogContent>
-        <Box sx={{ pt: 2 }}>
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
+          <TextField
+            label="Last Name"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            fullWidth
+            disabled={loading}
+            required
+          />
 
-          {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              Member {member ? 'updated' : 'created'} successfully!
-            </Alert>
-          )}
+          <TextField
+            label="Email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            fullWidth
+            disabled={loading}
+            required
+          />
 
-          <Stack spacing={2}>
-            <TextField
-              label="First Name"
-              name="firstName"
-              value={formData.firstName}
+          <TextField
+            label="Phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            fullWidth
+            disabled={loading}
+          />
+
+          <FormControl fullWidth disabled={loading}>
+            <InputLabel>Role</InputLabel>
+            <Select
+              name="role"
+              value={formData.role}
               onChange={handleChange}
-              fullWidth
-              disabled={loading}
-              required
-            />
+              label="Role"
+            >
+              <MenuItem value="Member">Member</MenuItem>
+              <MenuItem value="Officer">Officer</MenuItem>
+              <MenuItem value="Admin">Admin</MenuItem>
+            </Select>
+          </FormControl>
 
-            <TextField
-              label="Last Name"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              fullWidth
-              disabled={loading}
-              required
-            />
-
-            <TextField
-              label="Email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              fullWidth
-              disabled={loading}
-              required
-            />
-
-            <TextField
-              label="Phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              fullWidth
-              disabled={loading}
-            />
-
-            <FormControl fullWidth disabled={loading}>
-              <InputLabel>Role</InputLabel>
-              <Select
-                name="role"
-                value={formData.role}
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="isOfficer"
+                checked={formData.isOfficer}
                 onChange={handleChange}
-                label="Role"
-              >
-                <MenuItem value="Member">Member</MenuItem>
-                <MenuItem value="Officer">Officer</MenuItem>
-                <MenuItem value="Admin">Admin</MenuItem>
-              </Select>
-            </FormControl>
+                disabled={loading}
+              />
+            }
+            label="Is Officer"
+          />
 
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="isOfficer"
-                  checked={formData.isOfficer}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-              }
-              label="Is Officer"
-            />
+          <FormControl fullWidth disabled={loading}>
+            <InputLabel>Position</InputLabel>
+            <Select
+              name="position"
+              value={formData.position || ''}
+              onChange={handleChange}
+              label="Position"
+            >
+              <MenuItem value="">None</MenuItem>
+              <MenuItem value="President">President</MenuItem>
+              <MenuItem value="Treasurer">Treasurer</MenuItem>
+              <MenuItem value="Trip Coordinator">Trip Coordinator</MenuItem>
+              <MenuItem value="Web Master">Web Master</MenuItem>
+            </Select>
+          </FormControl>
 
-            <FormControl fullWidth disabled={loading}>
-              <InputLabel>Position</InputLabel>
-              <Select
-                name="position"
-                value={formData.position || ''}
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="isActive"
+                checked={formData.isActive}
                 onChange={handleChange}
-                label="Position"
-              >
-                <MenuItem value="">None</MenuItem>
-                <MenuItem value="President">President</MenuItem>
-                <MenuItem value="Treasurer">Treasurer</MenuItem>
-                <MenuItem value="Trip Coordinator">Trip Coordinator</MenuItem>
-                <MenuItem value="Web Master">Web Master</MenuItem>
-              </Select>
-            </FormControl>
+                disabled={loading}
+              />
+            }
+            label="Active Member"
+          />
 
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="isActive"
-                  checked={formData.isActive}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-              }
-              label="Active Member"
-            />
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="showInDirectory"
+                checked={formData.showInDirectory}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            }
+            label="Show in Member Directory"
+          />
 
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="showInDirectory"
-                  checked={formData.showInDirectory}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-              }
-              label="Show in Member Directory"
-            />
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="showEmail"
+                checked={formData.showEmail}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            }
+            label="Show Email Address"
+          />
 
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="showEmail"
-                  checked={formData.showEmail}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-              }
-              label="Show Email Address"
-            />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="showPhone"
-                  checked={formData.showPhone}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-              }
-              label="Show Phone Number"
-            />
-          </Stack>
-        </Box>
-      </DialogContent>
-
-      <DialogActions>
-        <Button onClick={onClose} disabled={loading}>
-          Cancel
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          disabled={loading}
-          sx={{ position: 'relative' }}
-        >
-          {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
-          {member ? 'Update Member' : 'Create Member'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="showPhone"
+                checked={formData.showPhone}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            }
+            label="Show Phone Number"
+          />
+        </Stack>
+      </Box>
+    </AppDialog>
   )
 }
 

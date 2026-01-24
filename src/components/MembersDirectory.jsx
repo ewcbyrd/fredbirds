@@ -11,12 +11,6 @@ import {
   Grid,
   Avatar,
   Box,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  ListItemButton,
-  Divider,
   TextField,
   InputAdornment,
   Alert,
@@ -36,6 +30,7 @@ import {
   WorkspacePremium
 } from '@mui/icons-material'
 import { getActiveMembers } from '../services/restdbService'
+import AppCard from './common/AppCard'
 
 const MembersDirectory = () => {
   const [members, setMembers] = useState([])
@@ -52,10 +47,10 @@ const MembersDirectory = () => {
       try {
         setLoading(true)
         setError(null)
-        
+
         const data = await getActiveMembers()
         console.log('Members data received:', data)
-        
+
         if (data && Array.isArray(data)) {
           // Sort members alphabetically by last name, then first name
           const sortedMembers = data.sort((a, b) => {
@@ -69,26 +64,26 @@ const MembersDirectory = () => {
                   first: parts.length > 1 ? parts.slice(0, -1).join(' ') : parts[0] || ''
                 }
               }
-              
+
               return {
                 last: member.lastName || member.last || '',
                 first: member.firstName || member.first || member.name || ''
               }
             }
-            
+
             const nameA = getNameParts(a)
             const nameB = getNameParts(b)
-            
+
             // First compare last names
             const lastNameComparison = nameA.last.localeCompare(nameB.last)
             if (lastNameComparison !== 0) {
               return lastNameComparison
             }
-            
+
             // If last names are equal, compare first names
             return nameA.first.localeCompare(nameB.first)
           })
-          
+
           // Filter members based on showInDirectory setting
           // Admins and Officers can see all members
           // Regular members can only see members who have showInDirectory enabled (or themselves)
@@ -97,17 +92,17 @@ const MembersDirectory = () => {
             if (isAdmin || isOfficer) {
               return true
             }
-            
+
             // Members can see themselves
             if (user?.email && member.email === user.email) {
               return true
             }
-            
+
             // Otherwise, respect the showInDirectory setting
             // Default to true if not set (backwards compatible)
             return member.showInDirectory !== false
           })
-          
+
           setMembers(visibleMembers)
           setFilteredMembers(visibleMembers)
         } else {
@@ -135,10 +130,10 @@ const MembersDirectory = () => {
       const fullName = formatName(member).toLowerCase()
       const email = (member.email || '').toLowerCase()
       const search = searchTerm.toLowerCase()
-      
+
       return fullName.includes(search) || email.includes(search)
     })
-    
+
     setFilteredMembers(filtered)
   }, [searchTerm, members])
 
@@ -157,20 +152,20 @@ const MembersDirectory = () => {
     if (member.Name) {
       return member.Name  // Capital N (officers data format)
     }
-    
+
     const firstName = member.firstName || member.first || ''
     const lastName = member.lastName || member.last || ''
     const fullName = `${firstName} ${lastName}`.trim()
-    
+
     if (fullName) {
       return fullName
     }
-    
+
     // Try single name field
     if (member.name) {
       return member.name
     }
-    
+
     return 'Name not provided'
   }
 
@@ -190,27 +185,27 @@ const MembersDirectory = () => {
       const nameParts = member.Name.split(' ')
       return nameParts.map(part => part.charAt(0)).join('').toUpperCase() || 'M'
     }
-    
+
     const firstName = member.firstName || member.first || ''
     const lastName = member.lastName || member.last || ''
     const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
-    
+
     if (initials.length > 0) {
       return initials
     }
-    
+
     // Try single name field
     if (member.name) {
       const nameParts = member.name.split(' ')
       return nameParts.map(part => part.charAt(0)).join('').toUpperCase() || 'M'
     }
-    
+
     return 'M'
   }
 
   const getMilestoneInfo = (member) => {
     const worldCount = member.worldCount || 0
-    
+
     if (worldCount >= 1000) {
       return {
         icon: Diamond,
@@ -244,7 +239,7 @@ const MembersDirectory = () => {
         level: 'accomplished'
       }
     }
-    
+
     return null
   }
 
@@ -311,7 +306,7 @@ const MembersDirectory = () => {
 
       {/* Stats */}
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-        <Chip 
+        <Chip
           icon={<Group />}
           label={`${filteredMembers.length} ${filteredMembers.length === 1 ? 'Member' : 'Members'}`}
           color="primary"
@@ -321,97 +316,85 @@ const MembersDirectory = () => {
       </Box>
 
       {/* Members List */}
-      <Card>
-        <CardContent sx={{ p: 0 }}>
-          {filteredMembers.length === 0 ? (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-              <Typography variant="body1" color="text.secondary">
-                {searchTerm ? 'No members found matching your search.' : 'No members found.'}
-              </Typography>
-            </Box>
-          ) : (
-            <List sx={{ p: 0 }}>
-              {filteredMembers.map((member, index) => (
-                <React.Fragment key={member._id || member.email || index}>
-                  <ListItem disablePadding>
-                    <ListItemButton
-                      onClick={() => handleMemberClick(member)}
-                      sx={{
-                        py: 2,
-                        px: 3,
-                        '&:hover': {
-                          backgroundColor: 'grey.50'
-                        }
-                      }}
-                    >
-                      <ListItemAvatar>
-                        <Avatar
-                          src={getPictureUrl(member.picture)}
+      {/* Members List */}
+      {filteredMembers.length === 0 ? (
+        <Card>
+          <CardContent sx={{ p: 4, textAlign: 'center' }}>
+            <Typography variant="body1" color="text.secondary">
+              {searchTerm ? 'No members found matching your search.' : 'No members found.'}
+            </Typography>
+          </CardContent>
+        </Card>
+      ) : (
+        <Grid container spacing={2}>
+          {filteredMembers.map((member, index) => (
+            <Grid item xs={12} sm={6} md={4} key={member._id || member.email || index}>
+              <AppCard
+                onClick={() => handleMemberClick(member)}
+                sx={{ height: '100%' }}
+                contentSx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', pt: 3 }}
+                customMedia={
+                  <Avatar
+                    src={getPictureUrl(member.picture)}
+                    sx={{
+                      bgcolor: 'primary.main',
+                      width: 80,
+                      height: 80,
+                      fontSize: '2rem',
+                      fontWeight: 600,
+                      mb: 2,
+                      mx: 'auto'
+                    }}
+                  >
+                    {getInitials(member)}
+                  </Avatar>
+                }
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, justifyContent: 'center' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    {formatName(member)}
+                  </Typography>
+                  {(() => {
+                    const milestone = getMilestoneInfo(member)
+                    if (milestone) {
+                      const IconComponent = milestone.icon
+                      return (
+                        <IconComponent
                           sx={{
-                            bgcolor: 'primary.main',
-                            width: 48,
-                            height: 48,
-                            fontSize: '1.2rem',
-                            fontWeight: 600
+                            color: milestone.color,
+                            fontSize: 24
                           }}
-                        >
-                          {getInitials(member)}
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
-                              {formatName(member)}
-                            </Typography>
-                            {(() => {
-                              const milestone = getMilestoneInfo(member)
-                              if (milestone) {
-                                const IconComponent = milestone.icon
-                                return (
-                                  <IconComponent 
-                                    sx={{ 
-                                      color: milestone.color,
-                                      fontSize: 20
-                                    }}
-                                    titleAccess={milestone.tooltip}
-                                  />
-                                )
-                              }
-                              return null
-                            })()} 
-                          </Box>
-                        }
-                        secondary={
-                          <Box>
-                            {(member.showEmail === true || isOwnProfile(member)) && (
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                                <Email fontSize="small" color="action" />
-                                <Typography variant="body2" color="text.secondary">
-                                  {member.email || 'Email not provided'}
-                                </Typography>
-                              </Box>
-                            )}
-                            {member.phone && (member.showPhone === true || isOwnProfile(member)) && (
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Phone fontSize="small" color="action" />
-                                <Typography variant="body2" color="text.secondary">
-                                  {formatPhone(member.phone)}
-                                </Typography>
-                              </Box>
-                            )}
-                          </Box>
-                        }
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                  {index < filteredMembers.length - 1 && <Divider />}
-                </React.Fragment>
-              ))}
-            </List>
-          )}
-        </CardContent>
-      </Card>
+                          titleAccess={milestone.tooltip}
+                        />
+                      )
+                    }
+                    return null
+                  })()}
+                </Box>
+
+                <Box sx={{ mt: 'auto', width: '100%' }}>
+                  {(member.showEmail === true || isOwnProfile(member)) && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, color: 'text.secondary' }}>
+                      <Email fontSize="small" color="action" />
+                      <Typography variant="body2" noWrap sx={{ maxWidth: '100%' }}>
+                        {member.email || 'Email not provided'}
+                      </Typography>
+                    </Box>
+                  )}
+                  {member.phone && (member.showPhone === true || isOwnProfile(member)) && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, color: 'text.secondary' }}>
+                      <Phone fontSize="small" color="action" />
+                      <Typography variant="body2">
+                        {formatPhone(member.phone)}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              </AppCard>
+            </Grid>
+          ))}
+        </Grid>
+      )}
 
       {/* Footer note */}
       <Box sx={{ mt: 3, textAlign: 'center' }}>

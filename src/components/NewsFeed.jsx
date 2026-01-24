@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Typography, Card, CardContent, CardActionArea, Grid, Select, MenuItem, FormControl, InputLabel, CircularProgress, CardMedia, Button } from '@mui/material'
+import { Box, Typography, Grid, Select, MenuItem, FormControl, InputLabel, CircularProgress, Button } from '@mui/material'
 import { Flaky as FeatherIcon } from '@mui/icons-material'
 import { getNewsFeeds, getFeed } from '../services/restdbService'
 import NewsFeedDetails from './NewsFeedDetails'
+import AppCard from './common/AppCard'
 
 export default function NewsFeed() {
   const [feeds, setFeeds] = useState([])
@@ -98,8 +99,8 @@ export default function NewsFeed() {
           <Typography variant="body1" sx={{ mb: 2 }}>
             RSS feed content is temporarily unavailable.
           </Typography>
-          <Button 
-            variant="outlined" 
+          <Button
+            variant="outlined"
             onClick={handleDirectLink}
             sx={{ mb: 2 }}
           >
@@ -115,70 +116,64 @@ export default function NewsFeed() {
         <Grid container spacing={2}>
           {articles.map((article) => (
             <Grid item xs={12} sm={6} md={4} key={article.id}>
-              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <CardActionArea 
-                  onClick={() => setSelectedArticle(article)}
-                  sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}
-                >
-                  {article.enclosure?.url ? (
-                    <CardMedia 
-                      component="img" 
-                      image={article.enclosure.url} 
-                      alt={article.title} 
-                      sx={{ height: 140, objectFit: 'cover', flexShrink: 0 }} 
-                    />
-                  ) : (
-                    <Box 
-                      sx={{ 
-                        height: 140, 
+              <AppCard
+                onClick={() => setSelectedArticle(article)}
+                image={article.enclosure?.url}
+                imageHeight={140}
+                customMedia={
+                  !article.enclosure?.url ? (
+                    <Box
+                      sx={{
+                        height: 140,
                         backgroundColor: 'grey.100',
                         flexShrink: 0,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         background: 'linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)'
-                      }} 
+                      }}
                     >
                       <Typography sx={{ fontSize: 48 }}>🦅</Typography>
                     </Box>
-                  )}
-                  <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                    <Typography 
-                      variant="h6" 
-                      sx={{ 
-                        fontSize: '1rem', 
-                        mb: 0.5, 
-                        fontWeight: 500,
-                        lineHeight: 1.2,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        minHeight: '2.4rem'
-                      }}
-                    >
-                      {article.title}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1, flexShrink: 0 }}>
-                      {article.pubDate || article.isoDate || ''}
-                    </Typography>
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary" 
-                      sx={{ 
-                        flexGrow: 1,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        lineHeight: 1.4
-                      }}
-                    >
-                      {article.description || ''}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
+                  ) : null
+                }
+                sx={{ height: '100%' }}
+                contentSx={{ display: 'flex', flexDirection: 'column' }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontSize: '1rem',
+                    mb: 0.5,
+                    fontWeight: 500,
+                    lineHeight: 1.2,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    minHeight: '2.4rem'
+                  }}
+                >
+                  {article.title}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1, flexShrink: 0 }}>
+                  {article.pubDate || article.isoDate || ''}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    flexGrow: 1,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    lineHeight: 1.4
+                  }}
+                >
+                  {article.description || ''}
+                </Typography>
+              </AppCard>
             </Grid>
           ))}
         </Grid>

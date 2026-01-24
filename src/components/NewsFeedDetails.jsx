@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, Link, CircularProgress } from '@mui/material'
+import { Button, Typography, Box, Link, CircularProgress } from '@mui/material'
 import { getFeed } from '../services/restdbService'
+import AppDialog from './common/AppDialog'
 
 export default function NewsFeedDetails({ item, feedUrl, index, open = !!item || !!feedUrl, onClose }) {
   const [loading, setLoading] = useState(false)
@@ -36,10 +37,21 @@ export default function NewsFeedDetails({ item, feedUrl, index, open = !!item ||
 
   if (!open) return null
 
+  const title = entry?.title || 'News item'
+  const actions = (
+    <Button onClick={onClose}>Close</Button>
+  )
+
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>{entry?.title || 'News item'}</DialogTitle>
-      <DialogContent dividers>
+    <AppDialog
+      open={open}
+      onClose={onClose}
+      title={title}
+      actions={actions}
+      loading={loading}
+      maxWidth="md"
+    >
+      <Box>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}><CircularProgress /></Box>
         ) : error ? (
@@ -54,15 +66,15 @@ export default function NewsFeedDetails({ item, feedUrl, index, open = !!item ||
 
             {entry.thumbnail || entry.enclosure?.url ? (
               <Box sx={{ textAlign: 'center', mb: 2 }}>
-                <img 
-                  src={entry.thumbnail || entry.enclosure?.url} 
-                  alt={entry.title} 
-                  style={{ 
-                    maxWidth: '100%', 
+                <img
+                  src={entry.thumbnail || entry.enclosure?.url}
+                  alt={entry.title}
+                  style={{
+                    maxWidth: '100%',
                     height: 'auto',
                     borderRadius: '8px',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                  }} 
+                  }}
                 />
               </Box>
             ) : null}
@@ -87,10 +99,7 @@ export default function NewsFeedDetails({ item, feedUrl, index, open = !!item ||
         ) : (
           <Typography>No content available for this news item.</Typography>
         )}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Close</Button>
-      </DialogActions>
-    </Dialog>
+      </Box>
+    </AppDialog>
   )
 }
