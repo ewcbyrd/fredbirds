@@ -90,7 +90,7 @@ const EventDetailsDialog = ({ open, onClose, event }) => {
           email: memberProfile.email,
           firstName: memberProfile.first,
           lastName: memberProfile.last,
-          eventTitle: event.event,
+          eventTitle: event.title || event.event,
           eventStart: event.start,
           eventEnd: event.end
         })
@@ -196,7 +196,7 @@ const EventDetailsDialog = ({ open, onClose, event }) => {
             fontSize: { xs: '1.75rem', md: '2.25rem' },
             lineHeight: 1.2
           }}>
-            {event.event}
+            {event.title || event.event}
           </Typography>
         </Box>
         <IconButton
