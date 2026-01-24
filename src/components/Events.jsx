@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar'
 import { format, parse, startOfWeek, getDay } from 'date-fns'
 import enUS from 'date-fns/locale/en-US'
@@ -170,7 +170,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
   const [selected, setSelected] = useState(null)
   const [currentDate, setCurrentDate] = useState(new Date())
 
-  useEffect(() => {
+  const loadEvents = useCallback(() => {
     setLoading(true)
     if (home) {
       getFutureEvents(new Date(), 3).then(res => {
@@ -199,6 +199,10 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
         })
     }
   }, [home])
+
+  useEffect(() => {
+    loadEvents()
+  }, [loadEvents])
 
 
 
@@ -242,7 +246,12 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
           lat: item.lat,
           lon: item.lon,
           tripLeader: item.tripLeader || null,
-          locations: item.locations || (item.lat && item.lon ? [{ lat: item.lat, lon: item.lon, name: '', address: '' }] : [])
+          lat: item.lat,
+          lon: item.lon,
+          tripLeader: item.tripLeader || null,
+          locations: item.locations || (item.lat && item.lon ? [{ lat: item.lat, lon: item.lon, name: '', address: '' }] : []),
+          originalStart: item.start,
+          originalEnd: item.end
         }
       }
     })
@@ -615,6 +624,10 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
         open={!!selected}
         onClose={closeEvent}
         event={selected ? { ...selected, ...selected.resource } : null}
+        onEventUpdated={() => {
+          loadEvents()
+          closeEvent()
+        }}
       />
     </Box>
   )
