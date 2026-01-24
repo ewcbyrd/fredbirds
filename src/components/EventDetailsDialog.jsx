@@ -25,22 +25,30 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import MapIcon from '@mui/icons-material/Map'
+import EditIcon from '@mui/icons-material/Edit'
+import PeopleIcon from '@mui/icons-material/People'
+import { useUserRole } from '../hooks/useUserRole'
+import EventFormModal from './EventFormModal'
+import ManageAttendeesModal from './ManageAttendeesModal'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'date-fns'
 import EventPhotoSection from './EventPhotoSection'
 import { getEventAttendees, registerForEvent, unregisterFromEvent, getMembers } from '../services/restdbService'
 import { useAuth0 } from '@auth0/auth0-react'
 
-const EventDetailsDialog = ({ open, onClose, event }) => {
+const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
   const { user, isAuthenticated } = useAuth0()
+  const { isOfficer, isAdmin } = useUserRole()
 
   // State
   const [attendees, setAttendees] = useState([])
   const [currentUserAttending, setCurrentUserAttending] = useState(false)
   const [loadingAction, setLoadingAction] = useState(false)
   const [memberProfile, setMemberProfile] = useState(null)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [attendeesModalOpen, setAttendeesModalOpen] = useState(false)
 
   const eventId = event ? (event._id || event.id) : null
 
@@ -160,15 +168,15 @@ const EventDetailsDialog = ({ open, onClose, event }) => {
     >
       {/* Premium Header */}
       <DialogTitle sx={{
-        p: 4,
-        pb: 3,
+        p: { xs: 2, md: 4 },
+        pb: { xs: 2, md: 3 },
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
         borderBottom: '1px solid rgba(0,0,0,0.06)',
         bgcolor: '#fff'
       }}>
-        <Box sx={{ pr: 6 }}>
+        <Box sx={{ pr: { xs: 0, md: 6 }, flex: 1 }}>
           <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
             {event.cancelled && (
               <Chip label="Cancelled" color="error" size="small" sx={{ fontWeight: 700, borderRadius: 1.5 }} />
@@ -199,17 +207,61 @@ const EventDetailsDialog = ({ open, onClose, event }) => {
             {event.title || event.event}
           </Typography>
         </Box>
-        <IconButton
-          onClick={onClose}
-          sx={{
-            mt: -1,
-            mr: -1,
-            bgcolor: 'rgba(0,0,0,0.03)',
-            '&:hover': { bgcolor: 'rgba(0,0,0,0.08)', color: 'error.main' }
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
+        <Box sx={{
+          display: 'flex',
+          gap: { xs: 0.5, md: 1 },
+          flexShrink: 0,
+          ml: 1,
+          position: { xs: 'absolute', md: 'static' },
+          top: { xs: 8, md: 'auto' },
+          right: { xs: 8, md: 'auto' },
+          bgcolor: { xs: 'rgba(255,255,255,0.9)', md: 'transparent' },
+          borderRadius: { xs: 4, md: 0 },
+          pl: { xs: 1, md: 0 } // Add some padding if background is used
+        }}>
+          {(isOfficer || isAdmin) && (
+            <>
+              <Tooltip title="Manage Attendees">
+                <IconButton
+                  onClick={() => setAttendeesModalOpen(true)}
+                  size={fullScreen ? "small" : "medium"}
+                  sx={{
+                    mt: { xs: 0, md: -1 },
+                    bgcolor: 'rgba(0,0,0,0.03)',
+                    '&:hover': { bgcolor: 'rgba(0,0,0,0.08)', color: 'primary.main' }
+                  }}
+                >
+                  <PeopleIcon fontSize={fullScreen ? "small" : "medium"} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Edit Event">
+                <IconButton
+                  onClick={() => setEditModalOpen(true)}
+                  size={fullScreen ? "small" : "medium"}
+                  sx={{
+                    mt: { xs: 0, md: -1 },
+                    bgcolor: 'rgba(0,0,0,0.03)',
+                    '&:hover': { bgcolor: 'rgba(0,0,0,0.08)', color: 'primary.main' }
+                  }}
+                >
+                  <EditIcon fontSize={fullScreen ? "small" : "medium"} />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
+          <IconButton
+            onClick={onClose}
+            size={fullScreen ? "small" : "medium"}
+            sx={{
+              mt: { xs: 0, md: -1 },
+              mr: { xs: 0, md: -1 },
+              bgcolor: 'rgba(0,0,0,0.03)',
+              '&:hover': { bgcolor: 'rgba(0,0,0,0.08)', color: 'error.main' }
+            }}
+          >
+            <CloseIcon fontSize={fullScreen ? "small" : "medium"} />
+          </IconButton>
+        </Box>
       </DialogTitle>
 
       <DialogContent sx={{ p: 0 }}>
@@ -515,6 +567,32 @@ const EventDetailsDialog = ({ open, onClose, event }) => {
           </Box>
         </Box>
       </DialogContent>
+      {editModalOpen && (
+        <EventFormModal
+          open={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          event={{
+            ...event,
+            start: event.originalStart || event.start,
+            end: event.originalEnd !== undefined ? event.originalEnd : event.end
+          }}
+          onSuccess={() => {
+            setEditModalOpen(false)
+            if (onEventUpdated) onEventUpdated()
+          }}
+        />
+      )}
+      {attendeesModalOpen && (
+        <ManageAttendeesModal
+          open={attendeesModalOpen}
+          onClose={() => setAttendeesModalOpen(false)}
+          event={event}
+          onSuccess={() => {
+            // Reload local event data to update attendee count/list in the dialog
+            loadEventData()
+          }}
+        />
+      )}
     </Dialog>
   )
 }
