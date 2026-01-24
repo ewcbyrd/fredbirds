@@ -1,28 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Box,
-  IconButton,
   Button,
-  Card,
-  CardContent,
-  CardActions,
-  CircularProgress,
-  Alert,
   Typography,
   Chip,
   Stack
 } from '@mui/material'
 import {
-  Add as AddIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon,
-  Close
+  Delete as DeleteIcon
 } from '@mui/icons-material'
 import { getAnnouncements, deleteAnnouncement } from '../services/restdbService'
 import AnnouncementFormModal from './AnnouncementFormModal'
+import AppDialog from './common/AppDialog'
+import ConfirmDialog from './common/ConfirmDialog'
+import AdminResourceList from './common/AdminResourceList'
+import AdminItemCard from './common/AdminItemCard'
 
 const ManageAnnouncementsDialog = ({ open, onClose }) => {
   const [announcements, setAnnouncements] = useState([])
@@ -32,6 +24,7 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null)
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [deleteLoading, setDeleteLoading] = useState(null)
+  const [deleteConfirmation, setDeleteConfirmation] = useState(null)
 
   useEffect(() => {
     if (open) {
@@ -44,25 +37,26 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
       setLoading(true)
       setError(null)
       const data = await getAnnouncements()
-      
+
       if (Array.isArray(data)) {
-        // Filter out expired announcements and sort by date (newest first)
+        // Filter out expired announcements (kept as is based on previous logic)
         const today = new Date()
         today.setHours(0, 0, 0, 0)
-        
+
+        // This logic filters out expired items for the list
         const nonExpiredAnnouncements = data.filter(announcement => {
           if (!announcement.expires) return true
           const expiresDate = new Date(announcement.expires)
           expiresDate.setHours(0, 0, 0, 0)
           return expiresDate >= today
         })
-        
+
         const sortedAnnouncements = nonExpiredAnnouncements.sort((a, b) => {
           const dateA = new Date(a.date || 0)
           const dateB = new Date(b.date || 0)
           return dateB - dateA
         })
-        
+
         setAnnouncements(sortedAnnouncements)
       }
     } catch (err) {
@@ -92,15 +86,18 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
     setFormModalOpen(true)
   }
 
-  const handleDeleteAnnouncement = async (announcement) => {
-    if (!window.confirm(`Are you sure you want to delete the announcement "${announcement.headline}"?`)) {
-      return
-    }
+  const handleDeleteClick = (announcement) => {
+    setDeleteConfirmation(announcement)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmation) return
 
     try {
-      setDeleteLoading(announcement._id)
-      await deleteAnnouncement(announcement._id)
+      setDeleteLoading(deleteConfirmation._id)
+      await deleteAnnouncement(deleteConfirmation._id)
       setRefreshTrigger(prev => prev + 1)
+      setDeleteConfirmation(null)
     } catch (err) {
       console.error('Error deleting announcement:', err)
       setError('Failed to delete announcement')
@@ -118,13 +115,70 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
     setRefreshTrigger(prev => prev + 1)
   }
 
+  // Render function for individual items
+  const renderAnnouncement = (announcement) => {
+    const actions = (
+      <>
+        <Button
+          size="small"
+          startIcon={<EditIcon />}
+          onClick={() => handleEditAnnouncement(announcement)}
+        >
+          Edit
+        </Button>
+        <Button
+          size="small"
+          startIcon={<DeleteIcon />}
+          color="error"
+          onClick={() => handleDeleteClick(announcement)}
+          disabled={deleteLoading === announcement._id}
+        >
+          Delete
+        </Button>
+      </>
+    )
+
+    return (
+      <AdminItemCard
+        key={announcement._id}
+        title={announcement.headline}
+        subtitle={`Created: ${formatDate(announcement.date)}`}
+        actions={actions}
+      >
+        <Typography
+          variant="body2"
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            mb: 1
+          }}
+        >
+          {announcement.details}
+        </Typography>
+        <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+          {announcement.expires && (
+            <Chip
+              label={`Expires: ${formatDate(announcement.expires)}`}
+              size="small"
+              variant="outlined"
+              color="warning"
+            />
+          )}
+        </Stack>
+      </AdminItemCard>
+    )
+  }
+
   return (
     <>
-      <Dialog
+      <AppDialog
         open={open}
         onClose={onClose}
+        title="Manage Announcements"
         maxWidth="md"
-        fullWidth
         PaperProps={{
           sx: {
             minHeight: '70vh',
@@ -132,115 +186,34 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
           }
         }}
       >
-        <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            Manage Announcements
-            <IconButton
-              edge="end"
-              color="inherit"
-              onClick={onClose}
-              aria-label="close"
-            >
-              <Close />
-            </IconButton>
-          </Box>
-        </DialogTitle>
-
-        <DialogContent>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreateClick}
-            sx={{ mb: 3 }}
-          >
-            Add New Announcement
-          </Button>
-
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-              <CircularProgress />
-            </Box>
-          ) : announcements.length === 0 ? (
-            <Alert severity="info">
-              No active announcements found. Create your first announcement!
-            </Alert>
-          ) : (
-            <Stack spacing={2}>
-              {announcements.map((announcement) => (
-                <Card key={announcement._id} variant="outlined">
-                  <CardContent>
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                      <Box sx={{ flex: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                          <Typography variant="h6" component="div">
-                            {announcement.headline}
-                          </Typography>
-                        </Box>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                          Created: {formatDate(announcement.date)}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            mb: 1
-                          }}
-                        >
-                          {announcement.details}
-                        </Typography>
-                        <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                          {announcement.expires && (
-                            <Chip
-                              label={`Expires: ${formatDate(announcement.expires)}`}
-                              size="small"
-                              variant="outlined"
-                              color="warning"
-                            />
-                          )}
-                        </Stack>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                  <CardActions>
-                    <Button
-                      size="small"
-                      startIcon={<EditIcon />}
-                      onClick={() => handleEditAnnouncement(announcement)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="small"
-                      startIcon={deleteLoading === announcement._id ? <CircularProgress size={16} /> : <DeleteIcon />}
-                      color="error"
-                      onClick={() => handleDeleteAnnouncement(announcement)}
-                      disabled={deleteLoading === announcement._id}
-                    >
-                      Delete
-                    </Button>
-                  </CardActions>
-                </Card>
-              ))}
-            </Stack>
-          )}
-        </DialogContent>
-      </Dialog>
+        <AdminResourceList
+          items={announcements}
+          renderItem={renderAnnouncement}
+          onAdd={handleCreateClick}
+          loading={loading}
+          error={error}
+          addButtonText="Add New Announcement"
+          emptyMessage="No active announcements found. Create your first announcement!"
+          showSearch={false} // Announcements don't have search implemented in this view yet
+        />
+      </AppDialog>
 
       <AnnouncementFormModal
         open={formModalOpen}
         onClose={handleFormModalClose}
         announcement={selectedAnnouncement}
         onSuccess={handleAnnouncementSaved}
+      />
+
+      <ConfirmDialog
+        open={!!deleteConfirmation}
+        onClose={() => setDeleteConfirmation(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Announcement"
+        message={`Are you sure you want to delete the announcement "${deleteConfirmation?.headline}"? This action cannot be undone.`}
+        confirmText="Delete"
+        confirmColor="error"
+        loading={!!deleteLoading}
       />
     </>
   )

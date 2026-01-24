@@ -8,39 +8,19 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
+
 import Box from '@mui/material/Box'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
-import Link from '@mui/material/Link'
-import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import VisibilityIcon from '@mui/icons-material/Visibility'
+
 import LocationOnIcon from '@mui/icons-material/LocationOn'
-import PeopleIcon from '@mui/icons-material/People'
-import PersonAddIcon from '@mui/icons-material/PersonAdd'
-import PersonIcon from '@mui/icons-material/Person'
-import DeleteIcon from '@mui/icons-material/Delete'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import Autocomplete from '@mui/material/Autocomplete'
-import TextField from '@mui/material/TextField'
-import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
-import ListItemText from '@mui/material/ListItemText'
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction'
-import IconButton from '@mui/material/IconButton'
+
 import ReactMarkdown from 'react-markdown'
-import { getEventsByYear, getFutureEvents, getEventAttendees, registerForEvent, unregisterFromEvent, getMembers } from '../services/restdbService'
-import AccessControl from './AccessControl'
-import EventPhotoSection from './EventPhotoSection'
+import { getEventsByYear, getFutureEvents } from '../services/restdbService'
 import EventDetailsDialog from './EventDetailsDialog'
-import { ACCESS_LEVELS } from '../hooks/useUserRole'
-import WeatherForecast from './WeatherForecast'
+import AppCard from './common/AppCard'
+
 
 const locales = {
   'en-US': enUS
@@ -184,19 +164,11 @@ const EventMap = ({ lat, lon, title, locations }) => {
 };
 
 export default function Events({ home = false, singleEvent = false, maxEvents = 5, onViewAll }) {
-  const [year, setYear] = useState(new Date().getFullYear())
   const [yearEvents, setYearEvents] = useState([])
   const [allEvents, setAllEvents] = useState([])
   const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState(null)
-  const [currentIdx, setCurrentIdx] = useState(0)
   const [currentDate, setCurrentDate] = useState(new Date())
-
-  // Attendee management state
-  const [attendees, setAttendees] = useState([])
-  const [allMembers, setAllMembers] = useState([])
-  const [selectedMember, setSelectedMember] = useState(null)
-  const [loadingAttendees, setLoadingAttendees] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -228,16 +200,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
     }
   }, [home])
 
-  // Load all members for attendee selection
-  useEffect(() => {
-    console.log('Loading members...')
-    getMembers().then(members => {
-      console.log('Members loaded:', members)
-      setAllMembers(members || [])
-    }).catch(err => {
-      console.error('Error loading members:', err)
-    })
-  }, [])
+
 
   // Debug: Log selected event
   useEffect(() => {
@@ -299,68 +262,13 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
 
   function handleSelectEvent(event) {
     setSelected(event)
-    // Load attendees for this event
-    if (event && event.id) {
-      setLoadingAttendees(true)
-      getEventAttendees(event.id)
-        .then(data => {
-          setAttendees(data.attendees || [])
-          setLoadingAttendees(false)
-        })
-        .catch(err => {
-          console.error('Error loading attendees:', err)
-          setAttendees([])
-          setLoadingAttendees(false)
-        })
-    }
   }
 
   function closeEvent() {
     setSelected(null)
-    setAttendees([])
-    setSelectedMember(null)
   }
 
-  async function handleAddAttendee() {
-    if (!selectedMember || !selected) return
 
-    try {
-      await registerForEvent(selected.id, {
-        memberId: selectedMember._id,
-        email: selectedMember.email,
-        firstName: selectedMember.first,
-        lastName: selectedMember.last,
-        eventTitle: selected.title,
-        eventStart: selected.resource.start,
-        eventEnd: selected.resource.end
-      })
-
-      // Reload attendees
-      const data = await getEventAttendees(selected.id)
-      setAttendees(data.attendees || [])
-      setSelectedMember(null)
-    } catch (err) {
-      console.error('Error adding attendee:', err)
-      alert(err.message || 'Failed to add attendee')
-    }
-  }
-
-  async function handleRemoveAttendee(memberId) {
-    if (!selected) return
-
-    if (!confirm('Remove this attendee from the event?')) return
-
-    try {
-      await unregisterFromEvent(selected.id, memberId)
-
-      // Reload attendees
-      const data = await getEventAttendees(selected.id)
-      setAttendees(data.attendees || [])
-    } catch (err) {
-      console.error('Error removing attendee:', err)
-      alert('Failed to remove attendee')
-    }
-  }
 
   if (loading) return <Typography>Loading...</Typography>
 
@@ -395,98 +303,85 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
 
               return (
                 <Grid item xs={12} md={4} key={event.id || idx}>
-                  <Card
-                    sx={{
-                      height: '100%',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      borderRadius: 2,
-                      overflow: 'hidden',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                      '&:hover': {
-                        boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-                        transform: 'translateY(-2px)'
-                      }
-                    }}
+                  <AppCard
+                    sx={{ height: '100%' }}
                     onClick={() => handleSelectEvent(event)}
                   >
-                    <CardContent sx={{ py: 2, height: '100%', display: 'flex', flexDirection: 'column', '&:last-child': { pb: 2 } }}>
-                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', mb: 2 }}>
-                        {/* Date box */}
-                        <Box
-                          sx={{
-                            minWidth: 60,
-                            textAlign: 'center',
-                            bgcolor: event.resource?.cancelled ? '#d32f2f' : '#2c5f2d',
-                            color: 'white',
-                            borderRadius: 1,
-                            p: 1,
-                            flexShrink: 0
-                          }}
-                        >
-                          <Typography variant="h5" sx={{ fontWeight: 'bold', lineHeight: 1 }}>
-                            {event.start.getDate()}
-                          </Typography>
-                          <Typography variant="caption" sx={{ textTransform: 'uppercase', fontSize: '0.65rem' }}>
-                            {event.start.toLocaleDateString('en-US', { month: 'short' })}
-                          </Typography>
-                        </Box>
-
-                        {/* Event details */}
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', mb: 0.5, flexWrap: 'wrap' }}>
-                            <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem' }}>
-                              {event.title}
-                            </Typography>
-                          </Box>
-                          {isMultiDay && (
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                              {event.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {actualEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                            </Typography>
-                          )}
-                          {event.resource?.cancelled && (
-                            <Typography
-                              component="span"
-                              variant="caption"
-                              sx={{
-                                bgcolor: '#ffebee',
-                                color: '#d32f2f',
-                                px: 1,
-                                py: 0.25,
-                                borderRadius: 1,
-                                fontWeight: 500,
-                                display: 'inline-block'
-                              }}
-                            >
-                              Cancelled
-                            </Typography>
-                          )}
-                        </Box>
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', mb: 2 }}>
+                      {/* Date box */}
+                      <Box
+                        sx={{
+                          minWidth: 60,
+                          textAlign: 'center',
+                          bgcolor: event.resource?.cancelled ? '#d32f2f' : '#2c5f2d',
+                          color: 'white',
+                          borderRadius: 1,
+                          p: 1,
+                          flexShrink: 0
+                        }}
+                      >
+                        <Typography variant="h5" sx={{ fontWeight: 'bold', lineHeight: 1 }}>
+                          {event.start.getDate()}
+                        </Typography>
+                        <Typography variant="caption" sx={{ textTransform: 'uppercase', fontSize: '0.65rem' }}>
+                          {event.start.toLocaleDateString('en-US', { month: 'short' })}
+                        </Typography>
                       </Box>
 
-                      {event.resource?.details && (
-                        <Typography
-                          variant="body2"
-                          component="div"
-                          color="text.secondary"
-                          sx={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 3,
-                            WebkitBoxOrient: 'vertical',
-                            '& > div': {
-                              margin: 0,
-                              fontSize: '0.875rem',
-                              color: 'text.secondary'
-                            }
-                          }}
-                        >
-                          {formatEventDetails(event.resource.details)}
-                        </Typography>
-                      )}
-                    </CardContent>
-                  </Card>
+                      {/* Event details */}
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', mb: 0.5, flexWrap: 'wrap' }}>
+                          <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem' }}>
+                            {event.title}
+                          </Typography>
+                        </Box>
+                        {isMultiDay && (
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                            {event.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {actualEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </Typography>
+                        )}
+                        {event.resource?.cancelled && (
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            sx={{
+                              bgcolor: '#ffebee',
+                              color: '#d32f2f',
+                              px: 1,
+                              py: 0.25,
+                              borderRadius: 1,
+                              fontWeight: 500,
+                              display: 'inline-block'
+                            }}
+                          >
+                            Cancelled
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+
+                    {event.resource?.details && (
+                      <Typography
+                        variant="body2"
+                        component="div"
+                        color="text.secondary"
+                        sx={{
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: 'vertical',
+                          '& > div': {
+                            margin: 0,
+                            fontSize: '0.875rem',
+                            color: 'text.secondary'
+                          }
+                        }}
+                      >
+                        {formatEventDetails(event.resource.details)}
+                      </Typography>
+                    )}
+                  </AppCard>
                 </Grid>
               )
             })}
@@ -500,115 +395,102 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
             const isMultiDay = actualEnd && actualEnd.toDateString() !== event.start.toDateString()
 
             return (
-              <Card
+              <AppCard
                 key={event.id || idx}
-                sx={{
-                  mb: 2,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  borderRadius: 2,
-                  overflow: 'hidden',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  '&:hover': {
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-                    transform: 'translateY(-2px)'
-                  }
-                }}
+                sx={{ mb: 2 }}
                 onClick={() => handleSelectEvent(event)}
               >
-                <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                    {/* Date box */}
-                    <Box
-                      sx={{
-                        minWidth: 70,
-                        textAlign: 'center',
-                        bgcolor: event.resource?.cancelled ? '#d32f2f' : '#2c5f2d',
-                        color: 'white',
-                        borderRadius: 1,
-                        p: 1,
-                        flexShrink: 0
-                      }}
-                    >
-                      <Typography variant="h5" sx={{ fontWeight: 'bold', lineHeight: 1 }}>
-                        {event.start.getDate()}
-                      </Typography>
-                      <Typography variant="caption" sx={{ textTransform: 'uppercase', fontSize: '0.65rem' }}>
-                        {event.start.toLocaleDateString('en-US', { month: 'short' })}
-                      </Typography>
-                    </Box>
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                  {/* Date box */}
+                  <Box
+                    sx={{
+                      minWidth: 70,
+                      textAlign: 'center',
+                      bgcolor: event.resource?.cancelled ? '#d32f2f' : '#2c5f2d',
+                      color: 'white',
+                      borderRadius: 1,
+                      p: 1,
+                      flexShrink: 0
+                    }}
+                  >
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', lineHeight: 1 }}>
+                      {event.start.getDate()}
+                    </Typography>
+                    <Typography variant="caption" sx={{ textTransform: 'uppercase', fontSize: '0.65rem' }}>
+                      {event.start.toLocaleDateString('en-US', { month: 'short' })}
+                    </Typography>
+                  </Box>
 
-                    {/* Event details */}
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 0.5, flexWrap: 'wrap' }}>
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          {event.title}
-                        </Typography>
-                        {isMultiDay && (
-                          <Typography
-                            component="span"
-                            variant="caption"
-                            sx={{
-                              bgcolor: '#e3f2fd',
-                              color: '#1976d2',
-                              px: 1,
-                              py: 0.25,
-                              borderRadius: 1,
-                              fontWeight: 500
-                            }}
-                          >
-                            Multi-day
-                          </Typography>
-                        )}
-                        {event.resource?.cancelled && (
-                          <Typography
-                            component="span"
-                            variant="caption"
-                            sx={{
-                              bgcolor: '#ffebee',
-                              color: '#d32f2f',
-                              px: 1,
-                              py: 0.25,
-                              borderRadius: 1,
-                              fontWeight: 500
-                            }}
-                          >
-                            Cancelled
-                          </Typography>
-                        )}
-                      </Box>
-
+                  {/* Event details */}
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 0.5, flexWrap: 'wrap' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        {event.title}
+                      </Typography>
                       {isMultiDay && (
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                          {event.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {actualEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </Typography>
-                      )}
-
-                      {event.resource?.details && (
                         <Typography
-                          variant="body2"
-                          component="div"
-                          color="text.secondary"
+                          component="span"
+                          variant="caption"
                           sx={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            '& > div': {
-                              margin: 0,
-                              fontSize: '0.875rem',
-                              color: 'text.secondary'
-                            }
+                            bgcolor: '#e3f2fd',
+                            color: '#1976d2',
+                            px: 1,
+                            py: 0.25,
+                            borderRadius: 1,
+                            fontWeight: 500
                           }}
                         >
-                          {formatEventDetails(event.resource.details)}
+                          Multi-day
+                        </Typography>
+                      )}
+                      {event.resource?.cancelled && (
+                        <Typography
+                          component="span"
+                          variant="caption"
+                          sx={{
+                            bgcolor: '#ffebee',
+                            color: '#d32f2f',
+                            px: 1,
+                            py: 0.25,
+                            borderRadius: 1,
+                            fontWeight: 500
+                          }}
+                        >
+                          Cancelled
                         </Typography>
                       )}
                     </Box>
+
+                    {isMultiDay && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                        {event.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {actualEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </Typography>
+                    )}
+
+                    {event.resource?.details && (
+                      <Typography
+                        variant="body2"
+                        component="div"
+                        color="text.secondary"
+                        sx={{
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          '& > div': {
+                            margin: 0,
+                            fontSize: '0.875rem',
+                            color: 'text.secondary'
+                          }
+                        }}
+                      >
+                        {formatEventDetails(event.resource.details)}
+                      </Typography>
+                    )}
                   </Box>
-                </CardContent>
-              </Card>
+                </Box>
+              </AppCard>
             )
           })
         )}
