@@ -12,7 +12,8 @@ A standardized wrapper for Material-UI Dialogs, handling titles, closing behavio
 - `title` (string): Title of the dialog.
 - `loading` (bool): If true, disables close actions and shows loading behavior (if applicable).
 - `actions` (node): Buttons/actions for the dialog footer.
-- `fullScreen` / `mobileFullScreen` (bool): Helper props for responsive sizing.
+- `fullScreen` (bool): Force full screen mode.
+- `mobileFullScreen` (bool): Enable full screen on mobile devices only.
 
 **Usage:**
 
