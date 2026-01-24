@@ -79,6 +79,7 @@ A standardized list container dealing with loading states, error states, and emp
 - `onAdd` (func): Callback for the "Add New" button.
 - `onSearch` (func): Callback for search input.
 - `loading` (bool): Loading state.
+- `error` (string|null): Error message to display. If provided, shows an error alert above the list.
 
 **Usage:**
 ```jsx
