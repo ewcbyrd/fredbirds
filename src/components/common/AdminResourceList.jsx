@@ -6,8 +6,7 @@ import {
     InputAdornment,
     CircularProgress,
     Alert,
-    Stack,
-    Typography
+    Stack
 } from '@mui/material'
 import {
     Search as SearchIcon,
