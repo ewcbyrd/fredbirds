@@ -343,6 +343,7 @@ const MembersDirectory = () => {
                       fontSize: '2rem',
                       fontWeight: 600,
                       mb: 2,
+                      mt: 5,
                       mx: 'auto'
                     }}
                   >
