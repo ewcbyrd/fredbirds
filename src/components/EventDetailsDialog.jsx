@@ -177,16 +177,35 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
     >
       {/* Premium Header */}
       <DialogTitle sx={{
-        p: { xs: 2, md: 4 },
+        p: { xs: 2.5, md: 4 }, // slightly more padding on mobile
         pb: { xs: 2, md: 3 },
         display: 'flex',
+        flexDirection: { xs: 'column', md: 'row' }, // Stack on mobile
         justifyContent: 'space-between',
         alignItems: 'flex-start',
         borderBottom: '1px solid rgba(0,0,0,0.06)',
-        bgcolor: '#fff'
+        bgcolor: '#fff',
+        position: 'relative' // For absolute close button
       }}>
-        <Box sx={{ pr: { xs: 0, md: 6 }, flex: 1 }}>
-          <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+        {/* Close Button - Pinned Top Right on Mobile */}
+        <IconButton
+          onClick={onClose}
+          size={fullScreen ? "small" : "medium"}
+          sx={{
+            position: { xs: 'absolute', md: 'static' },
+            top: { xs: 8 },
+            right: { xs: 8 },
+            ml: { md: 1 },
+            bgcolor: 'rgba(0,0,0,0.03)',
+            '&:hover': { bgcolor: 'rgba(0,0,0,0.08)', color: 'error.main' },
+            zIndex: 10
+          }}
+        >
+          <CloseIcon fontSize={fullScreen ? "small" : "medium"} />
+        </IconButton>
+
+        <Box sx={{ pr: { xs: 4, md: 2 }, width: '100%' }}>
+          <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}>
             {currentEvent.cancelled && (
               <Chip label="Cancelled" color="error" size="small" sx={{ fontWeight: 700, borderRadius: 1.5 }} />
             )}
@@ -215,74 +234,71 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
           }}>
             {currentEvent.title || currentEvent.event}
           </Typography>
-        </Box>
-        <Box sx={{
-          display: 'flex',
-          gap: { xs: 0.5, md: 1 },
-          flexShrink: 0,
-          ml: 1,
-          pl: { xs: 1, md: 0 }, // Add some padding if background is used
-          position: { xs: 'static', md: 'static' } // ensure buttons are not absolute on mobile
-        }}>
+
+          {/* Action Buttons - Below title on mobile, right aligned on desktop */}
           {(isOfficer || isAdmin) && (
-            <>
-              <Tooltip title="Add Location">
-                <IconButton
-                  onClick={() => {
-                    setEditingLocationIndex(null)
-                    setLocationModalOpen(true)
-                  }}
-                  size={fullScreen ? "small" : "medium"}
-                  sx={{
-                    mt: { xs: 0, md: -1 },
-                    bgcolor: 'rgba(0,0,0,0.03)',
-                    '&:hover': { bgcolor: 'rgba(0,0,0,0.08)', color: 'primary.main' }
-                  }}
-                >
-                  <AddLocationIcon fontSize={fullScreen ? "small" : "medium"} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Manage Attendees">
-                <IconButton
-                  onClick={() => setAttendeesModalOpen(true)}
-                  size={fullScreen ? "small" : "medium"}
-                  sx={{
-                    mt: { xs: 0, md: -1 },
-                    bgcolor: 'rgba(0,0,0,0.03)',
-                    '&:hover': { bgcolor: 'rgba(0,0,0,0.08)', color: 'primary.main' }
-                  }}
-                >
-                  <PeopleIcon fontSize={fullScreen ? "small" : "medium"} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Edit Event">
-                <IconButton
-                  onClick={() => setEditModalOpen(true)}
-                  size={fullScreen ? "small" : "medium"}
-                  sx={{
-                    mt: { xs: 0, md: -1 },
-                    bgcolor: 'rgba(0,0,0,0.03)',
-                    '&:hover': { bgcolor: 'rgba(0,0,0,0.08)', color: 'primary.main' }
-                  }}
-                >
-                  <EditIcon fontSize={fullScreen ? "small" : "medium"} />
-                </IconButton>
-              </Tooltip>
-            </>
+            <Box sx={{
+              display: 'flex',
+              gap: 1,
+              mt: { xs: 2, md: 0 },
+              ...(fullScreen ? {} : { float: 'right' }) // On desktop, float them or use flex order? Flex is better.
+            }}>
+              {/* Wrap in a Box that we can position */}
+            </Box>
           )}
-          <IconButton
-            onClick={onClose}
-            size={fullScreen ? "small" : "medium"}
-            sx={{
-              mt: { xs: 0, md: -1 },
-              mr: { xs: 0, md: -1 },
-              bgcolor: 'rgba(0,0,0,0.03)',
-              '&:hover': { bgcolor: 'rgba(0,0,0,0.08)', color: 'error.main' }
-            }}
-          >
-            <CloseIcon fontSize={fullScreen ? "small" : "medium"} />
-          </IconButton>
         </Box>
+
+        {/* Desktop Action Buttons Container */}
+        {(isOfficer || isAdmin) && (
+          <Box sx={{
+            display: 'flex',
+            gap: 1,
+            mt: { xs: 2, md: 0 },
+            alignSelf: { xs: 'flex-start', md: 'flex-start' },
+            flexShrink: 0
+          }}>
+            <Tooltip title="Add Location">
+              <IconButton
+                onClick={() => {
+                  setEditingLocationIndex(null)
+                  setLocationModalOpen(true)
+                }}
+                size="small" // force small on all sizes for better fit
+                sx={{
+                  bgcolor: 'rgba(0,0,0,0.03)',
+                  '&:hover': { bgcolor: 'rgba(0,0,0,0.08)', color: 'primary.main' }
+                }}
+              >
+                <AddLocationIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Manage Attendees">
+              <IconButton
+                onClick={() => setAttendeesModalOpen(true)}
+                size="small"
+                sx={{
+                  bgcolor: 'rgba(0,0,0,0.03)',
+                  '&:hover': { bgcolor: 'rgba(0,0,0,0.08)', color: 'primary.main' }
+                }}
+              >
+                <PeopleIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Edit Event">
+              <IconButton
+                onClick={() => setEditModalOpen(true)}
+                size="small"
+                sx={{
+                  bgcolor: 'rgba(0,0,0,0.03)',
+                  '&:hover': { bgcolor: 'rgba(0,0,0,0.08)', color: 'primary.main' }
+                }}
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        )}
+
       </DialogTitle>
 
       <DialogContent sx={{ p: 0 }}>
