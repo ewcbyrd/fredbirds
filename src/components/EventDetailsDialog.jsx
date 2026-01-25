@@ -9,7 +9,6 @@ import {
   Typography,
   Chip,
   Stack,
-  Divider,
   Link,
   Avatar,
   AvatarGroup,
@@ -19,7 +18,7 @@ import {
   Paper
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import LocationOnIcon from '@mui/icons-material/LocationOn'
+import AddLocationIcon from '@mui/icons-material/AddLocation'
 import PersonIcon from '@mui/icons-material/Person'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
@@ -30,6 +29,9 @@ import PeopleIcon from '@mui/icons-material/People'
 import { useUserRole } from '../hooks/useUserRole'
 import EventFormModal from './EventFormModal'
 import ManageAttendeesModal from './ManageAttendeesModal'
+// turbo
+import LocationDialog from './LocationDialog'
+import EventMap from './EventMap'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'date-fns'
 import EventPhotoSection from './EventPhotoSection'
@@ -49,10 +51,17 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
   const [memberProfile, setMemberProfile] = useState(null)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [attendeesModalOpen, setAttendeesModalOpen] = useState(false)
+  const [locationModalOpen, setLocationModalOpen] = useState(false)
+  const [editingLocationIndex, setEditingLocationIndex] = useState(null)
+  const [currentEvent, setCurrentEvent] = useState(event)
 
-  const eventId = event ? (event._id || event.id) : null
+  const eventId = currentEvent ? (currentEvent._id || currentEvent.id) : null
 
   // Effects
+  useEffect(() => {
+    setCurrentEvent(event)
+  }, [event])
+
   useEffect(() => {
     if (open && eventId) {
       loadEventData()
@@ -68,7 +77,7 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
     }
   }, [isAuthenticated, user])
 
-  if (!event) return null
+  if (!currentEvent) return null
 
   const loadEventData = async () => {
     try {
@@ -98,9 +107,9 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
           email: memberProfile.email,
           firstName: memberProfile.first,
           lastName: memberProfile.last,
-          eventTitle: event.title || event.event,
-          eventStart: event.start,
-          eventEnd: event.end
+          eventTitle: currentEvent.title || currentEvent.event,
+          eventStart: currentEvent.start,
+          eventEnd: currentEvent.end
         })
       }
       await loadEventData()
@@ -147,7 +156,7 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
     return start > today
   }
 
-  const locations = event.locations || (event.lat && event.lon ? [{ name: 'Event Location', lat: event.lat, lon: event.lon }] : [])
+  const locations = currentEvent.locations || (currentEvent.lat && currentEvent.lon ? [{ name: 'Event Location', lat: currentEvent.lat, lon: currentEvent.lon }] : [])
 
   return (
     <Dialog
@@ -178,15 +187,15 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
       }}>
         <Box sx={{ pr: { xs: 0, md: 6 }, flex: 1 }}>
           <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-            {event.cancelled && (
+            {currentEvent.cancelled && (
               <Chip label="Cancelled" color="error" size="small" sx={{ fontWeight: 700, borderRadius: 1.5 }} />
             )}
-            {isPastEvent(event) && (
+            {isPastEvent(currentEvent) && (
               <Chip label="Past Event" variant="outlined" size="small" sx={{ borderColor: 'text.disabled', color: 'text.disabled' }} />
             )}
             <Chip
               icon={<CalendarTodayIcon sx={{ fontSize: '0.9rem !important' }} />}
-              label={formatDateRange(event.start, event.end)}
+              label={formatDateRange(currentEvent.start, currentEvent.end)}
               size="small"
               sx={{
                 bgcolor: 'rgba(44, 95, 45, 0.08)',
@@ -204,7 +213,7 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
             fontSize: { xs: '1.75rem', md: '2.25rem' },
             lineHeight: 1.2
           }}>
-            {event.title || event.event}
+            {currentEvent.title || currentEvent.event}
           </Typography>
         </Box>
         <Box sx={{
@@ -212,15 +221,27 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
           gap: { xs: 0.5, md: 1 },
           flexShrink: 0,
           ml: 1,
-          position: { xs: 'absolute', md: 'static' },
-          top: { xs: 8, md: 'auto' },
-          right: { xs: 8, md: 'auto' },
-          bgcolor: { xs: 'rgba(255,255,255,0.9)', md: 'transparent' },
-          borderRadius: { xs: 4, md: 0 },
-          pl: { xs: 1, md: 0 } // Add some padding if background is used
+          pl: { xs: 1, md: 0 }, // Add some padding if background is used
+          position: { xs: 'static', md: 'static' } // ensure buttons are not absolute on mobile
         }}>
           {(isOfficer || isAdmin) && (
             <>
+              <Tooltip title="Add Location">
+                <IconButton
+                  onClick={() => {
+                    setEditingLocationIndex(null)
+                    setLocationModalOpen(true)
+                  }}
+                  size={fullScreen ? "small" : "medium"}
+                  sx={{
+                    mt: { xs: 0, md: -1 },
+                    bgcolor: 'rgba(0,0,0,0.03)',
+                    '&:hover': { bgcolor: 'rgba(0,0,0,0.08)', color: 'primary.main' }
+                  }}
+                >
+                  <AddLocationIcon fontSize={fullScreen ? "small" : "medium"} />
+                </IconButton>
+              </Tooltip>
               <Tooltip title="Manage Attendees">
                 <IconButton
                   onClick={() => setAttendeesModalOpen(true)}
@@ -307,11 +328,11 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
                 },
               }}
             >
-              <ReactMarkdown>{event.details || 'No details provided.'}</ReactMarkdown>
+              <ReactMarkdown>{currentEvent.details || 'No details provided.'}</ReactMarkdown>
             </Box>
 
             {/* Trip Reports Link Card */}
-            {(event.ebirdTripUrl || event.eBirdTripUrl || event.ebird_trip_url) && (
+            {(currentEvent.ebirdTripUrl || currentEvent.eBirdTripUrl || currentEvent.ebird_trip_url) && (
               <Paper
                 elevation={0}
                 sx={{
@@ -348,7 +369,7 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
                 <Button
                   variant="contained"
                   endIcon={<OpenInNewIcon />}
-                  href={event.ebirdTripUrl || event.eBirdTripUrl || event.ebird_trip_url}
+                  href={currentEvent.ebirdTripUrl || currentEvent.eBirdTripUrl || currentEvent.ebird_trip_url}
                   target="_blank"
                   sx={{
                     bgcolor: '#0284c7',
@@ -378,7 +399,7 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
           }}>
 
             {/* 1. Key Info (Trip Leader) - Swapped to top */}
-            {event.tripLeader && (
+            {currentEvent.tripLeader && (
               <Box>
                 <Paper
                   elevation={0}
@@ -397,7 +418,7 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
                     <Box>
                       <Typography variant="caption" fontWeight="600" color="text.secondary" textTransform="uppercase" sx={{ fontFamily: '"Inter", sans-serif' }}>Trip Leader</Typography>
                       <Typography variant="subtitle1" fontWeight="600" color="text.primary" sx={{ fontFamily: '"Inter", sans-serif' }}>
-                        {event.tripLeader.name || `${event.tripLeader.firstName} ${event.tripLeader.lastName}`}
+                        {currentEvent.tripLeader.name || `${currentEvent.tripLeader.firstName} ${currentEvent.tripLeader.lastName}`}
                       </Typography>
                     </Box>
                   </Box>
@@ -435,7 +456,7 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
                   variant={currentUserAttending ? "outlined" : "contained"}
                   color={currentUserAttending ? "error" : "primary"}
                   onClick={handleAttendanceToggle}
-                  disabled={loadingAction || (!currentUserAttending && isFutureEvent(event))}
+                  disabled={loadingAction || (!currentUserAttending && isFutureEvent(currentEvent))}
                   startIcon={currentUserAttending ? <CloseIcon /> : <CheckCircleIcon />}
                   size="large"
                   sx={{
@@ -490,71 +511,29 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
             </Paper>
 
             {/* 3. Locations (Map List) */}
-            {locations.length > 0 && (
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="subtitle2" fontWeight="700" textTransform="uppercase" letterSpacing={0.5} color="text.secondary" gutterBottom sx={{ pl: 1, fontFamily: '"Inter", sans-serif' }}>
-                  Locations {locations.length > 1 && `(${locations.length})`}
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column' } }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Typography variant="subtitle2" fontWeight="700" textTransform="uppercase" letterSpacing={0.5} color="text.secondary" sx={{ pl: 1, fontFamily: '"Inter", sans-serif' }}>
+                  Locations {locations.length > 0 && `(${locations.length})`}
                 </Typography>
-                <Stack spacing={2}>
-                  {locations.map((loc, idx) => (
-                    <Paper
-                      key={idx}
-                      elevation={0}
-                      variant="outlined"
-                      sx={{
-                        p: 2,
-                        display: 'flex',
-                        gap: 2,
-                        alignItems: 'flex-start',
-                        bgcolor: 'white',
-                        borderRadius: 3,
-                        borderColor: 'rgba(0,0,0,0.08)',
-                        transition: 'all 0.2s',
-                        '&:hover': { borderColor: 'primary.main', boxShadow: '0 4px 12px rgba(44, 95, 45, 0.1)' }
-                      }}
-                    >
-                      <Avatar sx={{
-                        width: 28,
-                        height: 28,
-                        fontSize: '0.85rem',
-                        bgcolor: '#2c5f2d',
-                        fontWeight: 700
-                      }}>
-                        {idx + 1}
-                      </Avatar>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="subtitle2" fontWeight="700" sx={{ lineHeight: 1.3, mb: 0.5, color: '#1a1a1a', fontFamily: '"Inter", sans-serif' }}>
-                          {loc.name || 'Event Location'}
-                        </Typography>
-                        {loc.address && (
-                          <Typography variant="body2" display="block" color="text.secondary" sx={{ mb: 1.5, lineHeight: 1.4, fontFamily: '"Inter", sans-serif' }}>
-                            {loc.address}
-                          </Typography>
-                        )}
-                        <Link
-                          href={`https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lon}`}
-                          target="_blank"
-                          rel="noopener"
-                          sx={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 0.5,
-                            fontSize: '0.8rem',
-                            fontWeight: 600,
-                            color: 'primary.main',
-                            textDecoration: 'none',
-                            fontFamily: '"Inter", sans-serif',
-                            '&:hover': { textDecoration: 'underline' }
-                          }}
-                        >
-                          <MapIcon sx={{ fontSize: 16 }} /> Open in Google Maps
-                        </Link>
-                      </Box>
-                    </Paper>
-                  ))}
-                </Stack>
               </Box>
-            )}
+
+              {locations.length > 0 ? (
+                <EventMap
+                  key={locations.length} // Force re-render when locations count changes
+                  event={currentEvent}
+                  onEditLocation={(index) => {
+                    setEditingLocationIndex(index)
+                    setLocationModalOpen(true)
+                  }}
+                  canEdit={isOfficer || isAdmin}
+                />
+              ) : (
+                <Typography variant="body2" color="text.secondary" sx={{ pl: 1, fontStyle: 'italic' }}>
+                  No location specified
+                </Typography>
+              )}
+            </Box>
 
             {/* 4. Photos (Thumbnail Grid) */}
             <Box>
@@ -572,9 +551,9 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
           open={editModalOpen}
           onClose={() => setEditModalOpen(false)}
           event={{
-            ...event,
-            start: event.originalStart || event.start,
-            end: event.originalEnd !== undefined ? event.originalEnd : event.end
+            ...currentEvent,
+            start: currentEvent.originalStart || currentEvent.start,
+            end: currentEvent.originalEnd !== undefined ? currentEvent.originalEnd : currentEvent.end
           }}
           onSuccess={() => {
             setEditModalOpen(false)
@@ -586,13 +565,30 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
         <ManageAttendeesModal
           open={attendeesModalOpen}
           onClose={() => setAttendeesModalOpen(false)}
-          event={event}
+          event={currentEvent}
           onSuccess={() => {
             // Reload local event data to update attendee count/list in the dialog
             loadEventData()
           }}
         />
       )}
+      {locationModalOpen && (
+        <LocationDialog
+          open={locationModalOpen}
+          onClose={() => setLocationModalOpen(false)}
+          event={currentEvent}
+          locationIndex={editingLocationIndex}
+          onEventUpdated={(updatedLocations) => {
+            if (updatedLocations) {
+              const updatedEvent = { ...currentEvent, locations: updatedLocations }
+              setCurrentEvent(updatedEvent)
+              // Optionally propagate up if parent needs to know (which it does for calendar view)
+              if (onEventUpdated) onEventUpdated(updatedEvent)
+            }
+          }}
+        />
+      )}
+
     </Dialog>
   )
 }

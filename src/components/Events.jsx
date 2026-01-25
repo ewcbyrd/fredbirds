@@ -618,9 +618,11 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
         open={!!selected}
         onClose={closeEvent}
         event={selected ? { ...selected, ...selected.resource } : null}
-        onEventUpdated={() => {
+        onEventUpdated={(updatedEvent) => {
+          if (updatedEvent && selected) {
+            setSelected(prev => ({ ...prev, ...updatedEvent, resource: { ...prev.resource, ...updatedEvent } }))
+          }
           loadEvents()
-          closeEvent()
         }}
       />
     </Box>
