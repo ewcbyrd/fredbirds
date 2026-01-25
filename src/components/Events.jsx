@@ -206,13 +206,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
 
 
 
-  // Debug: Log selected event
-  useEffect(() => {
-    if (selected) {
-      console.log('Selected event:', selected)
-      console.log('Selected resource:', selected.resource)
-    }
-  }, [selected])
+
 
   function transformEvents(result) {
     if (!result || result.length === 0) return []
