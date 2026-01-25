@@ -457,13 +457,19 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
                 <Typography variant="subtitle2" fontWeight="700" textTransform="uppercase" letterSpacing={1} color="text.secondary" sx={{ fontFamily: '"Inter", sans-serif' }}>
                   Attendance
                 </Typography>
-                <Chip
-                  label={attendees.length > 0 ? `${attendees.length} Going` : 'Be the first'}
-                  size="small"
-                  color={attendees.length > 0 ? "success" : "default"}
-                  variant="soft"
-                  sx={{ fontWeight: 600, bgcolor: attendees.length > 0 ? 'rgba(46, 125, 50, 0.1)' : 'rgba(0,0,0,0.05)', fontFamily: '"Inter", sans-serif' }}
-                />
+                {!isFutureEvent(currentEvent) && (
+                  <Chip
+                    label={attendees.length > 0 ? `${attendees.length} Attended` : 'Be the first'}
+                    size="small"
+                    sx={{
+                      fontWeight: 600,
+                      fontFamily: '"Inter", sans-serif',
+                      bgcolor: attendees.length > 0 ? 'rgba(46, 125, 50, 0.1)' : 'rgba(0,0,0,0.05)',
+                      color: attendees.length > 0 ? '#1b5e20' : 'text.secondary',
+                      border: attendees.length > 0 ? '1px solid rgba(46, 125, 50, 0.2)' : '1px solid rgba(0,0,0,0.1)'
+                    }}
+                  />
+                )}
               </Stack>
 
               {isAuthenticated ? (
