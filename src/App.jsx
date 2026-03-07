@@ -10,6 +10,7 @@ import Events from './components/Events'
 import Announcements from './components/Announcements'
 import NearbySightings from './components/NearbySightings'
 import Home from './components/Home'
+import MemberDashboard from './components/MemberDashboard'
 import About from './components/About'
 import News from './components/News'
 import NewsFeed from './components/NewsFeed'
@@ -127,7 +128,8 @@ export default function App() {
       resources: '/resources',
       officers: '/officers',
       photos: '/photos',
-      'members-directory': '/members-directory'
+      'members-directory': '/members-directory',
+      profile: '/profile'
     }
     const path = map[view] || '/'
     navigate(path)
@@ -161,7 +163,11 @@ export default function App() {
         <Header onNavigate={handleNavigate} />
         <Container sx={{ py: 0, px: 0 }} maxWidth={false}>
           <Routes>
-            <Route path="/" element={<Home onNavigate={handleNavigate} />} />
+            <Route path="/" element={
+              isAuthenticated
+                ? <MemberDashboard onNavigate={handleNavigate} />
+                : <Home onNavigate={handleNavigate} />
+            } />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/faqs" element={<FAQs />} />

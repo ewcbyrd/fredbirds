@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Card, 
-  CardContent, 
-  Grid, 
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Grid,
   Chip,
   Skeleton,
   Alert
 } from '@mui/material';
-import { 
-  Cloud, 
-  WbSunny, 
+import {
+  Cloud,
+  WbSunny,
   Grain,
   Air,
   Opacity,
   Thermostat
 } from '@mui/icons-material';
-import { 
-  getWeatherForecast, 
-  getCurrentWeather, 
-  getWeatherIconUrl, 
-  isWithinForecastRange 
+import {
+  getWeatherForecast,
+  getCurrentWeather,
+  getWeatherIconUrl,
+  isWithinForecastRange
 } from '../services/weatherService';
 
 const WeatherForecast = ({ latitude, longitude, eventDate, eventTitle }) => {
@@ -36,8 +36,11 @@ const WeatherForecast = ({ latitude, longitude, eventDate, eventTitle }) => {
         return;
       }
 
-      // Only show weather for events within 5-day forecast range
-      if (!isWithinForecastRange(eventDate)) {
+      // If no eventDate provided, default to current weather
+      const isCurrentRequest = !eventDate || new Date(eventDate).toDateString() === new Date().toDateString();
+
+      // Only show weather for future events within 5-day forecast range
+      if (!isCurrentRequest && !isWithinForecastRange(eventDate)) {
         setLoading(false);
         return;
       }
@@ -46,12 +49,8 @@ const WeatherForecast = ({ latitude, longitude, eventDate, eventTitle }) => {
         setLoading(true);
         setError(null);
 
-        const now = new Date();
-        const eventDateTime = new Date(eventDate);
-        const isToday = eventDateTime.toDateString() === now.toDateString();
-
         let weatherData;
-        if (isToday) {
+        if (isCurrentRequest) {
           weatherData = await getCurrentWeather(latitude, longitude);
         } else {
           weatherData = await getWeatherForecast(latitude, longitude, eventDate);
@@ -108,7 +107,7 @@ const WeatherForecast = ({ latitude, longitude, eventDate, eventTitle }) => {
       const eventDateTime = new Date(eventDate);
       const now = new Date();
       const daysUntilEvent = Math.ceil((eventDateTime - now) / (1000 * 60 * 60 * 24));
-      
+
       if (daysUntilEvent > 5 && daysUntilEvent <= 14) {
         return (
           <Box sx={{ mt: 2 }}>
@@ -138,7 +137,7 @@ const WeatherForecast = ({ latitude, longitude, eventDate, eventTitle }) => {
       '13d': Grain, '13n': Grain,
       '50d': Cloud, '50n': Cloud,
     };
-    
+
     const IconComponent = iconMap[iconCode] || Cloud;
     return IconComponent;
   };
@@ -155,8 +154,8 @@ const WeatherForecast = ({ latitude, longitude, eventDate, eventTitle }) => {
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={3} sx={{ textAlign: 'center' }}>
               {weather.icon ? (
-                <img 
-                  src={getWeatherIconUrl(weather.icon)} 
+                <img
+                  src={getWeatherIconUrl(weather.icon)}
                   alt={weather.description}
                   style={{ width: 50, height: 50 }}
                 />
@@ -176,31 +175,31 @@ const WeatherForecast = ({ latitude, longitude, eventDate, eventTitle }) => {
               <Typography variant="body2" sx={{ mb: 1, textTransform: 'capitalize' }}>
                 {weather.description}
               </Typography>
-              
+
               <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                <Chip 
-                  icon={<Air />} 
-                  label={`Wind ${weather.windSpeed} mph`} 
-                  size="small" 
+                <Chip
+                  icon={<Air />}
+                  label={`Wind ${weather.windSpeed} mph`}
+                  size="small"
                   variant="outlined"
                 />
-                <Chip 
-                  icon={<Opacity />} 
-                  label={`${weather.humidity}% humidity`} 
-                  size="small" 
+                <Chip
+                  icon={<Opacity />}
+                  label={`${weather.humidity}% humidity`}
+                  size="small"
                   variant="outlined"
                 />
                 {weather.precipitation > 0 && (
-                  <Chip 
-                    icon={<Grain />} 
-                    label={`${weather.precipitation}" rain`} 
-                    size="small" 
+                  <Chip
+                    icon={<Grain />}
+                    label={`${weather.precipitation}" rain`}
+                    size="small"
                     variant="outlined"
                     color="primary"
                   />
                 )}
               </Box>
-              
+
               {weather.forecastTime && !weather.isCurrentWeather && (
                 <Typography variant="caption" display="block" sx={{ mt: 1, color: 'text.secondary' }}>
                   Forecast for {weather.forecastTime.toLocaleDateString()} {weather.forecastTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

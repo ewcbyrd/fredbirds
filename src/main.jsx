@@ -48,7 +48,7 @@ const Auth0ProviderWithNavigate = ({ children }) => {
       }}
       onRedirectCallback={onRedirectCallback}
       onError={onError}
-      // cacheLocation="localstorage" - Removed to prevent permanent login
+      cacheLocation="localstorage"
       useRefreshTokens={true}
     >
       {children}
