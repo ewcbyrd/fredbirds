@@ -217,11 +217,22 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
               label={formatDateRange(currentEvent.start, currentEvent.end)}
               size="small"
               sx={{
-                bgcolor: 'rgba(44, 95, 45, 0.08)',
-                color: '#2c5f2d',
+                bgcolor: currentEvent.isClubEvent === false ? 'rgba(25, 118, 210, 0.08)' : 'rgba(44, 95, 45, 0.08)',
+                color: currentEvent.isClubEvent === false ? '#1976d2' : '#2c5f2d',
                 fontWeight: 700,
                 borderRadius: 1.5,
-                border: '1px solid rgba(44, 95, 45, 0.1)'
+                border: currentEvent.isClubEvent === false ? '1px solid rgba(25, 118, 210, 0.1)' : '1px solid rgba(44, 95, 45, 0.1)'
+              }}
+            />
+            <Chip
+              label={currentEvent.isClubEvent === false ? "Private / Non-Club Event" : "Official Club Event"}
+              size="small"
+              sx={{
+                bgcolor: currentEvent.isClubEvent === false ? 'rgba(25, 118, 210, 0.08)' : 'rgba(44, 95, 45, 0.08)',
+                color: currentEvent.isClubEvent === false ? '#1976d2' : '#2c5f2d',
+                fontWeight: 700,
+                borderRadius: 1.5,
+                border: currentEvent.isClubEvent === false ? '1px solid rgba(25, 118, 210, 0.1)' : '1px solid rgba(44, 95, 45, 0.1)'
               }}
             />
           </Stack>

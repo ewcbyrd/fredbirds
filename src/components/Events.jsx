@@ -235,6 +235,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
           cancelled: item.cancelled,
           participants: item.participants || [],
           species_sighted: item.species_sighted || [],
+          isClubEvent: item.isClubEvent,
           pdfFile: item.pdfFile,
           ebirdTripUrl: item.ebirdTripUrl,
           lat: item.lat,
@@ -316,7 +317,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
                         sx={{
                           minWidth: 60,
                           textAlign: 'center',
-                          bgcolor: event.resource?.cancelled ? '#d32f2f' : '#2c5f2d',
+                          bgcolor: event.resource?.cancelled ? '#d32f2f' : (event.resource?.isClubEvent === false ? '#1976d2' : '#2c5f2d'),
                           color: 'white',
                           borderRadius: 1,
                           p: 1,
@@ -409,7 +410,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
                     sx={{
                       minWidth: 70,
                       textAlign: 'center',
-                      bgcolor: event.resource?.cancelled ? '#d32f2f' : '#2c5f2d',
+                      bgcolor: event.resource?.cancelled ? '#d32f2f' : (event.resource?.isClubEvent === false ? '#1976d2' : '#2c5f2d'),
                       color: 'white',
                       borderRadius: 1,
                       p: 1,
@@ -603,7 +604,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
           }}
           eventPropGetter={(event) => ({
             style: {
-              backgroundColor: event.resource?.cancelled ? '#d32f2f' : '#2c5f2d',
+              backgroundColor: event.resource?.cancelled ? '#d32f2f' : (event.resource?.isClubEvent === false ? '#1976d2' : '#2c5f2d'),
               borderRadius: '4px',
               opacity: 0.9,
               color: 'white',
