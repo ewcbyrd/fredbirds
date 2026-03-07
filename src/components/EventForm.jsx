@@ -32,6 +32,7 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
     pdfFile: '',
     ebirdTripUrl: '',
     tripLeader: null,
+    isClubEvent: true,
     locations: [{ name: '', lat: '', lon: '', address: '' }]
   })
 
@@ -72,7 +73,7 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
   useEffect(() => {
     if (event) {
       setFormData({
-        event: event.event || '',
+        event: event.event || event.title || '',
         start: parseUTCDate(event.start),
         end: parseUTCDate(event.end),
         details: event.details || '',
@@ -80,6 +81,7 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
         pdfFile: event.pdfFile || '',
         ebirdTripUrl: event.ebirdTripUrl || '',
         tripLeader: event.tripLeader || null,
+        isClubEvent: event.isClubEvent !== undefined ? event.isClubEvent : true,
         locations: event.locations && event.locations.length > 0
           ? event.locations
           : [{ name: '', lat: '', lon: '', address: '' }]
@@ -187,11 +189,13 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
           lastName: formData.tripLeader.lastName || formData.tripLeader.last || '',
           name: formData.tripLeader.name || `${formData.tripLeader.firstName || formData.tripLeader.first || ''} ${formData.tripLeader.lastName || formData.tripLeader.last || ''}`.trim()
         } : null,
+        isClubEvent: formData.isClubEvent,
         locations: validLocations
       }
 
       if (isEditMode) {
-        await updateEvent(event._id, eventData)
+        const eventId = event._id || event.id;
+        await updateEvent(eventId, eventData)
         setSuccess(true)
         // Notify parent - they control modal close timing
         onSuccess()
@@ -208,6 +212,7 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
           pdfFile: '',
           ebirdTripUrl: '',
           tripLeader: null,
+          isClubEvent: true,
           locations: [{ name: '', lat: '', lon: '', address: '' }]
         })
         // Notify parent - they control modal close timing
@@ -385,6 +390,18 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
           helperText="Link to the eBird trip report for this event"
         />
 
+        {/* isClubEvent Checkbox */}
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={formData.isClubEvent}
+              onChange={(e) => handleChange('isClubEvent', e.target.checked)}
+            />
+          }
+          label="Official Club Event (Uncheck for private/other events)"
+          sx={{ mt: 1 }}
+        />
+
         {/* Cancelled Checkbox */}
         <FormControlLabel
           control={
@@ -394,7 +411,7 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
             />
           }
           label="Mark as Cancelled"
-          sx={{ mt: 2 }}
+          sx={{ mt: 1 }}
         />
 
         {/* Action Buttons */}

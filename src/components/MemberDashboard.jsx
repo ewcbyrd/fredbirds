@@ -73,7 +73,7 @@ export default function MemberDashboard({ onNavigate }) {
                     // Find the very next event that hasn't happened yet today
                     const now = new Date()
                     const upcoming = events
-                        .filter(e => !e.cancelled)
+                        .filter(e => !e.cancelled && e.isClubEvent !== false)
                         .sort((a, b) => new Date(a.start) - new Date(b.start))
                         .find(e => {
                             // Consider an event upcoming if its end time (or start time if no end) is in the future
