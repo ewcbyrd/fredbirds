@@ -124,7 +124,7 @@ const ManageAttendeesModal = ({ open, onClose, event, onSuccess }) => {
             <DialogTitle>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     Manage Attendees
-                    <IconButton onClick={onClose}><CloseIcon /></IconButton>
+                    <IconButton aria-label="Close dialog" onClick={onClose}><CloseIcon /></IconButton>
                 </Box>
             </DialogTitle>
             <DialogContent>

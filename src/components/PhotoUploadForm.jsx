@@ -150,7 +150,7 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         Upload Photo
-        <IconButton onClick={handleClose} disabled={uploading} size="small">
+        <IconButton aria-label="Close dialog" onClick={handleClose} disabled={uploading} size="small">
           <CloseIcon />
         </IconButton>
       </DialogTitle>
