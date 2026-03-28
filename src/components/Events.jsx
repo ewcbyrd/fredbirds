@@ -242,9 +242,6 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
           lat: item.lat,
           lon: item.lon,
           tripLeader: item.tripLeader || null,
-          lat: item.lat,
-          lon: item.lon,
-          tripLeader: item.tripLeader || null,
           locations: item.locations || (item.lat && item.lon ? [{ lat: item.lat, lon: item.lon, name: '', address: '' }] : []),
           originalStart: item.start,
           originalEnd: item.end
