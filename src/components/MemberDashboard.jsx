@@ -167,16 +167,33 @@ export default function MemberDashboard({ onNavigate }) {
                             onClick={() => handleNav('profile')}
                             sx={{
                                 bgcolor: '#f8fbfc',
-                                border: '1px solid rgba(0,0,0,0.05)',
-                                transition: 'all 0.2s',
-                                '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 8px 20px rgba(0,0,0,0.08)', borderColor: theme.palette.info.light }
+                                border: '1.5px solid rgba(91, 155, 213, 0.15)',
+                                borderRadius: 3,
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                                '&:hover': { 
+                                    transform: 'translateY(-6px)', 
+                                    boxShadow: '0 12px 28px rgba(91, 155, 213, 0.2)', 
+                                    borderColor: theme.palette.info.main,
+                                    bgcolor: '#ffffff'
+                                }
                             }}
                         >
-                            <CardActionArea sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'flex-start' }}>
-                                <Avatar sx={{ bgcolor: 'rgba(2, 136, 209, 0.1)', color: 'info.main' }}>
-                                    <PersonIcon />
+                            <CardActionArea sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'flex-start' }}>
+                                <Avatar sx={{ 
+                                    bgcolor: 'rgba(91, 155, 213, 0.12)', 
+                                    color: 'info.main',
+                                    width: 48,
+                                    height: 48,
+                                    transition: 'all 0.3s ease',
+                                    '.MuiCard-root:hover &': {
+                                        bgcolor: 'rgba(91, 155, 213, 0.18)',
+                                        transform: 'scale(1.1)'
+                                    }
+                                }}>
+                                    <PersonIcon fontSize="medium" />
                                 </Avatar>
-                                <Typography variant="subtitle1" fontWeight="700" color="text.primary">View Profile</Typography>
+                                <Typography variant="subtitle1" fontWeight="700" color="text.primary" sx={{ fontSize: '1.05rem' }}>View Profile</Typography>
                             </CardActionArea>
                         </Card>
                     </Grid>
@@ -186,16 +203,33 @@ export default function MemberDashboard({ onNavigate }) {
                             onClick={() => handleNav('events')}
                             sx={{
                                 bgcolor: '#f8fbfc',
-                                border: '1px solid rgba(0,0,0,0.05)',
-                                transition: 'all 0.2s',
-                                '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 8px 20px rgba(0,0,0,0.08)', borderColor: theme.palette.primary.light }
+                                border: '1.5px solid rgba(45, 80, 22, 0.15)',
+                                borderRadius: 3,
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                                '&:hover': { 
+                                    transform: 'translateY(-6px)', 
+                                    boxShadow: '0 12px 28px rgba(45, 80, 22, 0.2)', 
+                                    borderColor: theme.palette.primary.main,
+                                    bgcolor: '#ffffff'
+                                }
                             }}
                         >
-                            <CardActionArea sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'flex-start' }}>
-                                <Avatar sx={{ bgcolor: 'rgba(44, 95, 45, 0.1)', color: 'primary.main' }}>
-                                    <CalendarTodayIcon />
+                            <CardActionArea sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'flex-start' }}>
+                                <Avatar sx={{ 
+                                    bgcolor: 'rgba(45, 80, 22, 0.12)', 
+                                    color: 'primary.main',
+                                    width: 48,
+                                    height: 48,
+                                    transition: 'all 0.3s ease',
+                                    '.MuiCard-root:hover &': {
+                                        bgcolor: 'rgba(45, 80, 22, 0.18)',
+                                        transform: 'scale(1.1)'
+                                    }
+                                }}>
+                                    <CalendarTodayIcon fontSize="medium" />
                                 </Avatar>
-                                <Typography variant="subtitle1" fontWeight="700" color="text.primary">Browse Events</Typography>
+                                <Typography variant="subtitle1" fontWeight="700" color="text.primary" sx={{ fontSize: '1.05rem' }}>Browse Events</Typography>
                             </CardActionArea>
                         </Card>
                     </Grid>
@@ -205,16 +239,33 @@ export default function MemberDashboard({ onNavigate }) {
                             onClick={() => handleNav('members-directory')}
                             sx={{
                                 bgcolor: '#f8fbfc',
-                                border: '1px solid rgba(0,0,0,0.05)',
-                                transition: 'all 0.2s',
-                                '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 8px 20px rgba(0,0,0,0.08)', borderColor: theme.palette.secondary.light }
+                                border: '1.5px solid rgba(193, 120, 23, 0.15)',
+                                borderRadius: 3,
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                                '&:hover': { 
+                                    transform: 'translateY(-6px)', 
+                                    boxShadow: '0 12px 28px rgba(193, 120, 23, 0.2)', 
+                                    borderColor: theme.palette.secondary.main,
+                                    bgcolor: '#ffffff'
+                                }
                             }}
                         >
-                            <CardActionArea sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'flex-start' }}>
-                                <Avatar sx={{ bgcolor: 'rgba(193, 120, 23, 0.1)', color: 'secondary.main' }}>
-                                    <GroupsIcon />
+                            <CardActionArea sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'flex-start' }}>
+                                <Avatar sx={{ 
+                                    bgcolor: 'rgba(193, 120, 23, 0.12)', 
+                                    color: 'secondary.main',
+                                    width: 48,
+                                    height: 48,
+                                    transition: 'all 0.3s ease',
+                                    '.MuiCard-root:hover &': {
+                                        bgcolor: 'rgba(193, 120, 23, 0.18)',
+                                        transform: 'scale(1.1)'
+                                    }
+                                }}>
+                                    <GroupsIcon fontSize="medium" />
                                 </Avatar>
-                                <Typography variant="subtitle1" fontWeight="700" color="text.primary">Member Directory</Typography>
+                                <Typography variant="subtitle1" fontWeight="700" color="text.primary" sx={{ fontSize: '1.05rem' }}>Member Directory</Typography>
                             </CardActionArea>
                         </Card>
                     </Grid>
@@ -224,16 +275,33 @@ export default function MemberDashboard({ onNavigate }) {
                             onClick={() => handleNav('photos')}
                             sx={{
                                 bgcolor: '#f8fbfc',
-                                border: '1px solid rgba(0,0,0,0.05)',
-                                transition: 'all 0.2s',
-                                '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 8px 20px rgba(0,0,0,0.08)', borderColor: '#5b9bd5' }
+                                border: '1.5px solid rgba(91, 155, 213, 0.15)',
+                                borderRadius: 3,
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                                '&:hover': { 
+                                    transform: 'translateY(-6px)', 
+                                    boxShadow: '0 12px 28px rgba(91, 155, 213, 0.2)', 
+                                    borderColor: '#5b9bd5',
+                                    bgcolor: '#ffffff'
+                                }
                             }}
                         >
-                            <CardActionArea sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'flex-start' }}>
-                                <Avatar sx={{ bgcolor: 'rgba(91, 155, 213, 0.1)', color: '#5b9bd5' }}>
-                                    <PhotoLibraryIcon />
+                            <CardActionArea sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'flex-start' }}>
+                                <Avatar sx={{ 
+                                    bgcolor: 'rgba(91, 155, 213, 0.12)', 
+                                    color: '#5b9bd5',
+                                    width: 48,
+                                    height: 48,
+                                    transition: 'all 0.3s ease',
+                                    '.MuiCard-root:hover &': {
+                                        bgcolor: 'rgba(91, 155, 213, 0.18)',
+                                        transform: 'scale(1.1)'
+                                    }
+                                }}>
+                                    <PhotoLibraryIcon fontSize="medium" />
                                 </Avatar>
-                                <Typography variant="subtitle1" fontWeight="700" color="text.primary">Share a Photo</Typography>
+                                <Typography variant="subtitle1" fontWeight="700" color="text.primary" sx={{ fontSize: '1.05rem' }}>Share a Photo</Typography>
                             </CardActionArea>
                         </Card>
                     </Grid>
