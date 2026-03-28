@@ -33,6 +33,7 @@ import {
 } from '../services/restdbService'
 import { getPictureUrl } from '../services/cloudinaryService'
 import WeatherForecast from './WeatherForecast'
+import PageContainer from './common/PageContainer'
 
 // Helper to determine the default hotspot (could be expanded later to use user preferences)
 const DEFAULT_HOTSPOT = {
@@ -129,7 +130,7 @@ export default function MemberDashboard({ onNavigate }) {
     const firstName = memberProfile?.first || user?.name?.split(' ')[0] || 'Member'
 
     return (
-        <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, py: { xs: 4, md: 6 } }}>
+        <PageContainer>
 
             {/* 1. WELCOME SECTION */}
             {loading ? renderWelcomeSkeleton() : (
@@ -407,6 +408,6 @@ export default function MemberDashboard({ onNavigate }) {
                 </Grid>
             </Grid>
 
-        </Box>
+        </PageContainer>
     )
 }
