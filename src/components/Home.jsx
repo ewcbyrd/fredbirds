@@ -82,9 +82,20 @@ export default function Home({ onNavigate }) {
           minHeight: { xs: 400, md: 500 },
           display: 'flex',
           alignItems: 'center',
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), url(${getCloudinaryUrl('Group.jpg', transformations.hero)})`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.55)), url(${getCloudinaryUrl('Group.jpg', transformations.hero)})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          backgroundAttachment: { xs: 'scroll', md: 'fixed' }, // Parallax effect on desktop
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'radial-gradient(circle at 30% 50%, rgba(45, 80, 22, 0.2) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }
         }}
       >
         <Box
@@ -105,7 +116,18 @@ export default function Home({ onNavigate }) {
               fontWeight: 700,
               mb: 2,
               fontSize: { xs: '2rem', sm: '2.5rem', md: '3.5rem' },
-              textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+              textShadow: '2px 2px 8px rgba(0,0,0,0.6)',
+              animation: 'fadeInUp 0.8s ease-out',
+              '@keyframes fadeInUp': {
+                from: {
+                  opacity: 0,
+                  transform: 'translateY(20px)',
+                },
+                to: {
+                  opacity: 1,
+                  transform: 'translateY(0)',
+                }
+              }
             }}
           >
             Welcome to the Fredericksburg Birding Club
@@ -118,7 +140,18 @@ export default function Home({ onNavigate }) {
               fontWeight: 400,
               lineHeight: 1.6,
               fontSize: { xs: '1rem', md: '1.25rem' },
-              textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
+              textShadow: '1px 1px 4px rgba(0,0,0,0.6)',
+              animation: 'fadeInUp 0.8s ease-out 0.2s both',
+              '@keyframes fadeInUp': {
+                from: {
+                  opacity: 0,
+                  transform: 'translateY(20px)',
+                },
+                to: {
+                  opacity: 1,
+                  transform: 'translateY(0)',
+                }
+              }
             }}
           >
             Join bird enthusiasts of all skill levels in the greater Fredericksburg, Virginia area.
@@ -167,7 +200,8 @@ export default function Home({ onNavigate }) {
           </Typography>
 
           <Grid container spacing={3} justifyContent="center">
-            {/* Upcoming Events - Forest Green */}
+            {/* PRIMARY ACTION CARDS - Events, Sightings, Photos */}
+            {/* Upcoming Events - Forest Green - PRIMARY */}
             <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('events')}
@@ -176,54 +210,134 @@ export default function Home({ onNavigate }) {
                   textAlign: 'center',
                   py: 4,
                   cursor: 'pointer',
-                  borderRadius: 3,
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                  borderRadius: 4,
+                  boxShadow: '0 12px 35px rgba(45, 80, 22, 0.25)',
                   transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  border: '2px solid rgba(255,255,255,0.15)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.2) 0%, transparent 70%)',
+                    opacity: 0,
+                    transition: 'opacity 0.4s ease',
+                  },
                   '&:hover': {
-                    transform: 'translateY(-12px) scale(1.05)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+                    transform: 'translateY(-14px) scale(1.06)',
+                    boxShadow: '0 24px 50px rgba(45, 80, 22, 0.35)',
+                    border: '2px solid rgba(255,255,255,0.25)',
+                    '&::before': {
+                      opacity: 1,
+                    }
                   }
                 }}
               >
                 <CardContent>
-                  <CalendarTodayIcon sx={{ fontSize: 56, color: 'white', mb: 2, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }} />
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+                  <CalendarTodayIcon sx={{ 
+                    fontSize: 60, 
+                    color: 'white', 
+                    mb: 2, 
+                    filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
+                    transition: 'transform 0.4s ease',
+                    '.MuiCard-root:hover &': {
+                      transform: 'scale(1.1) rotate(5deg)',
+                    }
+                  }} />
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: 700, 
+                    color: 'white', 
+                    textShadow: '0 2px 8px rgba(0,0,0,0.25)',
+                    letterSpacing: '0.5px'
+                  }}>
                     Events
+                  </Typography>
+                  <Typography variant="caption" sx={{ 
+                    color: 'rgba(255,255,255,0.9)', 
+                    display: 'block',
+                    mt: 0.5,
+                    fontSize: '0.75rem',
+                    textShadow: '0 1px 4px rgba(0,0,0,0.2)'
+                  }}>
+                    Field Trips & Meetings
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
 
-            {/* Recent Sightings - Sky Blue (Info) */}
+            {/* Recent Sightings - Sky Blue (Info) - PRIMARY */}
             <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('sightings')}
                 sx={{
-                  background: `linear-gradient(135deg, ${theme.palette.accent.blue} 0%, ${theme.palette.accent.blue} 100%)`,
+                  background: `linear-gradient(135deg, #6ba8e0 0%, ${theme.palette.accent.blue} 100%)`,
                   textAlign: 'center',
                   py: 4,
                   cursor: 'pointer',
-                  borderRadius: 3,
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                  borderRadius: 4,
+                  boxShadow: '0 12px 35px rgba(91, 155, 213, 0.25)',
                   transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  border: '2px solid rgba(255,255,255,0.15)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.2) 0%, transparent 70%)',
+                    opacity: 0,
+                    transition: 'opacity 0.4s ease',
+                  },
                   '&:hover': {
-                    transform: 'translateY(-12px) scale(1.05)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+                    transform: 'translateY(-14px) scale(1.06)',
+                    boxShadow: '0 24px 50px rgba(91, 155, 213, 0.35)',
+                    border: '2px solid rgba(255,255,255,0.25)',
+                    '&::before': {
+                      opacity: 1,
+                    }
                   }
                 }}
               >
                 <CardContent>
-                  <VisibilityIcon sx={{ fontSize: 56, color: 'white', mb: 2, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }} />
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+                  <VisibilityIcon sx={{ 
+                    fontSize: 60, 
+                    color: 'white', 
+                    mb: 2, 
+                    filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
+                    transition: 'transform 0.4s ease',
+                    '.MuiCard-root:hover &': {
+                      transform: 'scale(1.1) rotate(-5deg)',
+                    }
+                  }} />
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: 700, 
+                    color: 'white', 
+                    textShadow: '0 2px 8px rgba(0,0,0,0.25)',
+                    letterSpacing: '0.5px'
+                  }}>
                     Sightings
+                  </Typography>
+                  <Typography variant="caption" sx={{ 
+                    color: 'rgba(255,255,255,0.9)', 
+                    display: 'block',
+                    mt: 0.5,
+                    fontSize: '0.75rem',
+                    textShadow: '0 1px 4px rgba(0,0,0,0.2)'
+                  }}>
+                    Recent Bird Reports
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
 
-            {/* Photo Gallery - Sunset Orange (Secondary) */}
+            {/* Photo Gallery - Sunset Orange (Secondary) - PRIMARY */}
             <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('photos')}
@@ -232,105 +346,212 @@ export default function Home({ onNavigate }) {
                   textAlign: 'center',
                   py: 4,
                   cursor: 'pointer',
-                  borderRadius: 3,
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                  borderRadius: 4,
+                  boxShadow: '0 12px 35px rgba(193, 120, 23, 0.25)',
                   transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  border: '2px solid rgba(255,255,255,0.15)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.2) 0%, transparent 70%)',
+                    opacity: 0,
+                    transition: 'opacity 0.4s ease',
+                  },
                   '&:hover': {
-                    transform: 'translateY(-12px) scale(1.05)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+                    transform: 'translateY(-14px) scale(1.06)',
+                    boxShadow: '0 24px 50px rgba(193, 120, 23, 0.35)',
+                    border: '2px solid rgba(255,255,255,0.25)',
+                    '&::before': {
+                      opacity: 1,
+                    }
                   }
                 }}
               >
                 <CardContent>
-                  <PhotoLibraryIcon sx={{ fontSize: 56, color: 'white', mb: 2, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }} />
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+                  <PhotoLibraryIcon sx={{ 
+                    fontSize: 60, 
+                    color: 'white', 
+                    mb: 2, 
+                    filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
+                    transition: 'transform 0.4s ease',
+                    '.MuiCard-root:hover &': {
+                      transform: 'scale(1.1) rotate(5deg)',
+                    }
+                  }} />
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: 700, 
+                    color: 'white', 
+                    textShadow: '0 2px 8px rgba(0,0,0,0.25)',
+                    letterSpacing: '0.5px'
+                  }}>
                     Photos
+                  </Typography>
+                  <Typography variant="caption" sx={{ 
+                    color: 'rgba(255,255,255,0.9)', 
+                    display: 'block',
+                    mt: 0.5,
+                    fontSize: '0.75rem',
+                    textShadow: '0 1px 4px rgba(0,0,0,0.2)'
+                  }}>
+                    Member Gallery
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
 
-            {/* Membership - Earthy Brown */}
+            {/* SECONDARY INFO CARDS - Membership, Officers, Members */}
+            {/* Membership - Earthy Brown - SECONDARY */}
             <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('membership')}
                 sx={{
-                  background: `linear-gradient(135deg, ${theme.palette.accent.brown} 0%, ${theme.palette.accent.brown} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.accent.brown} 0%, #9d8159 100%)`,
                   textAlign: 'center',
-                  py: 4,
+                  py: 3.5,
                   cursor: 'pointer',
                   borderRadius: 3,
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-                  transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  border: 'none',
+                  boxShadow: '0 8px 25px rgba(139, 111, 71, 0.2)',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  opacity: 0.95,
                   '&:hover': {
-                    transform: 'translateY(-12px) scale(1.05)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 16px 35px rgba(139, 111, 71, 0.28)',
+                    opacity: 1,
+                    border: '1px solid rgba(255,255,255,0.18)',
                   }
                 }}
               >
                 <CardContent>
-                  <BadgeIcon sx={{ fontSize: 56, color: 'white', mb: 2, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }} />
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+                  <BadgeIcon sx={{ 
+                    fontSize: 52, 
+                    color: 'white', 
+                    mb: 1.5, 
+                    filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.25))',
+                    opacity: 0.95
+                  }} />
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: 600, 
+                    color: 'white', 
+                    textShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                    fontSize: '1.05rem'
+                  }}>
                     Membership
+                  </Typography>
+                  <Typography variant="caption" sx={{ 
+                    color: 'rgba(255,255,255,0.85)', 
+                    display: 'block',
+                    mt: 0.5,
+                    fontSize: '0.7rem'
+                  }}>
+                    Join Our Community
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
 
-            {/* Officers - Deep Teal */}
+            {/* Officers - Deep Teal - SECONDARY */}
             <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('officers')}
                 sx={{
-                  background: `linear-gradient(135deg, ${theme.palette.accent.teal} 0%, ${theme.palette.accent.teal} 100%)`,
+                  background: `linear-gradient(135deg, ${theme.palette.accent.teal} 0%, #3a9288 100%)`,
                   textAlign: 'center',
-                  py: 4,
+                  py: 3.5,
                   cursor: 'pointer',
                   borderRadius: 3,
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-                  transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  border: 'none',
+                  boxShadow: '0 8px 25px rgba(44, 120, 115, 0.2)',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  opacity: 0.95,
                   '&:hover': {
-                    transform: 'translateY(-12px) scale(1.05)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 16px 35px rgba(44, 120, 115, 0.28)',
+                    opacity: 1,
+                    border: '1px solid rgba(255,255,255,0.18)',
                   }
                 }}
               >
                 <CardContent>
-                  <BadgeIcon sx={{ fontSize: 56, color: 'white', mb: 2, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }} />
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+                  <BadgeIcon sx={{ 
+                    fontSize: 52, 
+                    color: 'white', 
+                    mb: 1.5, 
+                    filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.25))',
+                    opacity: 0.95
+                  }} />
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: 600, 
+                    color: 'white', 
+                    textShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                    fontSize: '1.05rem'
+                  }}>
                     Officers
+                  </Typography>
+                  <Typography variant="caption" sx={{ 
+                    color: 'rgba(255,255,255,0.85)', 
+                    display: 'block',
+                    mt: 0.5,
+                    fontSize: '0.7rem'
+                  }}>
+                    Club Leadership
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
 
-            {/* Members Directory - Sage Green */}
+            {/* Members Directory - Sage Green - SECONDARY */}
             {hasAccess(ACCESS_LEVELS.MEMBER) && (
               <Grid item xs={12} sm={6} md={4} lg={2}>
                 <Card
                   onClick={() => onNavigate('members-directory')}
                   sx={{
-                    background: `linear-gradient(135deg, ${theme.palette.accent.sage} 0%, ${theme.palette.accent.sage} 100%)`,
+                    background: `linear-gradient(135deg, ${theme.palette.accent.sage} 0%, #7fa383 100%)`,
                     textAlign: 'center',
-                    py: 4,
+                    py: 3.5,
                     cursor: 'pointer',
                     borderRadius: 3,
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-                    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                    border: 'none',
+                    boxShadow: '0 8px 25px rgba(107, 142, 111, 0.2)',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    opacity: 0.95,
                     '&:hover': {
-                      transform: 'translateY(-12px) scale(1.05)',
-                      boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 16px 35px rgba(107, 142, 111, 0.28)',
+                      opacity: 1,
+                      border: '1px solid rgba(255,255,255,0.18)',
                     }
                   }}
                 >
                   <CardContent>
-                    <GroupsIcon sx={{ fontSize: 56, color: 'white', mb: 2, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }} />
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+                    <GroupsIcon sx={{ 
+                      fontSize: 52, 
+                      color: 'white', 
+                      mb: 1.5, 
+                      filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.25))',
+                      opacity: 0.95
+                    }} />
+                    <Typography variant="h6" sx={{ 
+                      fontWeight: 600, 
+                      color: 'white', 
+                      textShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                      fontSize: '1.05rem'
+                    }}>
                       Members
+                    </Typography>
+                    <Typography variant="caption" sx={{ 
+                      color: 'rgba(255,255,255,0.85)', 
+                      display: 'block',
+                      mt: 0.5,
+                      fontSize: '0.7rem'
+                    }}>
+                      Member Directory
                     </Typography>
                   </CardContent>
                 </Card>
