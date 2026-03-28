@@ -8,6 +8,7 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
+import Skeleton from '@mui/material/Skeleton'
 
 import Box from '@mui/material/Box'
 import Select from '@mui/material/Select'
@@ -274,7 +275,22 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
 
 
 
-  if (loading) return <Typography>Loading...</Typography>
+  if (loading) {
+    return (
+      <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, py: 4 }}>
+        <Skeleton variant="text" width={200} height={40} sx={{ mb: 3 }} />
+        <Grid container spacing={3}>
+          {[1, 2, 3].map((n) => (
+            <Grid item xs={12} md={4} key={n}>
+              <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 3 }} />
+              <Skeleton variant="text" width="80%" sx={{ mt: 2 }} />
+              <Skeleton variant="text" width="60%" />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    )
+  }
 
   if (singleEvent) {
     const upcomingEvents = yearEvents.slice(0, maxEvents)
