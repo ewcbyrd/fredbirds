@@ -17,11 +17,12 @@ import {
 } from '@mui/icons-material'
 import AccessControl from './AccessControl'
 import { ACCESS_LEVELS } from '../hooks/useUserRole'
+import PageContainer from './common/PageContainer'
 
 const AdminPanel = () => {
   return (
     <AccessControl requiredLevel={ACCESS_LEVELS.ADMIN}>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <PageContainer maxWidth="lg">
         <Typography variant="h4" gutterBottom>
           Admin Panel
         </Typography>
@@ -110,7 +111,7 @@ const AdminPanel = () => {
             </Card>
           </Grid>
         </Grid>
-      </Container>
+      </PageContainer>
     </AccessControl>
   )
 }

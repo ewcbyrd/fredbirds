@@ -12,6 +12,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import { getNewsletters } from '../services/restdbService'
+import PageContainer from './common/PageContainer'
 
 export default function Newsletters() {
   const [newsletters, setNewsletters] = useState([])
@@ -43,7 +44,7 @@ export default function Newsletters() {
   if (loading) return <Typography>Loading newsletters...</Typography>
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+    <PageContainer maxWidth="lg">
       <Box sx={{ bgcolor: 'white', p:2, borderRadius:1 }}>
         <Typography variant="h5" sx={{ mb:1 }}>Newsletters</Typography>
 
@@ -95,6 +96,6 @@ export default function Newsletters() {
           <Button onClick={() => setSelected(null)}>Close</Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </PageContainer>
   )
 }
