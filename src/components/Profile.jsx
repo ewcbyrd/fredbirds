@@ -56,6 +56,7 @@ import {
   Event as EventIcon
 } from '@mui/icons-material'
 import RoleBadge from './RoleBadge'
+import PageContainer from './common/PageContainer'
 
 const Profile = () => {
   const { user } = useAuth0()
@@ -140,22 +141,22 @@ const Profile = () => {
 
   if (!user) {
     return (
-      <Container maxWidth="md" sx={{ py: 4 }}>
+      <PageContainer maxWidth="md">
         <Typography variant="h4">Profile not found</Typography>
-      </Container>
+      </PageContainer>
     )
   }
 
   if (loading) {
     return (
-      <Container maxWidth="md" sx={{ py: 4 }}>
+      <PageContainer maxWidth="md">
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
           <CircularProgress />
           <Typography variant="body1" sx={{ ml: 2 }}>
             Loading profile...
           </Typography>
         </Box>
-      </Container>
+      </PageContainer>
     )
   }
 
@@ -309,7 +310,7 @@ const Profile = () => {
   )
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <PageContainer maxWidth="md">
       <Typography variant="h4" gutterBottom>
         My Profile
       </Typography>
@@ -984,7 +985,7 @@ const Profile = () => {
           </>
         </CardContent>
       </Card>
-    </Container>
+    </PageContainer>
   )
 }
 
