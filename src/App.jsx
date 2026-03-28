@@ -67,13 +67,84 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: { fontFamily: '"Outfit", sans-serif', fontWeight: 700 },
-    h2: { fontFamily: '"Outfit", sans-serif', fontWeight: 700 },
-    h3: { fontFamily: '"Outfit", sans-serif', fontWeight: 700 },
-    h4: { fontFamily: '"Outfit", sans-serif', fontWeight: 600 },
-    h5: { fontFamily: '"Outfit", sans-serif', fontWeight: 600 },
-    h6: { fontFamily: '"Outfit", sans-serif', fontWeight: 600 },
-    button: { fontFamily: '"Inter", sans-serif', fontWeight: 600, textTransform: 'none' },
+    fontSize: 16, // Increased from default 14px for better readability
+    body1: {
+      fontSize: '1rem', // 16px
+      lineHeight: 1.75, // Improved readability
+      letterSpacing: '0.00938em',
+    },
+    body2: {
+      fontSize: '0.875rem', // 14px
+      lineHeight: 1.7,
+      letterSpacing: '0.01071em',
+    },
+    h1: {
+      fontFamily: '"Outfit", sans-serif',
+      fontWeight: 700,
+      fontSize: '2.5rem', // 40px
+      lineHeight: 1.2,
+      letterSpacing: '-0.01562em',
+      marginBottom: '0.5em',
+    },
+    h2: {
+      fontFamily: '"Outfit", sans-serif',
+      fontWeight: 700,
+      fontSize: '2rem', // 32px
+      lineHeight: 1.25,
+      letterSpacing: '-0.00833em',
+      marginBottom: '0.5em',
+    },
+    h3: {
+      fontFamily: '"Outfit", sans-serif',
+      fontWeight: 700,
+      fontSize: '1.75rem', // 28px
+      lineHeight: 1.3,
+      letterSpacing: '0em',
+      marginBottom: '0.5em',
+    },
+    h4: {
+      fontFamily: '"Outfit", sans-serif',
+      fontWeight: 600,
+      fontSize: '1.5rem', // 24px
+      lineHeight: 1.35,
+      letterSpacing: '0.00735em',
+      marginBottom: '0.5em',
+    },
+    h5: {
+      fontFamily: '"Outfit", sans-serif',
+      fontWeight: 600,
+      fontSize: '1.25rem', // 20px
+      lineHeight: 1.4,
+      letterSpacing: '0em',
+      marginBottom: '0.5em',
+    },
+    h6: {
+      fontFamily: '"Outfit", sans-serif',
+      fontWeight: 600,
+      fontSize: '1.125rem', // 18px
+      lineHeight: 1.45,
+      letterSpacing: '0.0075em',
+      marginBottom: '0.5em',
+    },
+    button: {
+      fontFamily: '"Inter", sans-serif',
+      fontWeight: 600,
+      textTransform: 'none',
+      fontSize: '0.9375rem', // 15px
+      letterSpacing: '0.02857em',
+    },
+    caption: {
+      fontSize: '0.75rem', // 12px
+      lineHeight: 1.5,
+      letterSpacing: '0.03333em',
+    },
+    overline: {
+      fontSize: '0.75rem', // 12px
+      lineHeight: 2,
+      letterSpacing: '0.08333em',
+      fontWeight: 600,
+      textTransform: 'uppercase',
+    },
   },
   shape: {
     borderRadius: 16,
