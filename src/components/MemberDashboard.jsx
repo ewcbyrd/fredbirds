@@ -500,8 +500,16 @@ export default function MemberDashboard({ onNavigate }) {
                             <Box sx={{ p: 2, bgcolor: '#f8fbfc', borderTop: '1px solid rgba(0,0,0,0.05)', textAlign: 'center' }}>
                                 <Button
                                     fullWidth
+                                    variant="contained"
+                                    color="primary"
                                     onClick={() => handleNav('announcements')}
-                                    sx={{ textTransform: 'none', fontWeight: 600, color: 'primary.main' }}
+                                    sx={{ 
+                                        borderRadius: 50, 
+                                        px: 3, 
+                                        py: 1.5, 
+                                        textTransform: 'none', 
+                                        fontWeight: 600 
+                                    }}
                                 >
                                     View All Announcements
                                 </Button>
