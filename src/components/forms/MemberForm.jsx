@@ -235,6 +235,8 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
                     onChange={handleChange}
                     fullWidth
                     disabled={loading}
+                    placeholder="123-456-7890"
+                    helperText="Format: 123-456-7890"
                 />
 
                 <FormControl fullWidth disabled={loading}>
