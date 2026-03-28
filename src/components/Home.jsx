@@ -168,7 +168,7 @@ export default function Home({ onNavigate }) {
 
           <Grid container spacing={3} justifyContent="center">
             {/* Upcoming Events - Forest Green */}
-            <Grid item xs={6} sm={4} md={2}>
+            <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('events')}
                 sx={{
@@ -196,7 +196,7 @@ export default function Home({ onNavigate }) {
             </Grid>
 
             {/* Recent Sightings - Sky Blue (Info) */}
-            <Grid item xs={6} sm={4} md={2}>
+            <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('sightings')}
                 sx={{
@@ -224,7 +224,7 @@ export default function Home({ onNavigate }) {
             </Grid>
 
             {/* Photo Gallery - Sunset Orange (Secondary) */}
-            <Grid item xs={6} sm={4} md={2}>
+            <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('photos')}
                 sx={{
@@ -252,7 +252,7 @@ export default function Home({ onNavigate }) {
             </Grid>
 
             {/* Membership - Earthy Brown */}
-            <Grid item xs={6} sm={4} md={2}>
+            <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('membership')}
                 sx={{
@@ -280,7 +280,7 @@ export default function Home({ onNavigate }) {
             </Grid>
 
             {/* Officers - Deep Teal */}
-            <Grid item xs={6} sm={4} md={2}>
+            <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('officers')}
                 sx={{
@@ -309,7 +309,7 @@ export default function Home({ onNavigate }) {
 
             {/* Members Directory - Sage Green */}
             {hasAccess(ACCESS_LEVELS.MEMBER) && (
-              <Grid item xs={6} sm={4} md={2}>
+              <Grid item xs={12} sm={6} md={4} lg={2}>
                 <Card
                   onClick={() => onNavigate('members-directory')}
                   sx={{
