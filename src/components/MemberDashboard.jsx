@@ -320,12 +320,29 @@ export default function MemberDashboard({ onNavigate }) {
                     </Typography>
 
                     {loading ? (
-                        <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 3, mb: 4 }} />
+                        <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 4, mb: 4 }} />
                     ) : nextEvent ? (
-                        <Card sx={{ mb: 4, position: 'relative', overflow: 'hidden', borderRadius: 3, border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+                        <Card sx={{ 
+                            mb: 4, 
+                            position: 'relative', 
+                            overflow: 'hidden', 
+                            borderRadius: 4, 
+                            border: '1.5px solid rgba(45, 80, 22, 0.12)', 
+                            boxShadow: '0 6px 24px rgba(45, 80, 22, 0.08)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                boxShadow: '0 10px 32px rgba(45, 80, 22, 0.12)',
+                                borderColor: 'rgba(45, 80, 22, 0.18)'
+                            }
+                        }}>
                             <Box sx={{
-                                position: 'absolute', top: 0, left: 0, width: 6, height: '100%',
-                                bgcolor: 'primary.main'
+                                position: 'absolute', 
+                                top: 0, 
+                                left: 0, 
+                                width: 5, 
+                                height: '100%',
+                                bgcolor: 'primary.main',
+                                boxShadow: '2px 0 8px rgba(45, 80, 22, 0.3)'
                             }} />
                             <CardContent sx={{ p: { xs: 3, sm: 4 }, pl: { xs: 4, sm: 5 } }}>
                                 <Grid container spacing={3} alignItems="center">
@@ -378,7 +395,14 @@ export default function MemberDashboard({ onNavigate }) {
                             </CardContent>
                         </Card>
                     ) : (
-                        <Card variant="outlined" sx={{ mb: 4, bgcolor: '#f8f9fa', borderRadius: 3, borderStyle: 'dashed' }}>
+                        <Card variant="outlined" sx={{ 
+                            mb: 4, 
+                            bgcolor: '#f8f9fa', 
+                            borderRadius: 4, 
+                            borderStyle: 'dashed',
+                            borderWidth: 2,
+                            boxShadow: '0 4px 16px rgba(0,0,0,0.04)'
+                        }}>
                             <CardContent sx={{ textAlign: 'center', py: 5 }}>
                                 <Typography variant="h6" color="text.secondary">No upcoming events scheduled right now.</Typography>
                                 <Button variant="outlined" onClick={() => handleNav('events')} sx={{ mt: 2, borderRadius: 50 }}>
@@ -414,7 +438,15 @@ export default function MemberDashboard({ onNavigate }) {
                         <CampaignIcon color="secondary" /> Latest Club News
                     </Typography>
 
-                    <Card sx={{ borderRadius: 4, border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 4px 24px rgba(0,0,0,0.04)' }}>
+                    <Card sx={{ 
+                        borderRadius: 4, 
+                        border: '1.5px solid rgba(193, 120, 23, 0.12)', 
+                        boxShadow: '0 6px 24px rgba(193, 120, 23, 0.08)',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': {
+                            boxShadow: '0 10px 32px rgba(193, 120, 23, 0.12)'
+                        }
+                    }}>
                         <CardContent sx={{ p: 0 }}>
                             {loading ? (
                                 <Box sx={{ p: 3 }}>
@@ -428,8 +460,12 @@ export default function MemberDashboard({ onNavigate }) {
                                         <Box
                                             sx={{
                                                 p: 3,
-                                                transition: 'bgcolor 0.2s',
-                                                '&:hover': { bgcolor: 'rgba(0,0,0,0.02)', cursor: 'pointer' }
+                                                transition: 'all 0.25s ease',
+                                                '&:hover': { 
+                                                    bgcolor: 'rgba(193, 120, 23, 0.04)', 
+                                                    cursor: 'pointer',
+                                                    transform: 'translateX(4px)'
+                                                }
                                             }}
                                             onClick={() => handleNav('announcements')}
                                         >
