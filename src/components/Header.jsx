@@ -219,7 +219,7 @@ export default function Header(props) {
               }}
               onClick={() => handleNavigate('/')}
             >
-              {isMobile ? 'FBC' : 'Fredericksburg Birding Club'}
+              {isMobile ? 'Fredericksburg BC' : 'Fredericksburg Birding Club'}
             </Typography>
 
             <Box sx={{ flexGrow: 1 }} />
