@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import { getPictureUrl } from '../services/cloudinaryService'
 import {
@@ -54,10 +54,12 @@ import {
   Event as EventIcon
 } from '@mui/icons-material'
 import { getMemberByEmail, getMemberEvents } from '../services/restdbService'
+import Breadcrumbs from './common/Breadcrumbs'
 
 const MemberProfile = () => {
   const { email } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const { user } = useAuth0()
   const [memberData, setMemberData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -319,8 +321,14 @@ const MemberProfile = () => {
 
   const profileImage = getProfileImage()
 
+  const breadcrumbItems = [
+    { label: 'Members', path: '/members-directory' },
+    { label: `${memberData?.first} ${memberData?.last}`, path: location.pathname }
+  ]
+
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
+      <Breadcrumbs customCrumbs={breadcrumbItems} />
       <Button 
         startIcon={<ArrowBack />} 
         onClick={() => navigate('/members-directory')}
