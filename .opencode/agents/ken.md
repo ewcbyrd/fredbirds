@@ -1,7 +1,7 @@
 ---
 description: Birding feature ideation agent that consults a panel of renowned ornithology experts to propose new features for the Fredericksburg Birding Club website
 mode: subagent
-model: anthropic/claude-opus-4-20250514
+model: github-copilot/claude-opus-4.6
 temperature: 0.8
 permission:
   edit: ask

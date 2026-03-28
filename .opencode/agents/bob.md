@@ -1,7 +1,7 @@
 ---
 description: Expert React engineer with broad framework knowledge, specializing in JavaScript/TypeScript and building amazing web applications
 mode: subagent
-model: anthropic/claude-opus-4-20250514
+model: github-copilot/claude-opus-4.6
 temperature: 0.5
 permission:
   edit: ask

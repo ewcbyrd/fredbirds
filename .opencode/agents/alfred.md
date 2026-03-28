@@ -1,7 +1,7 @@
 ---
 description: Expert-level AI Frontend Design Agent specializing in UI/UX and modern frontend development
 mode: subagent
-model: anthropic/claude-opus-4-20250514
+model: github-copilot/claude-opus-4.6
 temperature: 0.7
 permission:
   edit: ask
