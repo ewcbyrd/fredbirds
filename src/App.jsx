@@ -57,6 +57,12 @@ const theme = createTheme({
     text: {
       primary: '#1a1a1a',
       secondary: '#5c5c5c',
+    },
+    accent: {
+      blue: '#5b9bd5',
+      brown: '#8b6f47',
+      teal: '#2c7873',
+      sage: '#6b8e6f'
     }
   },
   typography: {

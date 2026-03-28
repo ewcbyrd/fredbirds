@@ -168,7 +168,7 @@ export default function Home({ onNavigate }) {
 
           <Grid container spacing={3} justifyContent="center">
             {/* Upcoming Events - Forest Green */}
-            <Grid item xs={6} sm={4} md={2}>
+            <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('events')}
                 sx={{
@@ -196,11 +196,11 @@ export default function Home({ onNavigate }) {
             </Grid>
 
             {/* Recent Sightings - Sky Blue (Info) */}
-            <Grid item xs={6} sm={4} md={2}>
+            <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('sightings')}
                 sx={{
-                  background: 'linear-gradient(135deg, #5b9bd5 0%, #70b5e8 100%)', // Keeping custom blue as accent
+                  background: `linear-gradient(135deg, ${theme.palette.accent.blue} 0%, ${theme.palette.accent.blue} 100%)`,
                   textAlign: 'center',
                   py: 4,
                   cursor: 'pointer',
@@ -224,7 +224,7 @@ export default function Home({ onNavigate }) {
             </Grid>
 
             {/* Photo Gallery - Sunset Orange (Secondary) */}
-            <Grid item xs={6} sm={4} md={2}>
+            <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('photos')}
                 sx={{
@@ -252,11 +252,11 @@ export default function Home({ onNavigate }) {
             </Grid>
 
             {/* Membership - Earthy Brown */}
-            <Grid item xs={6} sm={4} md={2}>
+            <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('membership')}
                 sx={{
-                  background: 'linear-gradient(135deg, #8b6f47 0%, #a08968 100%)',
+                  background: `linear-gradient(135deg, ${theme.palette.accent.brown} 0%, ${theme.palette.accent.brown} 100%)`,
                   textAlign: 'center',
                   py: 4,
                   cursor: 'pointer',
@@ -280,11 +280,11 @@ export default function Home({ onNavigate }) {
             </Grid>
 
             {/* Officers - Deep Teal */}
-            <Grid item xs={6} sm={4} md={2}>
+            <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
                 onClick={() => onNavigate('officers')}
                 sx={{
-                  background: 'linear-gradient(135deg, #2c7873 0%, #3d9891 100%)',
+                  background: `linear-gradient(135deg, ${theme.palette.accent.teal} 0%, ${theme.palette.accent.teal} 100%)`,
                   textAlign: 'center',
                   py: 4,
                   cursor: 'pointer',
@@ -309,11 +309,11 @@ export default function Home({ onNavigate }) {
 
             {/* Members Directory - Sage Green */}
             {hasAccess(ACCESS_LEVELS.MEMBER) && (
-              <Grid item xs={6} sm={4} md={2}>
+              <Grid item xs={12} sm={6} md={4} lg={2}>
                 <Card
                   onClick={() => onNavigate('members-directory')}
                   sx={{
-                    background: 'linear-gradient(135deg, #6b8e6f 0%, #7fa883 100%)',
+                    background: `linear-gradient(135deg, ${theme.palette.accent.sage} 0%, ${theme.palette.accent.sage} 100%)`,
                     textAlign: 'center',
                     py: 4,
                     cursor: 'pointer',
