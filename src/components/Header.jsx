@@ -185,6 +185,7 @@ export default function Header(props) {
           <Toolbar sx={{ width: '100%', mx: 'auto', px: { xs: 2, md: 6, lg: 10 } }}>
             {/* Logo/Home Button */}
             <IconButton
+              aria-label="Return to home page"
               edge="start"
               color="inherit"
               onClick={() => handleNavigate('/')}
@@ -267,6 +268,7 @@ export default function Header(props) {
 
             {/* Menu Icon */}
             <IconButton
+              aria-label="Open navigation menu"
               edge="end"
               color="inherit"
               onClick={() => setDrawerOpen(true)}
@@ -318,6 +320,7 @@ export default function Header(props) {
                   Complete Setup
                 </Button>
                 <IconButton
+                  aria-label="Dismiss banner"
                   size="small"
                   onClick={handleDismissBanner}
                   sx={{ color: 'rgba(0, 0, 0, 0.54)' }}
@@ -362,7 +365,7 @@ export default function Header(props) {
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
         }}>
           <Typography variant="h6" sx={{ fontWeight: 700 }}>Menu</Typography>
-          <IconButton onClick={() => setDrawerOpen(false)} sx={{ color: 'white' }}>
+          <IconButton aria-label="Close menu" onClick={() => setDrawerOpen(false)} sx={{ color: 'white' }}>
             <CloseIcon />
           </IconButton>
         </Box>

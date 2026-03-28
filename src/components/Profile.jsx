@@ -361,6 +361,7 @@ const Profile = () => {
                 </Typography>
                 {!editingPhone && (
                   <IconButton
+                    aria-label="Edit phone number"
                     onClick={handleEditPhone}
                     size="small"
                     color="primary"
@@ -616,6 +617,7 @@ const Profile = () => {
               </Typography>
               {!editingSocialLinks && (
                 <IconButton
+                  aria-label="Edit social links"
                   onClick={handleEditSocialLinks}
                   size="small"
                   color="primary"
@@ -819,6 +821,7 @@ const Profile = () => {
               </Typography>
               {!editingCounts && (
                 <IconButton
+                  aria-label="Edit species counts"
                   onClick={handleEditCounts}
                   size="small"
                   color="primary"
