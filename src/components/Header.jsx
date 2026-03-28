@@ -163,10 +163,12 @@ export default function Header(props) {
   ]
 
   const primaryNav = [
-    { label: 'Home', path: '/' },
-    { label: 'Sightings', path: '/sightings' },
     { label: 'Events', path: '/events' },
-    { label: 'Membership', path: '/membership' }
+    { label: 'Sightings', path: '/sightings' },
+    { label: 'Photos', path: '/photos' },
+    { label: 'News', path: '/announcements' },
+    { label: 'Members', path: '/members-directory' },
+    { label: 'Join', path: '/membership' }
   ]
 
   // Filter menu sections based on authentication
@@ -237,10 +239,11 @@ export default function Header(props) {
                       px: 2,
                       py: 0.8,
                       fontSize: '0.95rem',
-                      fontWeight: 600,
+                      fontWeight: location.pathname === item.path ? 700 : 600,
                       position: 'relative',
                       overflow: 'hidden',
                       borderRadius: '50px',
+                      bgcolor: location.pathname === item.path ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
                       '&::after': {
                         content: '""',
                         position: 'absolute',
