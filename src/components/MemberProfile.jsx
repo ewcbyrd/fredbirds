@@ -45,7 +45,6 @@ import {
   Facebook,
   LinkedIn,
   Launch,
-  ArrowBack,
   EmojiEvents,
   Star,
   Diamond,
@@ -329,13 +328,6 @@ const MemberProfile = () => {
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Breadcrumbs customCrumbs={breadcrumbItems} />
-      <Button 
-        startIcon={<ArrowBack />} 
-        onClick={() => navigate('/members-directory')}
-        sx={{ mb: 3 }}
-      >
-        Back to Directory
-      </Button>
 
       <Card>
         <CardContent sx={{ p: 4 }}>
