@@ -21,6 +21,7 @@ import ReactMarkdown from 'react-markdown'
 import { getEventsByYear, getFutureEvents } from '../services/restdbService'
 import EventDetailsDialog from './EventDetailsDialog'
 import AppCard from './common/AppCard'
+import PageContainer from './common/PageContainer'
 
 
 const locales = {
@@ -274,7 +275,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
 
   if (loading) {
     return (
-      <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, py: 4 }}>
+      <PageContainer>
         <Skeleton variant="text" width={200} height={40} sx={{ mb: 3 }} />
         <Grid container spacing={3}>
           {[1, 2, 3].map((n) => (
@@ -285,7 +286,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
             </Grid>
           ))}
         </Grid>
-      </Box>
+      </PageContainer>
     )
   }
 
@@ -587,7 +588,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
 
   // Full calendar view
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, py: 4 }}>
+    <PageContainer>
       <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 3 }}>
         Events Calendar
       </Typography>
@@ -639,6 +640,6 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
           loadEvents()
         }}
       />
-    </Box>
+    </PageContainer>
   )
 }

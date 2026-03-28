@@ -8,6 +8,7 @@ import { getPhotos } from '../services/restdbService'
 import { getCloudinaryUrl, transformations } from '../services/cloudinaryService'
 import { useAuth0 } from '@auth0/auth0-react'
 import PhotoUploadForm from './PhotoUploadForm'
+import PageContainer from './common/PageContainer'
 
 export default function Photos() {
   const { isAuthenticated } = useAuth0()
@@ -112,17 +113,17 @@ export default function Photos() {
 
   if (loading) {
     return (
-      <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, py: 4 }}>
+      <PageContainer>
         <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 3 }}>
           Photo Gallery
         </Typography>
         <Typography color="text.secondary">Loading photos...</Typography>
-      </Box>
+      </PageContainer>
     )
   }
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, py: 4 }}>
+    <PageContainer>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a' }}>
           Photo Gallery
@@ -220,6 +221,6 @@ export default function Photos() {
         onClose={() => setUploadDialogOpen(false)}
         onUploadSuccess={loadPhotos}
       />
-    </Box>
+    </PageContainer>
   )
 }
