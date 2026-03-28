@@ -174,7 +174,7 @@ export default function Photos() {
       
       <Grid container spacing={2}>
         {filteredPhotos.map((photo, idx) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={idx}>
+          <Grid item xs={6} sm={4} md={3} lg={2} key={idx}>
             <Card 
               sx={{ 
                 cursor: 'pointer',
