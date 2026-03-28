@@ -55,11 +55,14 @@ const AppCard = ({
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                borderRadius: 2,
-                transition: 'transform 0.2s, box-shadow 0.2s',
+                borderRadius: 3,
+                border: '1.5px solid rgba(0, 0, 0, 0.08)',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': onClick ? {
-                    transform: 'translateY(-4px)',
-                    boxShadow: theme.shadows[8]
+                    transform: 'translateY(-6px)',
+                    boxShadow: '0 12px 28px rgba(0, 0, 0, 0.12)',
+                    borderColor: 'rgba(0, 0, 0, 0.12)'
                 } : {},
                 ...sx
             }}
