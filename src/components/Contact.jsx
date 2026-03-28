@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
 import { sendEmail } from '../services/restdbService'
+import PageContainer from './common/PageContainer'
 
 const options = [
   { value: 'membership', label: 'Membership' },
@@ -65,7 +66,7 @@ export default function Contact() {
   }
 
   return (
-    <Box sx={{ maxWidth: 900, mx: 'auto' }}>
+    <PageContainer maxWidth="md">
       <Box sx={{ bgcolor: 'white', p:2, borderRadius:1 }}>
         <Typography variant="h5">Contact Us</Typography>
         <Typography sx={{ mb:2 }}>Need to reach us? Fill out the form and submit.</Typography>
@@ -84,6 +85,6 @@ export default function Contact() {
           <Typography sx={{ mt:2, color: status.type === 'error' ? 'error.main' : 'success.main' }}>{status.message}</Typography>
         )}
       </Box>
-    </Box>
+    </PageContainer>
   )
 }

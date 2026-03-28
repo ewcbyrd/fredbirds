@@ -2,6 +2,7 @@ import React from 'react'
 import { Box, Typography, Card, CardContent } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { getCloudinaryUrl, transformations } from '../services/cloudinaryService'
+import PageContainer from './common/PageContainer'
 
 const vsoLogo = getCloudinaryUrl('vso.png', transformations.optimized)
 
@@ -14,7 +15,7 @@ export default function About() {
   }
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, py: 4 }}>
+    <PageContainer maxWidth="lg">
       <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 3 }}>
         About Us
       </Typography>
@@ -69,6 +70,6 @@ export default function About() {
           </Box>
         </CardContent>
       </Card>
-    </Box>
+    </PageContainer>
   )
 }

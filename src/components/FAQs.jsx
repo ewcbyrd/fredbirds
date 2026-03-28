@@ -6,6 +6,7 @@ import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { getFaqs } from '../services/restdbService'
+import PageContainer from './common/PageContainer'
 
 export default function FAQs(){
   const [faqs, setFaqs] = useState([])
@@ -20,7 +21,7 @@ export default function FAQs(){
   },[])
 
   return (
-    <Box sx={{ maxWidth: 900, mx: 'auto' }}>
+    <PageContainer maxWidth="md">
       <Box sx={{ bgcolor: 'white', p:2, borderRadius:1 }}>
         <Typography variant="h5" sx={{ mb:2 }}>FAQ's</Typography>
         {loading && <Typography>Loading...</Typography>}
@@ -36,6 +37,6 @@ export default function FAQs(){
           </Accordion>
         ))}
       </Box>
-    </Box>
+    </PageContainer>
   )
 }
