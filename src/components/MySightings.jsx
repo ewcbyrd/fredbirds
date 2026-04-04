@@ -9,7 +9,7 @@ import StarIcon from '@mui/icons-material/Star'
 import MapModal from './MapModal'
 import { isRareBird } from '../utils/rareBirdsUtils'
 
-export default function MySightings({ sightings = [], header = 'Sightings', viewtype, filter }) {
+export default function MySightings({ sightings = [], header = 'Sightings' }) {
   const [openIds, setOpenIds] = useState(new Set())
   const [mapOpen, setMapOpen] = useState(false)
   const [selectedRecord, setSelectedRecord] = useState(null)
