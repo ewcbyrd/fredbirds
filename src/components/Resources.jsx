@@ -543,7 +543,7 @@ export default function Resources() {
                 </Typography>
               </Box>
             ) : (
-              <MySightings sightings={sightings} header={dropdown} viewtype={setting.view} />
+              <MySightings sightings={sightings} header={dropdown} />
             )}
           </Box>
         </Card>
