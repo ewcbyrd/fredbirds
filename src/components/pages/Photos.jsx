@@ -1,0 +1,251 @@
+import React, { useState, useEffect } from 'react';
+import {
+    Box,
+    Typography,
+    Grid,
+    Card,
+    CardMedia,
+    Tabs,
+    Tab,
+    Button,
+    CircularProgress,
+    Alert
+} from '@mui/material';
+import Lightbox from 'yet-another-react-lightbox';
+import Captions from 'yet-another-react-lightbox/plugins/captions';
+import 'yet-another-react-lightbox/styles.css';
+import 'yet-another-react-lightbox/plugins/captions.css';
+import { getPhotos } from '../../services/restdbService';
+import {
+    getCloudinaryUrl,
+    transformations
+} from '../../services/cloudinaryService';
+import { formatPhotoDate } from '../../utils/dateUtils';
+import { useAuth0 } from '@auth0/auth0-react';
+import PhotoUploadForm from '../forms/PhotoUploadForm';
+import PageContainer from '../common/PageContainer';
+
+export default function Photos() {
+    const { isAuthenticated } = useAuth0();
+    const [index, setIndex] = useState(-1);
+    const [activeTab, setActiveTab] = useState(0);
+    const [photos, setPhotos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+
+    useEffect(() => {
+        loadPhotos();
+    }, []);
+
+    const loadPhotos = async () => {
+        try {
+            setLoading(true);
+            const data = await getPhotos();
+
+            // Transform API data to match component format
+            const transformedPhotos = data
+                .filter((photo) => photo.cloudinary_public_id)
+                .map((photo) => {
+                    // Build caption from available metadata
+                    const captionParts = [];
+
+                    if (photo.header) {
+                        captionParts.push(photo.header);
+                    }
+
+                    if (photo.description) {
+                        captionParts.push(photo.description);
+                    }
+
+                    if (photo.location) {
+                        captionParts.push(photo.location);
+                    }
+
+                    if (photo.photoDate) {
+                        const formattedDate = formatPhotoDate(photo.photoDate);
+                        if (formattedDate) {
+                            captionParts.push(formattedDate);
+                        }
+                    }
+
+                    if (photo.contributor) {
+                        captionParts.push(`Contributor: ${photo.contributor}`);
+                    }
+
+                    return {
+                        src: getCloudinaryUrl(
+                            photo.cloudinary_public_id,
+                            transformations.optimized
+                        ),
+                        category: (photo.category || 'people').toLowerCase(),
+                        title: photo.header || 'Photo',
+                        description:
+                            captionParts.length > 0
+                                ? captionParts.join(' • ')
+                                : undefined
+                    };
+                });
+
+            setPhotos(transformedPhotos);
+        } catch (err) {
+            console.error('Error loading photos:', err);
+            setError(err.message || 'Failed to load photos');
+            setPhotos([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const categories = ['people', 'places', 'birds'];
+    const filteredPhotos = photos.filter(
+        (photo) => photo.category === categories[activeTab]
+    );
+
+    const handleTabChange = (event, newValue) => {
+        setActiveTab(newValue);
+    };
+
+    if (loading) {
+        return (
+            <PageContainer>
+                <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight="200px"
+                >
+                    <CircularProgress />
+                    <Typography variant="body1" sx={{ ml: 2 }}>
+                        Loading photos...
+                    </Typography>
+                </Box>
+            </PageContainer>
+        );
+    }
+
+    return (
+        <PageContainer>
+            {error && (
+                <Alert
+                    severity="error"
+                    onClose={() => setError(null)}
+                    sx={{ mb: 2 }}
+                >
+                    {error}
+                </Alert>
+            )}
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 3
+                }}
+            >
+                <Typography
+                    variant="h4"
+                    sx={{ fontWeight: 700, color: 'text.primary' }}
+                >
+                    Photo Gallery
+                </Typography>
+                {isAuthenticated && (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => setUploadDialogOpen(true)}
+                    >
+                        Upload Photo
+                    </Button>
+                )}
+            </Box>
+
+            <Box
+                sx={{
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                    mb: 3,
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                }}
+            >
+                <Tabs
+                    value={activeTab}
+                    onChange={(e, newValue) => {
+                        setActiveTab(newValue);
+                        setIndex(-1); // Reset lightbox when switching tabs
+                    }}
+                    sx={{
+                        '& .MuiTab-root': {
+                            textTransform: 'none',
+                            fontSize: '1rem',
+                            fontWeight: 600,
+                            minWidth: 120,
+                            '&.Mui-selected': {
+                                color: 'primary.main'
+                            }
+                        },
+                        '& .MuiTabs-indicator': {
+                            backgroundColor: 'primary.main',
+                            height: 3
+                        }
+                    }}
+                >
+                    <Tab label="People" />
+                    <Tab label="Places" />
+                    <Tab label="Birds" />
+                </Tabs>
+            </Box>
+
+            <Grid container spacing={2}>
+                {filteredPhotos.map((photo, idx) => (
+                    <Grid item xs={6} sm={4} md={3} lg={2} key={idx}>
+                        <Card
+                            sx={{
+                                cursor: 'pointer',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                borderRadius: 2,
+                                overflow: 'hidden',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                                    transform: 'translateY(-4px)'
+                                }
+                            }}
+                            onClick={() => {
+                                // Find the index in the filtered photos array for lightbox
+                                const allPhotosIndex = photos.findIndex(
+                                    (p) => p.src === photo.src
+                                );
+                                setIndex(allPhotosIndex);
+                            }}
+                        >
+                            <CardMedia
+                                component="img"
+                                image={photo.src}
+                                alt={photo.title}
+                                sx={{
+                                    height: 250,
+                                    objectFit: 'cover'
+                                }}
+                            />
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+
+            <Lightbox
+                open={index >= 0}
+                index={index}
+                close={() => setIndex(-1)}
+                slides={photos}
+                plugins={[Captions]}
+            />
+
+            <PhotoUploadForm
+                open={uploadDialogOpen}
+                onClose={() => setUploadDialogOpen(false)}
+                onUploadSuccess={loadPhotos}
+            />
+        </PageContainer>
+    );
+}
