@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button, Box, Typography, Avatar, Menu, MenuItem, Divider } from '@mui/material'
 import { AccountCircle, Login, Logout, Settings, EventNote } from '@mui/icons-material'
 import { useUserRole, ACCESS_LEVELS } from '../hooks/useUserRole'
-import { getMemberByEmail } from '../services/restdbService'
+import { useMember } from '../hooks/useMember'
 import RoleBadge from './RoleBadge'
 
 const LoginButton = () => {
@@ -71,25 +71,7 @@ const UserProfile = () => {
   const { hasAccess, userRole } = useUserRole()
   const navigate = useNavigate()
   const [anchorEl, setAnchorEl] = React.useState(null)
-  const [memberData, setMemberData] = React.useState(null)
-  
-  // Fetch member data when user is authenticated
-  React.useEffect(() => {
-    const fetchMemberData = async () => {
-      if (isAuthenticated && user?.email) {
-        try {
-          const member = await getMemberByEmail(user.email)
-          setMemberData(member)
-        } catch (error) {
-          // If no member record found, that's okay - use Auth0 data
-          console.log('No member record found, using Auth0 data')
-          setMemberData(null)
-        }
-      }
-    }
-    
-    fetchMemberData()
-  }, [isAuthenticated, user?.email])
+  const { member: memberData } = useMember()
 
   // Debug logging
   React.useEffect(() => {

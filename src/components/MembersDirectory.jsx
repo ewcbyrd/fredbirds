@@ -18,18 +18,13 @@ import {
   Chip
 } from '@mui/material'
 import {
-  Person,
   Email,
   Phone,
   Search,
-  Group,
-  EmojiEvents,
-  Star,
-  Diamond,
-  Whatshot,
-  WorkspacePremium
+  Group
 } from '@mui/icons-material'
 import { getActiveMembers } from '../services/restdbService'
+import { getNameParts, formatName, getInitials, formatPhone, getMilestoneInfo, isOwnProfile } from '../utils/memberUtils'
 import AppCard from './common/AppCard'
 
 const MembersDirectory = () => {
@@ -54,23 +49,6 @@ const MembersDirectory = () => {
         if (data && Array.isArray(data)) {
           // Sort members alphabetically by last name, then first name
           const sortedMembers = data.sort((a, b) => {
-            // Helper function to extract last and first names
-            const getNameParts = (member) => {
-              if (member.Name) {
-                // Handle "First Last" format
-                const parts = member.Name.split(' ')
-                return {
-                  last: parts.length > 1 ? parts[parts.length - 1] : '',
-                  first: parts.length > 1 ? parts.slice(0, -1).join(' ') : parts[0] || ''
-                }
-              }
-
-              return {
-                last: member.lastName || member.last || '',
-                first: member.firstName || member.first || member.name || ''
-              }
-            }
-
             const nameA = getNameParts(a)
             const nameB = getNameParts(b)
 
@@ -140,107 +118,6 @@ const MembersDirectory = () => {
   const handleMemberClick = (member) => {
     // Navigate to member profile using email as identifier
     navigate(`/members/${encodeURIComponent(member.email)}`)
-  }
-
-  const isOwnProfile = (member) => {
-    if (!user || !member) return false
-    return user.email === member.email
-  }
-
-  const formatName = (member) => {
-    // Try different field name conventions
-    if (member.Name) {
-      return member.Name  // Capital N (officers data format)
-    }
-
-    const firstName = member.firstName || member.first || ''
-    const lastName = member.lastName || member.last || ''
-    const fullName = `${firstName} ${lastName}`.trim()
-
-    if (fullName) {
-      return fullName
-    }
-
-    // Try single name field
-    if (member.name) {
-      return member.name
-    }
-
-    return 'Name not provided'
-  }
-
-  const formatPhone = (phone) => {
-    if (!phone) return null
-    // Basic phone formatting
-    const cleaned = phone.replace(/\D/g, '')
-    if (cleaned.length === 10) {
-      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`
-    }
-    return phone
-  }
-
-  const getInitials = (member) => {
-    // Try different field name conventions
-    if (member.Name) {
-      const nameParts = member.Name.split(' ')
-      return nameParts.map(part => part.charAt(0)).join('').toUpperCase() || 'M'
-    }
-
-    const firstName = member.firstName || member.first || ''
-    const lastName = member.lastName || member.last || ''
-    const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
-
-    if (initials.length > 0) {
-      return initials
-    }
-
-    // Try single name field
-    if (member.name) {
-      const nameParts = member.name.split(' ')
-      return nameParts.map(part => part.charAt(0)).join('').toUpperCase() || 'M'
-    }
-
-    return 'M'
-  }
-
-  const getMilestoneInfo = (member) => {
-    const worldCount = member.worldCount || 0
-
-    if (worldCount >= 1000) {
-      return {
-        icon: Diamond,
-        color: '#9c27b0', // Purple
-        text: '1000+',
-        tooltip: '1000+ World Species',
-        level: 'master'
-      }
-    } else if (worldCount >= 500) {
-      return {
-        icon: EmojiEvents,
-        color: '#ff9800', // Gold
-        text: '500+',
-        tooltip: '500+ World Species',
-        level: 'expert'
-      }
-    } else if (worldCount >= 250) {
-      return {
-        icon: WorkspacePremium,
-        color: '#4caf50', // Green
-        text: '250+',
-        tooltip: '250+ World Species',
-        level: 'advanced'
-      }
-    } else if (worldCount >= 100) {
-      return {
-        icon: Star,
-        color: '#2196f3', // Blue
-        text: '100+',
-        tooltip: '100+ World Species',
-        level: 'accomplished'
-      }
-    }
-
-    return null
   }
 
   if (loading) {
@@ -374,7 +251,7 @@ const MembersDirectory = () => {
                 </Box>
 
                 <Box sx={{ mt: 'auto', width: '100%' }}>
-                  {(member.showEmail === true || isOwnProfile(member)) && (
+                  {(member.showEmail === true || isOwnProfile(user, member)) && (
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, color: 'text.secondary' }}>
                       <Email fontSize="small" color="action" />
                       <Typography variant="body2" noWrap sx={{ maxWidth: '100%' }}>
@@ -382,7 +259,7 @@ const MembersDirectory = () => {
                       </Typography>
                     </Box>
                   )}
-                  {member.phone && (member.showPhone === true || isOwnProfile(member)) && (
+                  {member.phone && (member.showPhone === true || isOwnProfile(user, member)) && (
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, color: 'text.secondary' }}>
                       <Phone fontSize="small" color="action" />
                       <Typography variant="body2">

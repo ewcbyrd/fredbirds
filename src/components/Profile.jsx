@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useUserRole } from '../hooks/useUserRole'
-import { getMemberByEmail, patchMember, getMemberEvents } from '../services/restdbService'
+import { useMember } from '../hooks/useMember'
+import { patchMember, getMemberEvents } from '../services/restdbService'
 import { getPictureUrl } from '../services/cloudinaryService'
 import {
   Container,
@@ -57,13 +58,13 @@ import {
 } from '@mui/icons-material'
 import RoleBadge from './RoleBadge'
 import PageContainer from './common/PageContainer'
+import { formatMemberEventDate } from '../utils/dateUtils'
 
 const Profile = () => {
   const { user } = useAuth0()
   const { userRole } = useUserRole()
+  const { member: fetchedMember, loading, error } = useMember()
   const [memberData, setMemberData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
   const [showEmail, setShowEmail] = useState(false)
   const [showPhone, setShowPhone] = useState(false)
   const [showInDirectory, setShowInDirectory] = useState(true)
@@ -82,38 +83,15 @@ const Profile = () => {
   const [eventsPage, setEventsPage] = useState(1)
   const eventsPerPage = 5
 
+  // Sync local memberData from hook and initialize toggle states
   useEffect(() => {
-    const fetchMemberData = async () => {
-      if (!user?.email) {
-        setLoading(false)
-        return
-      }
-
-      try {
-        setLoading(true)
-        setError(null)
-        console.log('Fetching member data for:', user.email)
-        
-        let data = await getMemberByEmail(user.email)
-        console.log('Member data received:', data)
-        
-        console.log('US Count:', data?.usCount)
-        console.log('World Count:', data?.worldCount)
-        console.log('Picture URL:', data?.picture)
-        setMemberData(data)
-        setShowEmail(data?.showEmail ?? false)
-        setShowPhone(data?.showPhone ?? false)
-        setShowInDirectory(data?.showInDirectory ?? true)
-      } catch (err) {
-        console.error('Error fetching member data:', err)
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
+    if (fetchedMember) {
+      setMemberData(fetchedMember)
+      setShowEmail(fetchedMember.showEmail ?? false)
+      setShowPhone(fetchedMember.showPhone ?? false)
+      setShowInDirectory(fetchedMember.showInDirectory ?? true)
     }
-
-    fetchMemberData()
-  }, [user?.email])
+  }, [fetchedMember])
 
   // Fetch member events
   useEffect(() => {
@@ -269,34 +247,6 @@ const Profile = () => {
     setEditingPhone(false);
     setEditPhone('');
   };
-
-  const formatEventDate = (startDateString, endDateString) => {
-    if (!startDateString) return 'Date not available'
-
-    // Parse dates in UTC to avoid timezone issues
-    const startDate = new Date(startDateString)
-    const startMonth = startDate.toLocaleDateString('en-US', { month: 'long', timeZone: 'UTC' })
-    const startDay = startDate.getUTCDate()
-    const startYear = startDate.getUTCFullYear()
-
-    // No end date - single day event
-    if (!endDateString) {
-      return `${startMonth} ${startDay}, ${startYear}`
-    }
-
-    const endDate = new Date(endDateString)
-    const endMonth = endDate.toLocaleDateString('en-US', { month: 'long', timeZone: 'UTC' })
-    const endDay = endDate.getUTCDate()
-    const endYear = endDate.getUTCFullYear()
-
-    // Same month - format: September 7-10, 2010
-    if (startMonth === endMonth && startYear === endYear) {
-      return `${startMonth} ${startDay}-${endDay}, ${startYear}`
-    }
-
-    // Different months - format: September 29 - October 1, 2010
-    return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${endYear}`
-  }
 
   const handleEventsPageChange = (event, value) => {
     setEventsPage(value)
@@ -961,7 +911,7 @@ const Profile = () => {
                           </TableCell>
                           <TableCell sx={{ width: '40%' }}>
                             <Typography variant="body2" color="text.secondary">
-                              {formatEventDate(event.eventStart, event.eventEnd)}
+                              {formatMemberEventDate(event.eventStart, event.eventEnd)}
                             </Typography>
                           </TableCell>
                         </TableRow>

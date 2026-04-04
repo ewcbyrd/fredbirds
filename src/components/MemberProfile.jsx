@@ -45,14 +45,12 @@ import {
   Facebook,
   LinkedIn,
   Launch,
-  EmojiEvents,
-  Star,
-  Diamond,
-  Whatshot,
-  WorkspacePremium,
+  ArrowBack,
   Event as EventIcon
 } from '@mui/icons-material'
 import { getMemberByEmail, getMemberEvents } from '../services/restdbService'
+import { formatName, getInitials, formatPhone, getMilestoneInfo, isOwnProfile } from '../utils/memberUtils'
+import { formatMemberEventDate } from '../utils/dateUtils'
 import Breadcrumbs from './common/Breadcrumbs'
 
 const MemberProfile = () => {
@@ -126,91 +124,8 @@ const MemberProfile = () => {
     fetchMemberEvents()
   }, [memberData])
 
-  const formatEventDate = (startDateString, endDateString) => {
-    if (!startDateString) return 'Date not available'
-
-    // Parse dates in UTC to avoid timezone issues
-    const startDate = new Date(startDateString)
-    const startMonth = startDate.toLocaleDateString('en-US', { month: 'long', timeZone: 'UTC' })
-    const startDay = startDate.getUTCDate()
-    const startYear = startDate.getUTCFullYear()
-
-    // No end date - single day event
-    if (!endDateString) {
-      return `${startMonth} ${startDay}, ${startYear}`
-    }
-
-    const endDate = new Date(endDateString)
-    const endMonth = endDate.toLocaleDateString('en-US', { month: 'long', timeZone: 'UTC' })
-    const endDay = endDate.getUTCDate()
-    const endYear = endDate.getUTCFullYear()
-
-    // Same month - format: September 7-10, 2010
-    if (startMonth === endMonth && startYear === endYear) {
-      return `${startMonth} ${startDay}-${endDay}, ${startYear}`
-    }
-
-    // Different months - format: September 29 - October 1, 2010
-    return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${endYear}`
-  }
-
   const handleEventsPageChange = (event, value) => {
     setEventsPage(value)
-  }
-
-  const isOwnProfile = () => {
-    if (!user || !memberData) return false
-    return user.email === memberData.email
-  }
-
-  const formatName = (member) => {
-    if (!member) return 'Unknown Member'
-    
-    // Try different field name conventions
-    if (member.Name) {
-      return member.Name  // Capital N (officers data format)
-    }
-    
-    const firstName = member.firstName || member.first || ''
-    const lastName = member.lastName || member.last || ''
-    const fullName = `${firstName} ${lastName}`.trim()
-    
-    if (fullName) {
-      return fullName
-    }
-    
-    // Try single name field
-    if (member.name) {
-      return member.name
-    }
-    
-    return 'Name not provided'
-  }
-
-  const getInitials = (member) => {
-    if (!member) return 'M'
-    
-    // Try different field name conventions
-    if (member.Name) {
-      const nameParts = member.Name.split(' ')
-      return nameParts.map(part => part.charAt(0)).join('').toUpperCase() || 'M'
-    }
-    
-    const firstName = member.firstName || member.first || ''
-    const lastName = member.lastName || member.last || ''
-    const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
-    
-    if (initials.length > 0) {
-      return initials
-    }
-    
-    // Try single name field
-    if (member.name) {
-      const nameParts = member.name.split(' ')
-      return nameParts.map(part => part.charAt(0)).join('').toUpperCase() || 'M'
-    }
-    
-    return 'M'
   }
 
   const getProfileImage = () => {
@@ -229,63 +144,6 @@ const MemberProfile = () => {
     ].filter(Boolean)
     
     return parts.length > 0 ? parts.join(', ') : null
-  }
-
-  const formatPhone = (phone) => {
-    if (!phone) return null
-    const cleaned = phone.replace(/\D/g, '')
-    if (cleaned.length === 10) {
-      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`
-    }
-    return phone
-  }
-
-  const getMilestoneInfo = () => {
-    const worldCount = memberData?.worldCount || 0
-    
-    if (worldCount >= 1000) {
-      return {
-        icon: Diamond,
-        color: '#9c27b0', // Purple
-        text: '1000+',
-        tooltip: '1000+ World Species',
-        level: 'master',
-        bgColor: '#f3e5f5',
-        borderColor: '#9c27b0'
-      }
-    } else if (worldCount >= 500) {
-      return {
-        icon: EmojiEvents,
-        color: '#ff9800', // Gold  
-        text: '500+',
-        tooltip: '500+ World Species',
-        level: 'expert',
-        bgColor: '#fff3e0',
-        borderColor: '#ff9800'
-      }
-    } else if (worldCount >= 250) {
-      return {
-        icon: WorkspacePremium,
-        color: '#4caf50', // Green
-        text: '250+',
-        tooltip: '250+ World Species',
-        level: 'advanced',
-        bgColor: '#e8f5e9',
-        borderColor: '#4caf50'
-      }
-    } else if (worldCount >= 100) {
-      return {
-        icon: Star,
-        color: '#2196f3', // Blue
-        text: '100+',
-        tooltip: '100+ World Species',
-        level: 'accomplished',
-        bgColor: '#e3f2fd',
-        borderColor: '#2196f3'
-      }
-    }
-    
-    return null
   }
 
   if (loading) {
@@ -370,7 +228,7 @@ const MemberProfile = () => {
                   {formatName(memberData)}
                 </Typography>
                 {(() => {
-                  const milestone = getMilestoneInfo()
+                  const milestone = getMilestoneInfo(memberData)
                   if (milestone) {
                     const IconComponent = milestone.icon
                     return (
@@ -411,7 +269,7 @@ const MemberProfile = () => {
                 Contact Information
               </Typography>
               <List dense>
-                {(memberData?.showEmail === true || isOwnProfile()) && (
+                {(memberData?.showEmail === true || isOwnProfile(user, memberData)) && (
                   <ListItem>
                     <ListItemIcon>
                       <Email color="action" />
@@ -423,7 +281,7 @@ const MemberProfile = () => {
                   </ListItem>
                 )}
                 
-                {memberData?.phone && (memberData?.showPhone === true || isOwnProfile()) && (
+                {memberData?.phone && (memberData?.showPhone === true || isOwnProfile(user, memberData)) && (
                   <ListItem>
                     <ListItemIcon>
                       <Phone color="action" />
@@ -604,7 +462,7 @@ const MemberProfile = () => {
                 {memberData?.worldCount && (
                   <Grid item xs={12} sm={6}>
                     {(() => {
-                      const milestone = getMilestoneInfo()
+                      const milestone = getMilestoneInfo(memberData)
                       return (
                         <Card variant="outlined" sx={{ 
                           textAlign: 'center', 
@@ -700,7 +558,7 @@ const MemberProfile = () => {
                             </TableCell>
                             <TableCell sx={{ width: '40%' }}>
                               <Typography variant="body2" color="text.secondary">
-                                {formatEventDate(event.eventStart, event.eventEnd)}
+                                {formatMemberEventDate(event.eventStart, event.eventEnd)}
                               </Typography>
                             </TableCell>
                           </TableRow>

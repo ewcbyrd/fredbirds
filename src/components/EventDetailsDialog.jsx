@@ -33,7 +33,7 @@ import ManageAttendeesModal from './ManageAttendeesModal'
 import LocationDialog from './LocationDialog'
 import EventMap from './EventMap'
 import ReactMarkdown from 'react-markdown'
-import { format } from 'date-fns'
+import { formatDateRangeDetail, isPastEvent, isFutureEvent } from '../utils/dateUtils'
 import EventPhotoSection from './EventPhotoSection'
 import { getEventAttendees, registerForEvent, unregisterFromEvent, getMembers } from '../services/restdbService'
 import { useAuth0 } from '@auth0/auth0-react'
@@ -121,40 +121,9 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
     }
   }
 
-  // Formatting Helpers
-  const formatDateRange = (start, end) => {
-    const utcStart = new Date(start)
-    const startDate = new Date(utcStart.getUTCFullYear(), utcStart.getUTCMonth(), utcStart.getUTCDate())
-
-    if (!end) return format(startDate, 'EEEE, MMMM d, yyyy')
-
-    const utcEnd = new Date(end)
-    // End date is exclusive (midnight of next day), so subtract 1 day to get the inclusive end date
-    utcEnd.setUTCDate(utcEnd.getUTCDate() - 1)
-
-    const endDate = new Date(utcEnd.getUTCFullYear(), utcEnd.getUTCMonth(), utcEnd.getUTCDate())
-
-    // If start and end are same day (or end is before start due to data weirdness), show single date
-    if (startDate.getTime() >= endDate.getTime()) {
-      return format(startDate, 'EEEE, MMMM d, yyyy')
-    }
-    return `${format(startDate, 'MMM d')} - ${format(endDate, 'MMM d, yyyy')}`
-  }
-
-  const isPastEvent = (evt) => {
-    const start = new Date(evt.start)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    return start < today
-  }
-
-  const isFutureEvent = (evt) => {
-    const start = new Date(evt.start)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    start.setHours(0, 0, 0, 0)
-    return start > today
-  }
+  // Formatting Helpers — imported from dateUtils:
+  // formatDateRangeDetail (aliased as formatDateRange in template), isPastEvent, isFutureEvent
+  const formatDateRange = formatDateRangeDetail
 
   const locations = currentEvent.locations || (currentEvent.lat && currentEvent.lon ? [{ name: 'Event Location', lat: currentEvent.lat, lon: currentEvent.lon }] : [])
 
