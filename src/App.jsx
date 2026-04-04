@@ -33,7 +33,7 @@ import AdminPanel from './components/AdminPanel'
 import AccessControl from './components/AccessControl'
 import MemberAccessControl from './components/MemberAccessControl'
 import { ACCESS_LEVELS } from './hooks/useUserRole'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
 const theme = createTheme({
   palette: {
@@ -186,32 +186,6 @@ const theme = createTheme({
 })
 
 export default function App() {
-  const navigate = useNavigate()
-
-  function handleNavigate(view) {
-    const map = {
-      home: '/',
-      events: '/events',
-      announcements: '/announcements',
-      sightings: '/sightings',
-      about: '/about',
-      membership: '/membership',
-      membershiplist: '/membership/list',
-      newsletters: '/newsletters',
-      faqs: '/faqs',
-      contact: '/contact',
-      news: '/news',
-      newsfeed: '/newsfeed',
-      resources: '/resources',
-      officers: '/officers',
-      photos: '/photos',
-      'members-directory': '/members-directory',
-      profile: '/profile'
-    }
-    const path = map[view] || '/'
-    navigate(path)
-  }
-
   const { logout, isAuthenticated } = useAuth0()
 
   // Handle idle timeout - auto logout after 30 minutes of inactivity
@@ -237,13 +211,13 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ bgcolor: '#f5f7f9', minHeight: '100vh' }}>
-        <Header onNavigate={handleNavigate} />
+        <Header />
         <Container sx={{ py: 0, px: 0 }} maxWidth={false}>
           <Routes>
             <Route path="/" element={
               isAuthenticated
-                ? <MemberDashboard onNavigate={handleNavigate} />
-                : <Home onNavigate={handleNavigate} />
+                ? <MemberDashboard />
+                : <Home />
             } />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
@@ -305,7 +279,7 @@ export default function App() {
             } />
 
             {/* fallback route */}
-            <Route path="*" element={<Home onNavigate={handleNavigate} />} />
+            <Route path="*" element={<Home />} />
           </Routes>
         </Container>
       </Box>

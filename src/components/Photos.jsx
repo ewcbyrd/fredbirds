@@ -6,6 +6,7 @@ import 'yet-another-react-lightbox/styles.css'
 import 'yet-another-react-lightbox/plugins/captions.css'
 import { getPhotos } from '../services/restdbService'
 import { getCloudinaryUrl, transformations } from '../services/cloudinaryService'
+import { formatPhotoDate } from '../utils/dateUtils'
 import { useAuth0 } from '@auth0/auth0-react'
 import PhotoUploadForm from './PhotoUploadForm'
 import PageContainer from './common/PageContainer'
@@ -21,36 +22,6 @@ export default function Photos() {
   useEffect(() => {
     loadPhotos()
   }, [])
-
-  const formatDate = (dateString) => {
-    if (!dateString) return null
-    try {
-      // Parse date-only strings (YYYY-MM-DD) in local timezone to avoid off-by-one errors
-      // When new Date('2025-12-09') is called, JS interprets it as UTC midnight,
-      // which can shift to previous day in negative UTC offset timezones
-      const dateMatch = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/)
-      if (dateMatch) {
-        const [, year, month, day] = dateMatch
-        const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10))
-        return date.toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        })
-      }
-      
-      // Fallback to regular date parsing for other formats
-      const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      })
-    } catch (error) {
-      console.error('Error formatting date:', error)
-      return dateString
-    }
-  }
 
   const loadPhotos = async () => {
     try {
@@ -77,7 +48,7 @@ export default function Photos() {
           }
           
           if (photo.photoDate) {
-            const formattedDate = formatDate(photo.photoDate)
+            const formattedDate = formatPhotoDate(photo.photoDate)
             if (formattedDate) {
               captionParts.push(formattedDate)
             }

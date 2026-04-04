@@ -24,6 +24,7 @@ import {
 import { useAuth0 } from '@auth0/auth0-react'
 import { getCloudinaryUrl, uploadToCloudinary } from '../services/cloudinaryService'
 import { getMemberByEmail, getEventPhotos, addEventPhoto } from '../services/restdbService'
+import { formatPhotoDate } from '../utils/dateUtils'
 
 const EventPhotoSection = ({ eventId }) => {
   const { isAuthenticated, user, isLoading: authLoading } = useAuth0()
@@ -171,22 +172,6 @@ const EventPhotoSection = ({ eventId }) => {
 
   const currentPhoto = photos.length > 0 ? photos[currentPhotoIndex] : null
 
-  const formatDate = (dateString) => {
-    if (!dateString) return null
-    try {
-      const dateMatch = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/)
-      if (dateMatch) {
-        const [, year, month, day] = dateMatch
-        const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10))
-        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-      }
-      const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-    } catch (error) {
-      return dateString
-    }
-  }
-
   // Loading state
   if (loading || authLoading) {
     return (
@@ -328,7 +313,7 @@ const EventPhotoSection = ({ eventId }) => {
             {currentPhoto.description && <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{currentPhoto.description}</Typography>}
             <Stack direction="row" spacing={2} sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
               {currentPhoto.location && <Typography variant="caption">📍 {currentPhoto.location}</Typography>}
-              {currentPhoto.photoDate && <Typography variant="caption">📅 {formatDate(currentPhoto.photoDate)}</Typography>}
+              {currentPhoto.photoDate && <Typography variant="caption">📅 {formatPhotoDate(currentPhoto.photoDate)}</Typography>}
               {currentPhoto.contributor && <Typography variant="caption">👤 {currentPhoto.contributor}</Typography>}
           </Stack>
         </Box>

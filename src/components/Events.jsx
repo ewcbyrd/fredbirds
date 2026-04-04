@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar'
 import { format, parse, startOfWeek, getDay } from 'date-fns'
 import enUS from 'date-fns/locale/en-US'
@@ -18,6 +19,7 @@ import Divider from '@mui/material/Divider'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 
 import ReactMarkdown from 'react-markdown'
+import { parseUTCDate } from '../utils/dateUtils'
 import { getEventsByYear, getFutureEvents } from '../services/restdbService'
 import EventDetailsDialog from './EventDetailsDialog'
 import AppCard from './common/AppCard'
@@ -165,7 +167,8 @@ const EventMap = ({ lat, lon, title, locations }) => {
   );
 };
 
-export default function Events({ home = false, singleEvent = false, maxEvents = 5, onViewAll }) {
+export default function Events({ home = false, singleEvent = false, maxEvents = 5 }) {
+  const navigate = useNavigate()
   const [yearEvents, setYearEvents] = useState([])
   const [allEvents, setAllEvents] = useState([])
   const [loading, setLoading] = useState(false)
@@ -215,12 +218,8 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
     // Map to React Big Calendar format
     return result.map(item => {
       // Parse date strings and adjust for timezone to avoid off-by-one day issues
-      const startDate = new Date(item.start)
-      const endDate = item.end ? new Date(item.end) : new Date(item.start)
-
-      // Create date in local timezone by using year, month, day components from UTC
-      const localStart = new Date(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate())
-      const localEnd = new Date(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate())
+      const localStart = parseUTCDate(item.start)
+      const localEnd = parseUTCDate(item.end || item.start)
 
       // React Big Calendar treats end date as exclusive, so add 1 day to include the final day
       // Since we're displaying the actual last day of the event, we need to set end to the day after
@@ -534,7 +533,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
                 borderWidth: 2
               }
             }}
-            onClick={() => onViewAll && onViewAll('events')}
+            onClick={() => navigate('/events')}
           >
             View Full Calendar
           </Button>

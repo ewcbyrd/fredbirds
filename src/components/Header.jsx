@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useUserRole, ACCESS_LEVELS } from '../hooks/useUserRole'
-import { getMemberByEmail } from '../services/restdbService'
+import { useMember } from '../hooks/useMember'
 import {
   AppBar,
   Toolbar,
@@ -66,27 +66,21 @@ export default function Header(props) {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const { user, isAuthenticated } = useAuth0()
   const { hasAccess } = useUserRole()
+  const { member: memberRecord, error: memberError } = useMember()
 
-  // Check if user needs to complete onboarding
+  // Show onboarding banner if authenticated but no member record
   useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      if (!isAuthenticated || !user?.email || bannerDismissed) {
-        setShowOnboardingBanner(false)
-        return
-      }
-
-      try {
-        await getMemberByEmail(user.email)
-        // If we get here, member record exists
-        setShowOnboardingBanner(false)
-      } catch (error) {
-        // No member record found - show onboarding banner
-        setShowOnboardingBanner(true)
-      }
+    if (bannerDismissed) {
+      setShowOnboardingBanner(false)
+      return
     }
-
-    checkOnboardingStatus()
-  }, [user?.email, isAuthenticated, bannerDismissed])
+    if (!isAuthenticated) {
+      setShowOnboardingBanner(false)
+      return
+    }
+    // If there's an error (no member record found), show the banner
+    setShowOnboardingBanner(!memberRecord && !!memberError)
+  }, [isAuthenticated, memberRecord, memberError, bannerDismissed])
 
   const handleDismissBanner = () => {
     setBannerDismissed(true)

@@ -11,6 +11,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { createAnnouncement, updateAnnouncement } from '../../services/restdbService'
+import { parseUTCDate } from '../../utils/dateUtils'
 
 const AnnouncementForm = ({ announcement, onSuccess, onCancel }) => {
     const [formData, setFormData] = useState({
@@ -23,14 +24,6 @@ const AnnouncementForm = ({ announcement, onSuccess, onCancel }) => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const [success, setSuccess] = useState(false)
-
-    // Helper function to convert UTC date string to local date with same calendar date
-    const parseUTCDate = (dateString) => {
-        if (!dateString) return null
-        const utcDate = new Date(dateString)
-        // Create a new date in local timezone with the same year/month/day as UTC
-        return new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate())
-    }
 
     useEffect(() => {
         if (announcement) {

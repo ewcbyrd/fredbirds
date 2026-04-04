@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
-import { getMemberByEmail } from '../services/restdbService'
 import { useUserRole, ACCESS_LEVELS } from '../hooks/useUserRole'
+import { useMember } from '../hooks/useMember'
 import { Box, Typography, CircularProgress, Alert, Button } from '@mui/material'
 import { PersonAdd, Lock } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
@@ -17,35 +17,9 @@ const MemberAccessControl = ({
   const { user, isAuthenticated, isLoading: authLoading } = useAuth0()
   const { hasAccess, roleLoading } = useUserRole()
   const navigate = useNavigate()
-  const [memberRecord, setMemberRecord] = useState(null)
-  const [memberLoading, setMemberLoading] = useState(true)
-  const [memberError, setMemberError] = useState(null)
-
-  // Check for member record when component mounts
-  useEffect(() => {
-    const checkMemberRecord = async () => {
-      if (!user?.email || !isAuthenticated) {
-        setMemberLoading(false)
-        return
-      }
-
-      try {
-        setMemberLoading(true)
-        const data = await getMemberByEmail(user.email)
-        setMemberRecord(data)
-        setMemberError(null)
-      } catch (error) {
-        console.error('Error checking member record:', error)
-        setMemberError(error.message)
-      } finally {
-        setMemberLoading(false)
-      }
-    }
-
-    if (!authLoading && !roleLoading) {
-      checkMemberRecord()
-    }
-  }, [user?.email, isAuthenticated, authLoading, roleLoading])
+  const { member: memberRecord, loading: memberLoading, error: memberError } = useMember({
+    enabled: !authLoading && !roleLoading
+  })
 
   // Show loading while checking everything
   if (authLoading || roleLoading || memberLoading) {
