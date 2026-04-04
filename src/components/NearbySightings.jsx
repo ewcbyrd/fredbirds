@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, Typography, Grid, Box, Button, Chip, IconButton, Tooltip } from '@mui/material'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
@@ -8,7 +9,8 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import { getNearbyNotableObservations } from '../services/ebirdService'
 import { isRareBird } from '../utils/rareBirdsUtils'
 
-export default function NearbySightings({ onViewAll }) {
+export default function NearbySightings() {
+  const navigate = useNavigate()
   const [sightings, setSightings] = useState([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
@@ -354,7 +356,7 @@ export default function NearbySightings({ onViewAll }) {
                   borderWidth: 2
                 }
               }}
-              onClick={() => onViewAll && onViewAll('sightings')}
+              onClick={() => navigate('/sightings')}
             >
               View More Sightings
             </Button>

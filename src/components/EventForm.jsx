@@ -18,6 +18,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import LocationsManager from './LocationsManager'
 import { createEvent, updateEvent } from '../services/restdbService'
 import { getActiveMembers } from '../services/restdbService'
+import { parseUTCDate } from '../utils/dateUtils'
 
 const EventForm = ({ event, onSuccess, onCancel }) => {
   const isEditMode = !!event
@@ -60,14 +61,6 @@ const EventForm = ({ event, onSuccess, onCancel }) => {
     }
     fetchMembers()
   }, [])
-
-  // Helper function to convert UTC date string to local date with same calendar date
-  const parseUTCDate = (dateString) => {
-    if (!dateString) return null
-    const utcDate = new Date(dateString)
-    // Create a new date in local timezone with the same year/month/day as UTC
-    return new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate())
-  }
 
   // Load event data for edit mode
   useEffect(() => {

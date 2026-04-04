@@ -34,6 +34,7 @@ import {
 import { getPictureUrl } from '../services/cloudinaryService'
 import WeatherForecast from './WeatherForecast'
 import PageContainer from './common/PageContainer'
+import { parseUTCDate } from '../utils/dateUtils'
 
 // Helper to determine the default hotspot (could be expanded later to use user preferences)
 const DEFAULT_HOTSPOT = {
@@ -42,7 +43,7 @@ const DEFAULT_HOTSPOT = {
     lon: -77.3402
 }
 
-export default function MemberDashboard({ onNavigate }) {
+export default function MemberDashboard() {
     const { user, isAuthenticated } = useAuth0()
     const theme = useTheme()
     const navigate = useNavigate()
@@ -108,15 +109,6 @@ export default function MemberDashboard({ onNavigate }) {
         return null // Should be handled by router, but just in case
     }
 
-    // Handle local navigation mapping if needed
-    const handleNav = (path) => {
-        if (onNavigate) {
-            onNavigate(path)
-        } else {
-            navigate(`/${path}`)
-        }
-    }
-
     const renderWelcomeSkeleton = () => (
         <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 3 }}>
             <Skeleton variant="circular" width={80} height={80} />
@@ -164,7 +156,7 @@ export default function MemberDashboard({ onNavigate }) {
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6} md={3}>
                         <Card
-                            onClick={() => handleNav('profile')}
+                            onClick={() => navigate('/profile')}
                             sx={{
                                 bgcolor: '#f8fbfc',
                                 border: '1.5px solid rgba(91, 155, 213, 0.15)',
@@ -200,7 +192,7 @@ export default function MemberDashboard({ onNavigate }) {
 
                     <Grid item xs={12} sm={6} md={3}>
                         <Card
-                            onClick={() => handleNav('events')}
+                            onClick={() => navigate('/events')}
                             sx={{
                                 bgcolor: '#f8fbfc',
                                 border: '1.5px solid rgba(45, 80, 22, 0.15)',
@@ -236,7 +228,7 @@ export default function MemberDashboard({ onNavigate }) {
 
                     <Grid item xs={12} sm={6} md={3}>
                         <Card
-                            onClick={() => handleNav('members-directory')}
+                            onClick={() => navigate('/members-directory')}
                             sx={{
                                 bgcolor: '#f8fbfc',
                                 border: '1.5px solid rgba(193, 120, 23, 0.15)',
@@ -272,7 +264,7 @@ export default function MemberDashboard({ onNavigate }) {
 
                     <Grid item xs={12} sm={6} md={3}>
                         <Card
-                            onClick={() => handleNav('photos')}
+                            onClick={() => navigate('/photos')}
                             sx={{
                                 bgcolor: '#f8fbfc',
                                 border: '1.5px solid rgba(91, 155, 213, 0.15)',
@@ -358,12 +350,7 @@ export default function MemberDashboard({ onNavigate }) {
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
                                                 <CalendarTodayIcon fontSize="small" />
                                                 <Typography variant="body1" fontWeight="500">
-                                                    {(() => {
-                                                        const start = new Date(nextEvent.start)
-                                                        // Parse as local timezone to avoid UTC shifting the day backwards
-                                                        const localStart = new Date(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate())
-                                                        return localStart.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
-                                                    })()}
+                                                    {parseUTCDate(nextEvent.start).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                                                 </Typography>
                                             </Box>
 
@@ -385,7 +372,7 @@ export default function MemberDashboard({ onNavigate }) {
                                             variant="contained"
                                             color="primary"
                                             endIcon={<ArrowForwardIcon />}
-                                            onClick={() => handleNav('events')}
+                                            onClick={() => navigate('/events')}
                                             sx={{ borderRadius: 50, px: 3, py: 1.5, textTransform: 'none', fontWeight: 600 }}
                                         >
                                             View Calendar
@@ -405,7 +392,7 @@ export default function MemberDashboard({ onNavigate }) {
                         }}>
                             <CardContent sx={{ textAlign: 'center', py: 5 }}>
                                 <Typography variant="h6" color="text.secondary">No upcoming events scheduled right now.</Typography>
-                                <Button variant="outlined" onClick={() => handleNav('events')} sx={{ mt: 2, borderRadius: 50 }}>
+                                <Button variant="outlined" onClick={() => navigate('/events')} sx={{ mt: 2, borderRadius: 50 }}>
                                     View Event History
                                 </Button>
                             </CardContent>
@@ -467,7 +454,7 @@ export default function MemberDashboard({ onNavigate }) {
                                                     transform: 'translateX(4px)'
                                                 }
                                             }}
-                                            onClick={() => handleNav('announcements')}
+                                            onClick={() => navigate('/announcements')}
                                         >
                                             <Typography variant="caption" color="primary.main" fontWeight="700" sx={{ display: 'block', mb: 1 }}>
                                                 {new Date(announcement.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -502,7 +489,7 @@ export default function MemberDashboard({ onNavigate }) {
                                     fullWidth
                                     variant="contained"
                                     color="primary"
-                                    onClick={() => handleNav('announcements')}
+                                    onClick={() => navigate('/announcements')}
                                     sx={{ 
                                         borderRadius: 50, 
                                         px: 3, 

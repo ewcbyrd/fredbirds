@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useUserRole, ACCESS_LEVELS } from '../hooks/useUserRole'
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
@@ -22,10 +22,11 @@ import NearbySightings from './NearbySightings'
 import { getAnnouncements } from '../services/restdbService'
 import { getCloudinaryUrl, transformations } from '../services/cloudinaryService'
 
-export default function Home({ onNavigate }) {
+export default function Home() {
   const { isAuthenticated } = useAuth0()
   const { hasAccess } = useUserRole()
   const location = useLocation()
+  const navigate = useNavigate()
   const theme = useTheme()
 
   const [announcements, setAnnouncements] = useState([])
@@ -204,7 +205,7 @@ export default function Home({ onNavigate }) {
             {/* Upcoming Events - Forest Green - PRIMARY */}
             <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
-                onClick={() => onNavigate('events')}
+                onClick={() => navigate('/events')}
                 sx={{
                   background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
                   textAlign: 'center',
@@ -272,7 +273,7 @@ export default function Home({ onNavigate }) {
             {/* Recent Sightings - Sky Blue (Info) - PRIMARY */}
             <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
-                onClick={() => onNavigate('sightings')}
+                onClick={() => navigate('/sightings')}
                 sx={{
                   background: `linear-gradient(135deg, #6ba8e0 0%, ${theme.palette.accent.blue} 100%)`,
                   textAlign: 'center',
@@ -340,7 +341,7 @@ export default function Home({ onNavigate }) {
             {/* Photo Gallery - Sunset Orange (Secondary) - PRIMARY */}
             <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
-                onClick={() => onNavigate('photos')}
+                onClick={() => navigate('/photos')}
                 sx={{
                   background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.light} 100%)`,
                   textAlign: 'center',
@@ -409,7 +410,7 @@ export default function Home({ onNavigate }) {
             {/* Membership - Earthy Brown - SECONDARY */}
             <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
-                onClick={() => onNavigate('membership')}
+                onClick={() => navigate('/membership')}
                 sx={{
                   background: `linear-gradient(135deg, ${theme.palette.accent.brown} 0%, #9d8159 100%)`,
                   textAlign: 'center',
@@ -459,7 +460,7 @@ export default function Home({ onNavigate }) {
             {/* Officers - Deep Teal - SECONDARY */}
             <Grid item xs={12} sm={6} md={4} lg={2}>
               <Card
-                onClick={() => onNavigate('officers')}
+                onClick={() => navigate('/officers')}
                 sx={{
                   background: `linear-gradient(135deg, ${theme.palette.accent.teal} 0%, #3a9288 100%)`,
                   textAlign: 'center',
@@ -510,7 +511,7 @@ export default function Home({ onNavigate }) {
             {hasAccess(ACCESS_LEVELS.MEMBER) && (
               <Grid item xs={12} sm={6} md={4} lg={2}>
                 <Card
-                  onClick={() => onNavigate('members-directory')}
+                  onClick={() => navigate('/members-directory')}
                   sx={{
                     background: `linear-gradient(135deg, ${theme.palette.accent.sage} 0%, #7fa383 100%)`,
                     textAlign: 'center',
@@ -623,7 +624,7 @@ export default function Home({ onNavigate }) {
                         textShadow: '0 4px 20px rgba(0,0,0,0.4)'
                       }
                     }}
-                    onClick={() => onNavigate('announcements')}
+                    onClick={() => navigate('/announcements')}
                   >
                     {announcements[currentAnnouncementIndex]?.headline}
                   </Typography>
@@ -660,7 +661,7 @@ export default function Home({ onNavigate }) {
         }}
       >
         <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 } }}>
-          <Events home={true} singleEvent={true} maxEvents={3} onViewAll={onNavigate} />
+          <Events home={true} singleEvent={true} maxEvents={3} />
         </Box>
       </Box>
 
@@ -688,7 +689,7 @@ export default function Home({ onNavigate }) {
         }}
       >
         <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, position: 'relative', zIndex: 1 }}>
-          <NearbySightings onViewAll={onNavigate} />
+          <NearbySightings />
         </Box>
       </Box>
 

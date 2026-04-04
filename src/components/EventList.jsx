@@ -29,7 +29,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn'
 import PersonIcon from '@mui/icons-material/Person'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import { format } from 'date-fns'
+import { formatDateRangeShort, isPastEvent } from '../utils/dateUtils'
 import { getFutureEvents, getEventsByYear, deleteEvent } from '../services/restdbService'
 import EventDetailsDialog from './EventDetailsDialog'
 
@@ -150,34 +150,6 @@ const EventList = ({ onEditEvent, refreshTrigger }) => {
     setEventToView(null)
   }
 
-  const formatDateRange = (start, end) => {
-    // Parse UTC date and convert to local date using UTC components
-    // This prevents timezone shifts (e.g., Jan 4 UTC becoming Jan 3 local)
-    const utcStart = new Date(start)
-    const startDate = new Date(utcStart.getUTCFullYear(), utcStart.getUTCMonth(), utcStart.getUTCDate())
-
-    if (!end) {
-      return format(startDate, 'MMM d, yyyy')
-    }
-
-    const utcEnd = new Date(end)
-    const endDate = new Date(utcEnd.getUTCFullYear(), utcEnd.getUTCMonth(), utcEnd.getUTCDate())
-
-    if (startDate.toDateString() === endDate.toDateString()) {
-      return format(startDate, 'MMM d, yyyy')
-    }
-    return `${format(startDate, 'MMM d')} - ${format(endDate, 'MMM d, yyyy')}`
-  }
-
-  const isPastEvent = (event) => {
-    // Parse UTC date and convert to local date using UTC components
-    const utcStart = new Date(event.start)
-    const startDate = new Date(utcStart.getUTCFullYear(), utcStart.getUTCMonth(), utcStart.getUTCDate())
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    return startDate < today
-  }
-
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
@@ -254,7 +226,7 @@ const EventList = ({ onEditEvent, refreshTrigger }) => {
                 </Box>
 
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                  {formatDateRange(event.start, event.end)}
+                  {formatDateRangeShort(event.start, event.end)}
                 </Typography>
 
                 {event.tripLeader && (
