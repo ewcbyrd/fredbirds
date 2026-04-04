@@ -107,7 +107,7 @@ export default function MySightings({ sightings = [], header = 'Sightings' }) {
                     <CardContent sx={{ pt: 1, flexGrow: 1 }}>
                       <Box sx={{ mb: 2 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 600, color: '#2c5f2d' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
                             Locations:
                           </Typography>
                           <Typography variant="body2" color="text.secondary" noWrap>
@@ -116,7 +116,7 @@ export default function MySightings({ sightings = [], header = 'Sightings' }) {
                         </Box>
 
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 600, color: '#2c5f2d' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
                             Most Recent:
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
@@ -131,10 +131,10 @@ export default function MySightings({ sightings = [], header = 'Sightings' }) {
                         endIcon={openIds.has(s.id || s.name) ? <ExpandMoreIcon sx={{ transform: 'rotate(180deg)' }} /> : <ExpandMoreIcon />}
                         onClick={() => toggleId(s.id || s.name)}
                         sx={{
-                          color: '#2c5f2d',
+                          color: 'primary.main',
                           borderColor: 'rgba(44, 95, 45, 0.3)',
                           '&:hover': {
-                            borderColor: '#2c5f2d',
+                            borderColor: 'primary.main',
                             bgcolor: 'rgba(44, 95, 45, 0.04)'
                           }
                         }}
@@ -155,7 +155,7 @@ export default function MySightings({ sightings = [], header = 'Sightings' }) {
                                   borderRadius: 2,
                                   border: '1px solid #eee'
                                 }}>
-                                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: '#1a1a1a' }}>
+                                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: 'text.primary' }}>
                                     {locality}
                                   </Typography>
 
@@ -181,7 +181,7 @@ export default function MySightings({ sightings = [], header = 'Sightings' }) {
                                         size="small"
                                         onClick={(e) => handleIndividualClick(record, e)}
                                         sx={{
-                                          color: '#2c5f2d',
+                                          color: 'primary.main',
                                           bgcolor: 'white',
                                           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                                           '&:hover': { bgcolor: '#f1f8f4' }
@@ -211,14 +211,14 @@ export default function MySightings({ sightings = [], header = 'Sightings' }) {
                 size="large"
                 onClick={() => setDisplayLimit(prev => prev + 20)}
                 sx={{
-                  bgcolor: '#2c5f2d',
+                  bgcolor: 'primary.main',
                   color: 'white',
                   px: 4,
                   py: 1.5,
                   borderRadius: 50,
                   boxShadow: '0 4px 12px rgba(44, 95, 45, 0.2)',
                   '&:hover': {
-                    bgcolor: '#1b4d24',
+                    bgcolor: 'primary.dark',
                     boxShadow: '0 6px 16px rgba(44, 95, 45, 0.3)'
                   }
                 }}

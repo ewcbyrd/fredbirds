@@ -34,6 +34,7 @@ import {
   TableHead,
   TableRow
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import {
   Person,
   Email,
@@ -64,6 +65,7 @@ const Profile = () => {
   const { user } = useAuth0()
   const { userRole } = useUserRole()
   const { member: fetchedMember, loading, error } = useMember()
+  const theme = useTheme()
   const [memberData, setMemberData] = useState(null)
   const [showEmail, setShowEmail] = useState(false)
   const [showPhone, setShowPhone] = useState(false)
@@ -656,7 +658,7 @@ const Profile = () => {
                               target="_blank"
                               rel="noopener noreferrer"
                               style={{
-                                color: '#1976d2',
+                                color: theme.palette.info.main,
                                 textDecoration: 'none',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -693,7 +695,7 @@ const Profile = () => {
                               target="_blank"
                               rel="noopener noreferrer"
                               style={{
-                                color: '#1976d2',
+                                color: theme.palette.info.main,
                                 textDecoration: 'none',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -730,7 +732,7 @@ const Profile = () => {
                               target="_blank"
                               rel="noopener noreferrer"
                               style={{
-                                color: '#1976d2',
+                                color: theme.palette.info.main,
                                 textDecoration: 'none',
                                 display: 'flex',
                                 alignItems: 'center',

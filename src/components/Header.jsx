@@ -310,8 +310,8 @@ export default function Header(props) {
                   startIcon={<PersonAdd />}
                   onClick={handleCompleteOnboarding}
                   sx={{
-                    bgcolor: '#1976d2',
-                    '&:hover': { bgcolor: '#1565c0' }
+                    bgcolor: 'info.main',
+                    '&:hover': { bgcolor: 'info.dark' }
                   }}
                 >
                   Complete Setup

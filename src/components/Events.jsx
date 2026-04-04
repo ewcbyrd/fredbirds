@@ -15,6 +15,7 @@ import Box from '@mui/material/Box'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import Divider from '@mui/material/Divider'
+import { useTheme } from '@mui/material/styles'
 
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 
@@ -169,6 +170,7 @@ const EventMap = ({ lat, lon, title, locations }) => {
 
 export default function Events({ home = false, singleEvent = false, maxEvents = 5 }) {
   const navigate = useNavigate()
+  const theme = useTheme()
   const [yearEvents, setYearEvents] = useState([])
   const [allEvents, setAllEvents] = useState([])
   const [loading, setLoading] = useState(false)
@@ -330,7 +332,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
                         sx={{
                           minWidth: 60,
                           textAlign: 'center',
-                          bgcolor: event.resource?.cancelled ? '#d32f2f' : (event.resource?.isClubEvent === false ? '#1976d2' : '#2c5f2d'),
+                          bgcolor: event.resource?.cancelled ? 'error.main' : (event.resource?.isClubEvent === false ? 'info.main' : 'primary.main'),
                           color: 'white',
                           borderRadius: 1,
                           p: 1,
@@ -363,7 +365,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
                             variant="caption"
                             sx={{
                               bgcolor: '#ffebee',
-                              color: '#d32f2f',
+                              color: 'error.main',
                               px: 1,
                               py: 0.25,
                               borderRadius: 1,
@@ -423,7 +425,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
                     sx={{
                       minWidth: 70,
                       textAlign: 'center',
-                      bgcolor: event.resource?.cancelled ? '#d32f2f' : (event.resource?.isClubEvent === false ? '#1976d2' : '#2c5f2d'),
+                      bgcolor: event.resource?.cancelled ? 'error.main' : (event.resource?.isClubEvent === false ? 'info.main' : 'primary.main'),
                       color: 'white',
                       borderRadius: 1,
                       p: 1,
@@ -450,7 +452,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
                           variant="caption"
                           sx={{
                             bgcolor: '#e3f2fd',
-                            color: '#1976d2',
+                            color: 'info.main',
                             px: 1,
                             py: 0.25,
                             borderRadius: 1,
@@ -466,7 +468,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
                           variant="caption"
                           sx={{
                             bgcolor: '#ffebee',
-                            color: '#d32f2f',
+                            color: 'error.main',
                             px: 1,
                             py: 0.25,
                             borderRadius: 1,
@@ -522,14 +524,14 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
               fontSize: '1rem',
               fontWeight: 600,
               textTransform: 'none',
-              color: '#2c5f2d',
-              borderColor: '#2c5f2d',
+              color: 'primary.main',
+              borderColor: 'primary.main',
               borderWidth: 2,
               borderRadius: 50,
               '&:hover': {
-                bgcolor: '#2c5f2d',
+                bgcolor: 'primary.main',
                 color: 'white',
-                borderColor: '#2c5f2d',
+                borderColor: 'primary.main',
                 borderWidth: 2
               }
             }}
@@ -588,7 +590,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
   // Full calendar view
   return (
     <PageContainer>
-      <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 3 }}>
+      <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', mb: 3 }}>
         Events Calendar
       </Typography>
 
@@ -617,7 +619,7 @@ export default function Events({ home = false, singleEvent = false, maxEvents = 
           }}
           eventPropGetter={(event) => ({
             style: {
-              backgroundColor: event.resource?.cancelled ? '#d32f2f' : (event.resource?.isClubEvent === false ? '#1976d2' : '#2c5f2d'),
+              backgroundColor: event.resource?.cancelled ? theme.palette.error.main : (event.resource?.isClubEvent === false ? theme.palette.info.main : theme.palette.primary.main),
               borderRadius: '4px',
               opacity: 0.9,
               color: 'white',

@@ -13,6 +13,7 @@ import {
     Skeleton,
     Divider,
     Stack,
+    Alert,
     useTheme
 } from '@mui/material'
 import MapIcon from '@mui/icons-material/Map'
@@ -52,6 +53,7 @@ export default function MemberDashboard() {
     const [nextEvent, setNextEvent] = useState(null)
     const [recentAnnouncements, setRecentAnnouncements] = useState([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
 
     useEffect(() => {
         if (!isAuthenticated || !user?.email) {
@@ -97,6 +99,7 @@ export default function MemberDashboard() {
 
             } catch (err) {
                 console.error('Error loading dashboard data:', err)
+                setError(err.message || 'Failed to load dashboard data')
             } finally {
                 setLoading(false)
             }
@@ -138,7 +141,7 @@ export default function MemberDashboard() {
                         }}
                     />
                     <Box>
-                        <Typography variant="h3" sx={{ fontWeight: 800, color: '#1a1a1a', letterSpacing: '-0.5px', fontSize: { xs: '2rem', md: '2.5rem' } }}>
+                        <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: '-0.5px', fontSize: { xs: '2rem', md: '2.5rem' } }}>
                             Welcome back, {firstName}!
                         </Typography>
                         <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500, mt: 0.5 }}>
@@ -146,6 +149,12 @@ export default function MemberDashboard() {
                         </Typography>
                     </Box>
                 </Box>
+            )}
+
+            {error && (
+                <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3 }}>
+                    {error}
+                </Alert>
             )}
 
             {/* 2. QUICK ACTIONS ROW */}
