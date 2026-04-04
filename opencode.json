@@ -28,7 +28,7 @@
             "environment": {
                 "MDB_MCP_CONNECTION_STRING": "{env:MONGODB_CONNECTION_STRING}"
             },
-            "enabled": false
+            "enabled": true
         },
         "auth0": {
             "type": "local",
