@@ -20,7 +20,7 @@
         "github": {
             "type": "remote",
             "url": "https://api.githubcopilot.com/mcp/",
-            "enabled": true
+            "enabled": false
         },
         "mongodb": {
             "type": "local",
@@ -32,7 +32,13 @@
         },
         "auth0": {
             "type": "local",
-            "command": ["npx", "-y", "@auth0/auth0-mcp-server", "run", "--read-only"],
+            "command": [
+                "npx",
+                "-y",
+                "@auth0/auth0-mcp-server",
+                "run",
+                "--read-only"
+            ],
             "enabled": false
         }
     }

@@ -53,14 +53,22 @@ src/
   App.jsx                  # Root: MUI theme, routing, idle timeout
   main.jsx                 # Entry: Auth0Provider + BrowserRouter
   index.css                # Minimal global styles (35 lines)
-  components/              # All UI components (flat structure)
-    common/                # Reusable shared components (AppCard, PageContainer, etc.)
-    forms/                 # Form components (MemberForm, AnnouncementForm)
-    [40+ page/feature components]
-  hooks/                   # Custom hooks (useUserRole, useIdleTimeout, useScrollAnimation)
+  components/
+    admin/                 # Admin & officer tools (AdminPanel, OfficerTools, Manage*Dialog)
+    auth/                  # Auth & access control (AccessControl, ProtectedRoute, RoleBadge)
+    common/                # Reusable shared components (AppCard, PageContainer, AppDialog, etc.)
+    events/                # Event feature (Events, EventForm, EventList, EventMap, etc.)
+    forms/                 # Form components (AnnouncementForm, MemberForm, *FormModal, PhotoUploadForm)
+    layout/                # App shell (Header, UserProfile, ContactTile)
+    members/               # Member feature (MemberDashboard, MemberProfile, MembersDirectory, etc.)
+    news/                  # News & announcements (News, NewsFeed, Announcements, Newsletters)
+    pages/                 # Static/info pages (Home, About, Contact, FAQs, Resources, Officers, Photos, Profile)
+    sightings/             # Bird sightings (MySightings, NearbySightings, MapModal)
+  hooks/                   # Custom hooks (useUserRole, useIdleTimeout, useScrollAnimation, useMember)
   services/                # API clients (restdbService, ebirdService, cloudinaryService, weatherService)
-  utils/                   # Utilities (rareBirdsUtils)
+  utils/                   # Utilities (rareBirdsUtils, dateUtils, memberUtils)
 api/                       # Serverless API routes
+docs/                      # Project documentation guides
 scripts/                   # Node.js utility scripts
 public/                    # Static assets
 ```
@@ -77,6 +85,7 @@ public/                    # Static assets
 ### Imports
 
 Order imports in this sequence:
+
 1. `react` and React hooks
 2. Third-party libraries (`react-router-dom`, `@auth0/auth0-react`, `date-fns`)
 3. Custom hooks (`from '../hooks/...'`)
@@ -93,8 +102,8 @@ All imports use relative paths. No path aliases are configured.
 
 - **Functional components only** -- no class components
 - Two declaration styles coexist:
-  - Page/route components: `export default function ComponentName({ props }) { ... }`
-  - Reusable/common components: `const ComponentName = ({ props }) => { ... }` with `export default ComponentName`
+    - Page/route components: `export default function ComponentName({ props }) { ... }`
+    - Reusable/common components: `const ComponentName = ({ props }) => { ... }` with `export default ComponentName`
 - **Default exports** for all components
 - **Named exports** for service functions, constants, and hooks
 - Services also export a default object containing all named exports
@@ -102,18 +111,18 @@ All imports use relative paths. No path aliases are configured.
 
 ### Naming Conventions
 
-| Entity | Convention | Example |
-|--------|-----------|---------|
-| Component files | PascalCase.jsx | `EventForm.jsx`, `MemberDashboard.jsx` |
-| Hook files | camelCase.js with `use` prefix | `useUserRole.js` |
-| Service files | camelCase.js with `Service` suffix | `restdbService.js` |
-| Utility files | camelCase.js with `Utils` suffix | `rareBirdsUtils.js` |
-| Script files | kebab-case.js | `setup-access-levels.js` |
-| Components | PascalCase | `const AppCard = ...` |
-| Functions/variables | camelCase | `handleSubmit`, `yearEvents` |
-| Event handlers | `handle` prefix | `handleChange`, `handleSelectEvent` |
-| Constants | SCREAMING_SNAKE_CASE | `ACCESS_LEVELS`, `WEATHER_API_KEY` |
-| Booleans | `is`/`show`/`has`/`loading` prefix | `isAuthenticated`, `showMessage`, `loading` |
+| Entity              | Convention                         | Example                                     |
+| ------------------- | ---------------------------------- | ------------------------------------------- |
+| Component files     | PascalCase.jsx                     | `EventForm.jsx`, `MemberDashboard.jsx`      |
+| Hook files          | camelCase.js with `use` prefix     | `useUserRole.js`                            |
+| Service files       | camelCase.js with `Service` suffix | `restdbService.js`                          |
+| Utility files       | camelCase.js with `Utils` suffix   | `rareBirdsUtils.js`                         |
+| Script files        | kebab-case.js                      | `setup-access-levels.js`                    |
+| Components          | PascalCase                         | `const AppCard = ...`                       |
+| Functions/variables | camelCase                          | `handleSubmit`, `yearEvents`                |
+| Event handlers      | `handle` prefix                    | `handleChange`, `handleSelectEvent`         |
+| Constants           | SCREAMING_SNAKE_CASE               | `ACCESS_LEVELS`, `WEATHER_API_KEY`          |
+| Booleans            | `is`/`show`/`has`/`loading` prefix | `isAuthenticated`, `showMessage`, `loading` |
 
 ### Styling
 
@@ -127,15 +136,15 @@ All imports use relative paths. No path aliases are configured.
 ### Error Handling
 
 - Use `try/catch` with `useState` for error display in components:
-  ```jsx
-  const [error, setError] = useState(null)
-  try {
-    await someOperation()
-  } catch (err) {
-    console.error('Error doing X:', err)
-    setError(err.message || 'Fallback error message')
-  }
-  ```
+    ```jsx
+    const [error, setError] = useState(null);
+    try {
+        await someOperation();
+    } catch (err) {
+        console.error('Error doing X:', err);
+        setError(err.message || 'Fallback error message');
+    }
+    ```
 - Display errors with MUI `<Alert severity="error">` with `onClose` to dismiss
 - Services throw on HTTP errors: `throw new Error(\`HTTP \${res.status}: \${res.statusText}\`)`
 - Some services return graceful degradation objects (`{ items: [], error: error.message }`)
@@ -154,6 +163,7 @@ All imports use relative paths. No path aliases are configured.
 ### Access Control
 
 Four-tier role hierarchy defined in `src/hooks/useUserRole.js`:
+
 - `ACCESS_LEVELS.PUBLIC` -- no auth required
 - `ACCESS_LEVELS.MEMBER` -- authenticated member
 - `ACCESS_LEVELS.OFFICER` -- club officer
@@ -172,6 +182,7 @@ Routes are protected using `<MemberAccessControl requiredLevel={ACCESS_LEVELS.X}
 ### Environment Variables
 
 All client-side env vars use the `VITE_` prefix (required by Vite):
+
 - `VITE_AUTH0_DOMAIN`, `VITE_AUTH0_CLIENT_ID`
 - `VITE_GOOGLE_MAPS_API_KEY`
 - `VITE_OPENWEATHER_API_KEY`
