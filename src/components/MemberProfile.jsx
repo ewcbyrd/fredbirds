@@ -29,6 +29,7 @@ import {
   TableRow,
   Pagination
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import {
   Person,
   Email,
@@ -58,6 +59,7 @@ const MemberProfile = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { user } = useAuth0()
+  const theme = useTheme()
   const [memberData, setMemberData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -354,7 +356,7 @@ const MemberProfile = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{
-                              color: '#1976d2',
+                              color: theme.palette.info.main,
                               textDecoration: 'none',
                               display: 'flex',
                               alignItems: 'center',
@@ -385,7 +387,7 @@ const MemberProfile = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{
-                              color: '#1976d2',
+                              color: theme.palette.info.main,
                               textDecoration: 'none',
                               display: 'flex',
                               alignItems: 'center',
@@ -416,7 +418,7 @@ const MemberProfile = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{
-                              color: '#1976d2',
+                              color: theme.palette.info.main,
                               textDecoration: 'none',
                               display: 'flex',
                               alignItems: 'center',

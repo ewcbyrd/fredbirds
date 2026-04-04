@@ -210,7 +210,7 @@ const EventPhotoSection = ({ eventId }) => {
             variant="contained"
             startIcon={<PhotoCameraIcon />}
             onClick={handleUploadClick}
-            sx={{ backgroundColor: '#2c5f2d', '&:hover': { backgroundColor: '#1e4620' } }}
+            color="primary"
           >
           Add Photo
         </Button>

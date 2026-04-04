@@ -187,7 +187,7 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
               size="small"
               sx={{
                 bgcolor: currentEvent.isClubEvent === false ? 'rgba(25, 118, 210, 0.08)' : 'rgba(44, 95, 45, 0.08)',
-                color: currentEvent.isClubEvent === false ? '#1976d2' : '#2c5f2d',
+                color: currentEvent.isClubEvent === false ? 'info.main' : 'primary.main',
                 fontWeight: 700,
                 borderRadius: 1.5,
                 border: currentEvent.isClubEvent === false ? '1px solid rgba(25, 118, 210, 0.1)' : '1px solid rgba(44, 95, 45, 0.1)'
@@ -198,7 +198,7 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
               size="small"
               sx={{
                 bgcolor: currentEvent.isClubEvent === false ? 'rgba(25, 118, 210, 0.08)' : 'rgba(44, 95, 45, 0.08)',
-                color: currentEvent.isClubEvent === false ? '#1976d2' : '#2c5f2d',
+                color: currentEvent.isClubEvent === false ? 'info.main' : 'primary.main',
                 fontWeight: 700,
                 borderRadius: 1.5,
                 border: currentEvent.isClubEvent === false ? '1px solid rgba(25, 118, 210, 0.1)' : '1px solid rgba(44, 95, 45, 0.1)'
@@ -208,7 +208,7 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
           <Typography variant="h3" component="h1" sx={{
             fontWeight: 800,
             fontFamily: '"Outfit", sans-serif',
-            color: '#1a1a1a',
+            color: 'text.primary',
             fontSize: { xs: '1.75rem', md: '2.25rem' },
             lineHeight: 1.2
           }}>
@@ -310,17 +310,17 @@ const EventDetailsDialog = ({ open, onClose, event, onEventUpdated }) => {
                   mb: 2,
                   fontWeight: 700,
                   fontFamily: '"Outfit", sans-serif',
-                  color: '#1a1a1a'
+                  color: 'text.primary'
                 },
                 '& ul': { pl: 3, mb: 3 },
                 '& li': { mb: 1, color: '#4a4a4a' },
                 '& a': {
-                  color: '#2c5f2d',
+                  color: 'primary.main',
                   textDecoration: 'none',
                   fontWeight: 600,
                   borderBottom: '2px solid rgba(44, 95, 45, 0.2)',
                   transition: 'all 0.2s',
-                  '&:hover': { borderBottomColor: '#2c5f2d', bgcolor: 'rgba(44, 95, 45, 0.05)' }
+                  '&:hover': { borderBottomColor: 'primary.main', bgcolor: 'rgba(44, 95, 45, 0.05)' }
                 },
               }}
             >

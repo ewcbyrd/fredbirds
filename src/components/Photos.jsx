@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Typography, Grid, Card, CardMedia, Tabs, Tab, Button } from '@mui/material'
+import { Box, Typography, Grid, Card, CardMedia, Tabs, Tab, Button, CircularProgress, Alert } from '@mui/material'
 import Lightbox from 'yet-another-react-lightbox'
 import Captions from 'yet-another-react-lightbox/plugins/captions'
 import 'yet-another-react-lightbox/styles.css'
@@ -17,6 +17,7 @@ export default function Photos() {
   const [activeTab, setActiveTab] = useState(0)
   const [photos, setPhotos] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
 
   useEffect(() => {
@@ -67,8 +68,9 @@ export default function Photos() {
         })
       
       setPhotos(transformedPhotos)
-    } catch (error) {
-      console.error('Error loading photos:', error)
+    } catch (err) {
+      console.error('Error loading photos:', err)
+      setError(err.message || 'Failed to load photos')
       setPhotos([])
     } finally {
       setLoading(false)
@@ -85,24 +87,31 @@ export default function Photos() {
   if (loading) {
     return (
       <PageContainer>
-        <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 3 }}>
-          Photo Gallery
-        </Typography>
-        <Typography color="text.secondary">Loading photos...</Typography>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+          <CircularProgress />
+          <Typography variant="body1" sx={{ ml: 2 }}>
+            Loading photos...
+          </Typography>
+        </Box>
       </PageContainer>
     )
   }
 
   return (
     <PageContainer>
+      {error && (
+        <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a' }}>
+        <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary' }}>
           Photo Gallery
         </Typography>
         {isAuthenticated && (
           <Button
             variant="contained"
-            sx={{ backgroundColor: '#2c5f2d', '&:hover': { backgroundColor: '#1e4620' } }}
+            color="primary"
             onClick={() => setUploadDialogOpen(true)}
           >
             Upload Photo
@@ -129,11 +138,11 @@ export default function Photos() {
               fontWeight: 600,
               minWidth: 120,
               '&.Mui-selected': {
-                color: '#2c5f2d'
+                color: 'primary.main'
               }
             },
             '& .MuiTabs-indicator': {
-              backgroundColor: '#2c5f2d',
+              backgroundColor: 'primary.main',
               height: 3
             }
           }}

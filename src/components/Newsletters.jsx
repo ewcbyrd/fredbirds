@@ -11,12 +11,15 @@ import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
+import CircularProgress from '@mui/material/CircularProgress'
+import Alert from '@mui/material/Alert'
 import { getNewsletters } from '../services/restdbService'
 import PageContainer from './common/PageContainer'
 
 export default function Newsletters() {
   const [newsletters, setNewsletters] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [selected, setSelected] = useState(null)
 
   useEffect(() => {
@@ -24,6 +27,7 @@ export default function Newsletters() {
     if (cached) {
       try {
         setNewsletters(JSON.parse(cached))
+        setLoading(false)
         return
       } catch (e) {
         // ignore parse error and fetch
@@ -37,14 +41,31 @@ export default function Newsletters() {
         sessionStorage.setItem('newsletters', JSON.stringify(items))
         sessionStorage.setItem('newslettersRetrieved', new Date().getTime())
       })
-      .catch((err) => console.error('getNewsletters', err))
+      .catch((err) => {
+        console.error('getNewsletters', err)
+        setError(err.message || 'Failed to load newsletters')
+      })
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <Typography>Loading newsletters...</Typography>
+  if (loading) return (
+    <PageContainer maxWidth="lg">
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress />
+        <Typography variant="body1" sx={{ ml: 2 }}>
+          Loading newsletters...
+        </Typography>
+      </Box>
+    </PageContainer>
+  )
 
   return (
     <PageContainer maxWidth="lg">
+      {error && (
+        <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
       <Box sx={{ bgcolor: 'white', p:2, borderRadius:1 }}>
         <Typography variant="h5" sx={{ mb:1 }}>Newsletters</Typography>
 
@@ -76,11 +97,8 @@ export default function Newsletters() {
               </Typography>
               <Button 
                 variant="contained" 
+                color="primary"
                 fullWidth
-                sx={{ 
-                  bgcolor: '#2c5f2d',
-                  '&:hover': { bgcolor: '#234d24' }
-                }}
                 href={`https://drive.google.com/file/d/${selected.pdfFile}/view`}
                 target="_blank"
                 rel="noopener noreferrer"

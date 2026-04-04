@@ -287,11 +287,11 @@ export default function Resources() {
       {/* Header Section */}
       <Box sx={{
         position: 'relative',
-        bgcolor: '#2c5f2d',
+        bgcolor: 'primary.main',
         color: 'white',
         py: { xs: 6, md: 8 },
         mb: 6,
-        background: 'linear-gradient(135deg, #1b4d24 0%, #3a7a3b 100%)',
+        background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.light} 100%)`,
         boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
       }}>
         <Container maxWidth="lg">
@@ -313,11 +313,12 @@ export default function Resources() {
               p: 3,
               height: '100%',
               background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-              borderLeft: '6px solid #2c5f2d',
+              borderLeft: '6px solid',
+              borderLeftColor: 'primary.main',
               boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
             }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <Typography variant="h3" sx={{ fontWeight: 700, color: '#2c5f2d', mr: 2 }}>
+                <Typography variant="h3" sx={{ fontWeight: 700, color: 'primary.main', mr: 2 }}>
                   {numSightings}
                 </Typography>
                 <Typography variant="overline" sx={{ lineHeight: 1.2, color: 'text.secondary' }}>
@@ -355,11 +356,12 @@ export default function Resources() {
               p: 3,
               height: '100%',
               background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-              borderLeft: '6px solid #1976d2',
+              borderLeft: '6px solid',
+              borderLeftColor: 'info.main',
               boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
             }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <Typography variant="h3" sx={{ fontWeight: 700, color: '#1976d2', mr: 2 }}>
+                <Typography variant="h3" sx={{ fontWeight: 700, color: 'info.main', mr: 2 }}>
                   {totalIndividuals}
                 </Typography>
                 <Typography variant="overline" sx={{ lineHeight: 1.2, color: 'text.secondary' }}>
@@ -385,7 +387,7 @@ export default function Resources() {
             gap: 2
           }}>
             <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 0.5 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 0.5 }}>
                 Sighting Reports
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -398,11 +400,11 @@ export default function Resources() {
               onClick={loadSightings}
               variant="contained"
               sx={{
-                bgcolor: '#2c5f2d',
+                bgcolor: 'primary.main',
                 color: 'white',
                 boxShadow: '0 4px 8px rgba(44, 95, 45, 0.2)',
                 '&:hover': {
-                  bgcolor: '#1b4d24',
+                  bgcolor: 'primary.dark',
                   boxShadow: '0 6px 12px rgba(44, 95, 45, 0.3)'
                 }
               }}
@@ -424,7 +426,7 @@ export default function Resources() {
             }}>
               {/* View Type */}
               <Box sx={{ flex: 1, minWidth: 200 }}>
-                <Typography variant="caption" sx={{ display: 'block', mb: 0.5, fontWeight: 600, color: '#2c5f2d' }}>
+                <Typography variant="caption" sx={{ display: 'block', mb: 0.5, fontWeight: 600, color: 'primary.main' }}>
                   DATA SOURCE
                 </Typography>
                 <Button
@@ -440,7 +442,7 @@ export default function Resources() {
                     py: 1.5,
                     '&:hover': {
                       bgcolor: 'white',
-                      borderColor: '#2c5f2d'
+                      borderColor: 'primary.main'
                     }
                   }}
                 >
@@ -457,7 +459,7 @@ export default function Resources() {
               {setting.view === 'state' && (
                 <>
                   <Box sx={{ flex: 1, minWidth: 200 }}>
-                    <Typography variant="caption" sx={{ display: 'block', mb: 0.5, fontWeight: 600, color: '#2c5f2d' }}>
+                    <Typography variant="caption" sx={{ display: 'block', mb: 0.5, fontWeight: 600, color: 'primary.main' }}>
                       STATE
                     </Typography>
                     <Button
@@ -473,7 +475,7 @@ export default function Resources() {
                         py: 1.5,
                         '&:hover': {
                           bgcolor: 'white',
-                          borderColor: '#2c5f2d'
+                          borderColor: 'primary.main'
                         }
                       }}
                     >
@@ -494,7 +496,7 @@ export default function Resources() {
                   </Box>
 
                   <Box sx={{ flex: 1, minWidth: 200 }}>
-                    <Typography variant="caption" sx={{ display: 'block', mb: 0.5, fontWeight: 600, color: '#2c5f2d' }}>
+                    <Typography variant="caption" sx={{ display: 'block', mb: 0.5, fontWeight: 600, color: 'primary.main' }}>
                       COUNTY
                     </Typography>
                     <Button
@@ -510,7 +512,7 @@ export default function Resources() {
                         py: 1.5,
                         '&:hover': {
                           bgcolor: 'white',
-                          borderColor: '#2c5f2d'
+                          borderColor: 'primary.main'
                         }
                       }}
                     >
@@ -536,7 +538,7 @@ export default function Resources() {
 
             {loading ? (
               <Box sx={{ py: 12, textAlign: 'center' }}>
-                <CircularProgress size={60} sx={{ color: '#2c5f2d', mb: 3 }} />
+                <CircularProgress size={60} sx={{ color: 'primary.main', mb: 3 }} />
                 <Typography variant="h6" color="text.secondary">Fetching latest bird sightings...</Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.7 }}>
                   Connecting to eBird API

@@ -11,7 +11,7 @@ export default function Membership() {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, py: 4 }}>
-      <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 3 }}>
+      <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', mb: 3 }}>
         Membership
       </Typography>
 
@@ -52,7 +52,8 @@ export default function Membership() {
             maxWidth: 600,
             width: '100%',
             bgcolor: '#e8f5e9',
-            border: '3px solid #2c5f2d',
+            border: '3px solid',
+            borderColor: 'primary.main',
             position: 'relative',
             boxShadow: '0 4px 12px rgba(44, 95, 45, 0.2)',
             borderRadius: 2,
@@ -60,7 +61,7 @@ export default function Membership() {
             '&:hover': { boxShadow: '0 6px 20px rgba(44, 95, 45, 0.3)' }
           }}
         >
-          <Box sx={{ bgcolor: '#2c5f2d', color: 'white', p: 3, textAlign: 'center' }}>
+          <Box sx={{ bgcolor: 'primary.main', color: 'white', p: 3, textAlign: 'center' }}>
             <Typography variant="h4" sx={{ fontWeight: 600 }}>
               Membership
             </Typography>
@@ -78,25 +79,25 @@ export default function Membership() {
                 Membership Benefits:
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                <CheckCircleIcon sx={{ color: '#2c5f2d', mr: 2, mt: 0.5 }} />
+                <CheckCircleIcon sx={{ color: 'primary.main', mr: 2, mt: 0.5 }} />
                 <Typography variant="body1">
                   Voting rights at club meetings and officer elections
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                <CheckCircleIcon sx={{ color: '#2c5f2d', mr: 2, mt: 0.5 }} />
+                <CheckCircleIcon sx={{ color: 'primary.main', mr: 2, mt: 0.5 }} />
                 <Typography variant="body1">
                   Eligibility to hold club officer positions
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                <CheckCircleIcon sx={{ color: '#2c5f2d', mr: 2, mt: 0.5 }} />
+                <CheckCircleIcon sx={{ color: 'primary.main', mr: 2, mt: 0.5 }} />
                 <Typography variant="body1">
                   Direct support for the club's conservation and education mission
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                <CheckCircleIcon sx={{ color: '#2c5f2d', mr: 2, mt: 0.5 }} />
+                <CheckCircleIcon sx={{ color: 'primary.main', mr: 2, mt: 0.5 }} />
                 <Typography variant="body1">
                   Participation in all club activities and web resources
                 </Typography>
@@ -112,14 +113,14 @@ export default function Membership() {
                 fontSize: '1.1rem',
                 fontWeight: 600,
                 textTransform: 'none',
-                color: '#2c5f2d',
-                borderColor: '#2c5f2d',
+                color: 'primary.main',
+                borderColor: 'primary.main',
                 borderWidth: 2,
                 borderRadius: 50,
                 '&:hover': {
-                  bgcolor: '#2c5f2d',
+                  bgcolor: 'primary.main',
                   color: 'white',
-                  borderColor: '#2c5f2d',
+                  borderColor: 'primary.main',
                   borderWidth: 2
                 }
               }}

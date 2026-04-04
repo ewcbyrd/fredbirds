@@ -9,16 +9,27 @@ import Container from '@mui/material/Container'
 import Chip from '@mui/material/Chip'
 import Pagination from '@mui/material/Pagination'
 import Stack from '@mui/material/Stack'
+import CircularProgress from '@mui/material/CircularProgress'
+import Alert from '@mui/material/Alert'
 import AnnouncementIcon from '@mui/icons-material/Announcement'
 import { getAnnouncements } from '../services/restdbService'
 
 export default function Announcements(){
   const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 1
 
   useEffect(()=>{
-    getAnnouncements().then(data=> setItems(data || []))
+    setLoading(true)
+    getAnnouncements()
+      .then(data => setItems(data || []))
+      .catch(err => {
+        console.error('Error loading announcements:', err)
+        setError(err.message || 'Failed to load announcements')
+      })
+      .finally(() => setLoading(false))
   },[])
 
   // Pagination logic
@@ -94,6 +105,43 @@ export default function Announcements(){
       return part;
     });
   };
+
+  if (loading) return (
+    <Box sx={{ bgcolor: '#f7faf7', minHeight: '50vh', py: 6 }}>
+      <Container maxWidth="lg">
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+          <CircularProgress />
+          <Typography variant="body1" sx={{ ml: 2 }}>
+            Loading announcements...
+          </Typography>
+        </Box>
+      </Container>
+    </Box>
+  )
+
+  if (error) return (
+    <Box sx={{ bgcolor: '#f7faf7', minHeight: '50vh', py: 6 }}>
+      <Container maxWidth="lg">
+        {/* Header Section */}
+        <Box sx={{ textAlign: 'center', mb: 6 }}>
+          <Typography 
+            variant="h3" 
+            sx={{ 
+              fontWeight: 700,
+              mb: 2,
+              color: 'text.primary',
+              fontSize: { xs: '2rem', md: '2.5rem' }
+            }}
+          >
+            Club Announcements
+          </Typography>
+        </Box>
+        <Alert severity="error" onClose={() => setError(null)} sx={{ maxWidth: 600, mx: 'auto' }}>
+          {error}
+        </Alert>
+      </Container>
+    </Box>
+  )
 
   if (!items.length) return (
     <Box sx={{ bgcolor: '#f7faf7', minHeight: '50vh', py: 6 }}>

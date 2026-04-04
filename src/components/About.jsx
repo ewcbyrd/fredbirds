@@ -16,7 +16,7 @@ export default function About() {
 
   return (
     <PageContainer maxWidth="lg">
-      <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a1a', mb: 3 }}>
+      <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', mb: 3 }}>
         About Us
       </Typography>
       
@@ -39,7 +39,7 @@ export default function About() {
               flex: 1, 
               minWidth: '300px',
               '& a': {
-                color: '#2c5f2d',
+                color: 'primary.main',
                 fontWeight: 600,
                 textDecoration: 'none',
                 '&:hover': {
