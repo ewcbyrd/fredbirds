@@ -56,19 +56,19 @@ export default function Contact() {
         setSubmitting(true);
         setStatus(null);
         const to = emailMap.get(form.topic);
-        const body = JSON.stringify({
-            to,
-            from: { email: 'admin@fredbirds.com', name: 'Contact Us Message' },
-            subject: 'Contact Us Message',
-            content: [
-                {
-                    type: 'text/plain',
-                    value: `Name: ${form.name}\nEmail: ${form.email}\nMessage: ${form.message}`
-                }
-            ]
-        });
+        const text = `Name: ${form.name}\nEmail: ${form.email}\nMessage: ${form.message}`;
+        const html =
+            `<p><strong>Name:</strong> ${form.name}</p>` +
+            `<p><strong>Email:</strong> ${form.email}</p>` +
+            `<p><strong>Message:</strong><br/>${form.message.replace(/\n/g, '<br/>')}</p>`;
         try {
-            await sendEmail(body);
+            await sendEmail({
+                to,
+                subject: 'Contact Us Message',
+                html,
+                text,
+                replyTo: form.email
+            });
             setStatus({ type: 'success', message: 'Message sent. Thank you.' });
             setForm({ name: '', email: '', topic: '', message: '' });
         } catch (err) {
