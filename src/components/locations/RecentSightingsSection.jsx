@@ -11,7 +11,10 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Chip from '@mui/material/Chip';
-import { getNearbyObservations } from '../../services/ebirdService';
+import {
+    getNearbyObservations,
+    getRecentObservationsByLocation
+} from '../../services/ebirdService';
 import { format } from 'date-fns';
 
 const RecentSightingsSection = ({ location }) => {
@@ -20,7 +23,11 @@ const RecentSightingsSection = ({ location }) => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        if (!location || !location.lat || !location.lon) {
+        if (
+            !location ||
+            (!location.ebirdHotspotIds?.length &&
+                (!location.lat || !location.lon))
+        ) {
             setLoading(false);
             return;
         }
@@ -29,15 +36,30 @@ const RecentSightingsSection = ({ location }) => {
             setLoading(true);
             setError(null);
             try {
-                // Fetch nearby sightings using location coordinates
-                const result = await getNearbyObservations({
-                    lat: location.lat,
-                    long: location.lon,
-                    dist: 3, // 3 km radius to focus on this specific location
-                    daysBack: 14
-                });
+                let allSightings = [];
 
-                const allSightings = result || [];
+                // Prefer eBird hotspot IDs if available
+                if (
+                    location.ebirdHotspotIds &&
+                    location.ebirdHotspotIds.length > 0
+                ) {
+                    // Fetch sightings from all hotspots
+                    const promises = location.ebirdHotspotIds.map((hotspotId) =>
+                        getRecentObservationsByLocation(hotspotId, 14)
+                    );
+
+                    const results = await Promise.all(promises);
+                    allSightings = results.flat();
+                } else {
+                    // Fall back to nearby observations using coordinates
+                    const result = await getNearbyObservations({
+                        lat: location.lat,
+                        long: location.lon,
+                        dist: 3,
+                        daysBack: 14
+                    });
+                    allSightings = result || [];
+                }
 
                 // Deduplicate by species and sort by date
                 const speciesMap = new Map();
@@ -76,7 +98,7 @@ const RecentSightingsSection = ({ location }) => {
         };
 
         fetchSightings();
-    }, [location._id, location.lat, location.lon]);
+    }, [location._id, location.lat, location.lon, location.ebirdHotspotIds]);
 
     return (
         <Box sx={{ mb: 4 }}>
