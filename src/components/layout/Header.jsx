@@ -36,6 +36,7 @@ import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary'; // Photos
 import VisibilityIcon from '@mui/icons-material/Visibility'; // Sightings
 import RssFeedIcon from '@mui/icons-material/RssFeed'; // Birding News
 import ContactSupportIcon from '@mui/icons-material/ContactSupport'; // FAQs
+import LocationOnIcon from '@mui/icons-material/LocationOn'; // Locations
 import { PersonAdd, Close } from '@mui/icons-material';
 import UserProfile from './UserProfile';
 
@@ -124,6 +125,8 @@ export default function Header(props) {
                 return <ContactSupportIcon />;
             case '/events':
                 return <CalendarTodayIcon />;
+            case '/locations':
+                return <LocationOnIcon />;
             case '/announcements':
                 return <AnnouncementIcon />;
             case '/newsletters':
@@ -163,6 +166,7 @@ export default function Header(props) {
         {
             title: 'Birding Resources',
             items: [
+                { label: 'Locations', path: '/locations' },
                 { label: 'Sightings', path: '/sightings' },
                 { label: 'Birding News', path: '/newsfeed' }
             ]
@@ -171,6 +175,7 @@ export default function Header(props) {
 
     const primaryNav = [
         { label: 'Events', path: '/events' },
+        { label: 'Locations', path: '/locations' },
         { label: 'Sightings', path: '/sightings' },
         { label: 'Photos', path: '/photos' },
         { label: 'News', path: '/announcements' },
