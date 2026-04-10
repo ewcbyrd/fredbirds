@@ -15,10 +15,18 @@ import Card from '@mui/material/Card';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Chip from '@mui/material/Chip';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import Collapse from '@mui/material/Collapse';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import SearchIcon from '@mui/icons-material/Search';
 import MapIcon from '@mui/icons-material/Map';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import AddLocationIcon from '@mui/icons-material/AddLocation';
+import ClearIcon from '@mui/icons-material/Clear';
 import { getLocations } from '../../services/restdbService';
 import LocationMap from './LocationMap';
 import LocationList from './LocationList';
@@ -29,6 +37,13 @@ const Locations = () => {
     const [locations, setLocations] = useState([]);
     const [viewMode, setViewMode] = useState('map');
     const [searchQuery, setSearchQuery] = useState('');
+    const [filters, setFilters] = useState({
+        types: [],
+        states: [],
+        amenities: [],
+        maxDistance: null
+    });
+    const [showFilters, setShowFilters] = useState(false);
     const [userLocation, setUserLocation] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -82,29 +97,104 @@ const Locations = () => {
         loadLocations();
     }, [loadLocations]);
 
-    // Filter locations based on search query
+    // Filter locations based on search query and filters
     const filteredLocations = useMemo(() => {
-        if (!searchQuery.trim()) {
-            return locations;
+        let results = locations;
+
+        // Text search filter
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            results = results.filter((loc) => {
+                const name = (loc.name || '').toLowerCase();
+                const description = (loc.description || '').toLowerCase();
+                const county = (loc.county || '').toLowerCase();
+                const state = (loc.state || '').toLowerCase();
+                const type = (loc.type || '').toLowerCase();
+
+                return (
+                    name.includes(query) ||
+                    description.includes(query) ||
+                    county.includes(query) ||
+                    state.includes(query) ||
+                    type.includes(query)
+                );
+            });
         }
 
-        const query = searchQuery.toLowerCase();
-        return locations.filter((loc) => {
-            const name = (loc.name || '').toLowerCase();
-            const description = (loc.description || '').toLowerCase();
-            const county = (loc.county || '').toLowerCase();
-            const state = (loc.state || '').toLowerCase();
-            const type = (loc.type || '').toLowerCase();
+        // Type filter
+        if (filters.types.length > 0) {
+            results = results.filter((loc) => filters.types.includes(loc.type));
+        }
 
-            return (
-                name.includes(query) ||
-                description.includes(query) ||
-                county.includes(query) ||
-                state.includes(query) ||
-                type.includes(query)
+        // State filter
+        if (filters.states.length > 0) {
+            results = results.filter((loc) =>
+                filters.states.includes(loc.state)
             );
+        }
+
+        // Amenities filter (location must have ALL selected amenities)
+        if (filters.amenities.length > 0) {
+            results = results.filter((loc) => {
+                const locAmenities = loc.amenities || [];
+                return filters.amenities.every((amenity) =>
+                    locAmenities.includes(amenity)
+                );
+            });
+        }
+
+        // Distance filter (only if user location is available)
+        if (filters.maxDistance && userLocation) {
+            results = results.filter((loc) => {
+                const distance = calculateDistance(
+                    userLocation.lat,
+                    userLocation.lng,
+                    loc.lat,
+                    loc.lon
+                );
+                return distance <= filters.maxDistance;
+            });
+        }
+
+        return results;
+    }, [locations, searchQuery, filters, userLocation]);
+
+    // Calculate distance between two coordinates (Haversine formula)
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371; // Earth's radius in km
+        const dLat = ((lat2 - lat1) * Math.PI) / 180;
+        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos((lat1 * Math.PI) / 180) *
+                Math.cos((lat2 * Math.PI) / 180) *
+                Math.sin(dLon / 2) *
+                Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distance in km
+    };
+
+    const handleFilterChange = (filterType, value) => {
+        setFilters((prev) => ({
+            ...prev,
+            [filterType]: value
+        }));
+    };
+
+    const handleClearFilters = () => {
+        setFilters({
+            types: [],
+            states: [],
+            amenities: [],
+            maxDistance: null
         });
-    }, [locations, searchQuery]);
+    };
+
+    const activeFilterCount =
+        filters.types.length +
+        filters.states.length +
+        filters.amenities.length +
+        (filters.maxDistance ? 1 : 0);
 
     const handleViewModeChange = (event, newMode) => {
         if (newMode !== null) {
@@ -388,6 +478,28 @@ const Locations = () => {
                                 alignItems: 'stretch'
                             }}
                         >
+                            {/* Filter Toggle Button */}
+                            <Button
+                                variant={showFilters ? 'contained' : 'outlined'}
+                                startIcon={<FilterListIcon />}
+                                onClick={() => setShowFilters(!showFilters)}
+                                sx={{ minWidth: 120 }}
+                            >
+                                Filters
+                                {activeFilterCount > 0 && (
+                                    <Chip
+                                        label={activeFilterCount}
+                                        size="small"
+                                        sx={{
+                                            ml: 1,
+                                            height: 20,
+                                            bgcolor: 'white',
+                                            color: 'primary.main'
+                                        }}
+                                    />
+                                )}
+                            </Button>
+
                             {/* View Mode Toggle */}
                             <ToggleButtonGroup
                                 value={viewMode}
@@ -426,6 +538,202 @@ const Locations = () => {
                             )}
                         </Box>
                     </Box>
+
+                    {/* Collapsible Filter Panel */}
+                    <Collapse in={showFilters}>
+                        <Box
+                            sx={{
+                                mt: 3,
+                                pt: 3,
+                                borderTop: '1px solid',
+                                borderColor: 'divider'
+                            }}
+                        >
+                            <Grid container spacing={2}>
+                                {/* Type Filter */}
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <FormControl fullWidth size="small">
+                                        <InputLabel>Type</InputLabel>
+                                        <Select
+                                            multiple
+                                            value={filters.types}
+                                            onChange={(e) =>
+                                                handleFilterChange(
+                                                    'types',
+                                                    e.target.value
+                                                )
+                                            }
+                                            input={
+                                                <OutlinedInput label="Type" />
+                                            }
+                                            renderValue={(selected) =>
+                                                selected
+                                                    .map(
+                                                        (t) =>
+                                                            t
+                                                                .charAt(0)
+                                                                .toUpperCase() +
+                                                            t.slice(1)
+                                                    )
+                                                    .join(', ')
+                                            }
+                                        >
+                                            <MenuItem value="monument">
+                                                Monument
+                                            </MenuItem>
+                                            <MenuItem value="park">
+                                                Park
+                                            </MenuItem>
+                                            <MenuItem value="preserve">
+                                                Preserve
+                                            </MenuItem>
+                                            <MenuItem value="refuge">
+                                                Refuge
+                                            </MenuItem>
+                                            <MenuItem value="road">
+                                                Road
+                                            </MenuItem>
+                                            <MenuItem value="trail">
+                                                Trail
+                                            </MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+
+                                {/* State Filter */}
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <FormControl fullWidth size="small">
+                                        <InputLabel>State</InputLabel>
+                                        <Select
+                                            multiple
+                                            value={filters.states}
+                                            onChange={(e) =>
+                                                handleFilterChange(
+                                                    'states',
+                                                    e.target.value
+                                                )
+                                            }
+                                            input={
+                                                <OutlinedInput label="State" />
+                                            }
+                                            renderValue={(selected) =>
+                                                selected.join(', ')
+                                            }
+                                        >
+                                            <MenuItem value="VA">
+                                                Virginia
+                                            </MenuItem>
+                                            <MenuItem value="DE">
+                                                Delaware
+                                            </MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+
+                                {/* Amenities Filter */}
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <FormControl fullWidth size="small">
+                                        <InputLabel>Amenities</InputLabel>
+                                        <Select
+                                            multiple
+                                            value={filters.amenities}
+                                            onChange={(e) =>
+                                                handleFilterChange(
+                                                    'amenities',
+                                                    e.target.value
+                                                )
+                                            }
+                                            input={
+                                                <OutlinedInput label="Amenities" />
+                                            }
+                                            renderValue={(selected) =>
+                                                `${selected.length} selected`
+                                            }
+                                        >
+                                            <MenuItem value="parking">
+                                                Parking
+                                            </MenuItem>
+                                            <MenuItem value="restrooms">
+                                                Restrooms
+                                            </MenuItem>
+                                            <MenuItem value="trails">
+                                                Trails
+                                            </MenuItem>
+                                            <MenuItem value="observation towers">
+                                                Observation Towers
+                                            </MenuItem>
+                                            <MenuItem value="auto tour">
+                                                Auto Tour
+                                            </MenuItem>
+                                            <MenuItem value="visitor center">
+                                                Visitor Center
+                                            </MenuItem>
+                                            <MenuItem value="accessible">
+                                                Accessible
+                                            </MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+
+                                {/* Distance Filter */}
+                                <Grid item xs={12} sm={6} md={3}>
+                                    <FormControl fullWidth size="small">
+                                        <InputLabel>Max Distance</InputLabel>
+                                        <Select
+                                            value={filters.maxDistance || ''}
+                                            onChange={(e) =>
+                                                handleFilterChange(
+                                                    'maxDistance',
+                                                    e.target.value || null
+                                                )
+                                            }
+                                            label="Max Distance"
+                                            disabled={!userLocation}
+                                        >
+                                            <MenuItem value="">
+                                                <em>Any</em>
+                                            </MenuItem>
+                                            <MenuItem value={25}>
+                                                25 km (~15 mi)
+                                            </MenuItem>
+                                            <MenuItem value={50}>
+                                                50 km (~30 mi)
+                                            </MenuItem>
+                                            <MenuItem value={100}>
+                                                100 km (~60 mi)
+                                            </MenuItem>
+                                            <MenuItem value={200}>
+                                                200 km (~125 mi)
+                                            </MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                    {!userLocation && (
+                                        <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                            sx={{ mt: 0.5, display: 'block' }}
+                                        >
+                                            Enable location to filter by
+                                            distance
+                                        </Typography>
+                                    )}
+                                </Grid>
+                            </Grid>
+
+                            {/* Clear Filters Button */}
+                            {activeFilterCount > 0 && (
+                                <Box sx={{ mt: 2, textAlign: 'right' }}>
+                                    <Button
+                                        size="small"
+                                        startIcon={<ClearIcon />}
+                                        onClick={handleClearFilters}
+                                    >
+                                        Clear All Filters
+                                    </Button>
+                                </Box>
+                            )}
+                        </Box>
+                    </Collapse>
 
                     {/* Search Results Count */}
                     {searchQuery && (
