@@ -58,11 +58,6 @@ export const getNearbyHotspots = async ({ lat, long, dist = 50 }) => {
     return callout(url);
 };
 
-export const getHotspotRecentSightings = async (hotspotId, daysBack = 7) => {
-    const url = `${api}hotspots/${hotspotId}/sightings?days=${daysBack}`;
-    return callout(url);
-};
-
 export default {
     getRegions,
     getNearbyNotableObservations,
@@ -70,6 +65,5 @@ export default {
     getSpeciesDetailsByLocation,
     getNearbyObservations,
     getNotableSightingsByLocation,
-    getNearbyHotspots,
-    getHotspotRecentSightings
+    getNearbyHotspots
 };

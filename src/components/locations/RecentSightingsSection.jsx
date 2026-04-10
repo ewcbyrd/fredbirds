@@ -11,16 +11,16 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Chip from '@mui/material/Chip';
-import { getHotspotRecentSightings } from '../../services/ebirdService';
+import { getNearbyObservations } from '../../services/ebirdService';
 import { format } from 'date-fns';
 
-const RecentSightingsSection = ({ location, ebirdHotspotIds }) => {
+const RecentSightingsSection = ({ location }) => {
     const [sightings, setSightings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        if (!ebirdHotspotIds || ebirdHotspotIds.length === 0) {
+        if (!location || !location.lat || !location.lon) {
             setLoading(false);
             return;
         }
@@ -29,15 +29,15 @@ const RecentSightingsSection = ({ location, ebirdHotspotIds }) => {
             setLoading(true);
             setError(null);
             try {
-                // Fetch sightings from all hotspots
-                const promises = ebirdHotspotIds.map((hotspotId) =>
-                    getHotspotRecentSightings(hotspotId, 7)
-                );
+                // Fetch nearby sightings using location coordinates
+                const result = await getNearbyObservations({
+                    lat: location.lat,
+                    long: location.lon,
+                    dist: 3, // 3 km radius to focus on this specific location
+                    daysBack: 14
+                });
 
-                const results = await Promise.all(promises);
-
-                // Flatten and combine results from all hotspots
-                const allSightings = results.flat();
+                const allSightings = result || [];
 
                 // Deduplicate by species and sort by date
                 const speciesMap = new Map();
@@ -76,12 +76,7 @@ const RecentSightingsSection = ({ location, ebirdHotspotIds }) => {
         };
 
         fetchSightings();
-    }, [ebirdHotspotIds]);
-
-    // Don't render section if no hotspot IDs
-    if (!ebirdHotspotIds || ebirdHotspotIds.length === 0) {
-        return null;
-    }
+    }, [location]);
 
     return (
         <Box sx={{ mb: 4 }}>

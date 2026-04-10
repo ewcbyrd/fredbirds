@@ -382,12 +382,7 @@ const LocationDetailsDialog = ({
                 </Box>
 
                 {/* Recent Sightings from eBird */}
-                {ebirdHotspotIds.length > 0 && (
-                    <RecentSightingsSection
-                        location={location}
-                        ebirdHotspotIds={ebirdHotspotIds}
-                    />
-                )}
+                <RecentSightingsSection location={location} />
             </DialogContent>
 
             <Divider />
