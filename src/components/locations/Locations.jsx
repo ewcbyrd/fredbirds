@@ -97,6 +97,21 @@ const Locations = () => {
         loadLocations();
     }, [loadLocations]);
 
+    // Calculate distance between two coordinates (Haversine formula)
+    const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
+        const R = 6371; // Earth's radius in km
+        const dLat = ((lat2 - lat1) * Math.PI) / 180;
+        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos((lat1 * Math.PI) / 180) *
+                Math.cos((lat2 * Math.PI) / 180) *
+                Math.sin(dLon / 2) *
+                Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distance in km
+    }, []);
+
     // Filter locations based on search query and filters
     const filteredLocations = useMemo(() => {
         let results = locations;
@@ -157,22 +172,7 @@ const Locations = () => {
         }
 
         return results;
-    }, [locations, searchQuery, filters, userLocation]);
-
-    // Calculate distance between two coordinates (Haversine formula)
-    const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371; // Earth's radius in km
-        const dLat = ((lat2 - lat1) * Math.PI) / 180;
-        const dLon = ((lon2 - lon1) * Math.PI) / 180;
-        const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos((lat1 * Math.PI) / 180) *
-                Math.cos((lat2 * Math.PI) / 180) *
-                Math.sin(dLon / 2) *
-                Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // Distance in km
-    };
+    }, [locations, searchQuery, filters, userLocation, calculateDistance]);
 
     const handleFilterChange = (filterType, value) => {
         setFilters((prev) => ({
