@@ -62,9 +62,9 @@ const RecentSightingsSection = ({ location }) => {
                 });
 
                 // Convert to array and sort by date (most recent first)
-                const sortedSightings = Array.from(speciesMap.values())
-                    .sort((a, b) => new Date(b.obsDt) - new Date(a.obsDt))
-                    .slice(0, 20); // Limit to top 20 most recent
+                const sortedSightings = Array.from(speciesMap.values()).sort(
+                    (a, b) => new Date(b.obsDt) - new Date(a.obsDt)
+                );
 
                 setSightings(sortedSightings);
             } catch (err) {
@@ -111,7 +111,6 @@ const RecentSightingsSection = ({ location }) => {
                         sx={{ mb: 2 }}
                     >
                         {sightings.length} species observed in the past 14 days
-                        (showing most recent)
                     </Typography>
                     <TableContainer
                         component={Paper}
