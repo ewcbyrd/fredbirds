@@ -21,6 +21,7 @@ const RecentSightingsSection = ({ location }) => {
     const [sightings, setSightings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [dataSource, setDataSource] = useState(null); // 'hotspot' or 'nearby'
 
     useEffect(() => {
         if (
@@ -50,6 +51,7 @@ const RecentSightingsSection = ({ location }) => {
 
                     const results = await Promise.all(promises);
                     allSightings = results.flat();
+                    setDataSource('hotspot');
                 } else {
                     // Fall back to nearby observations using coordinates
                     const result = await getNearbyObservations({
@@ -59,6 +61,7 @@ const RecentSightingsSection = ({ location }) => {
                         daysBack: 14
                     });
                     allSightings = result || [];
+                    setDataSource('nearby');
                 }
 
                 // Deduplicate by species and sort by date
@@ -133,6 +136,12 @@ const RecentSightingsSection = ({ location }) => {
                         sx={{ mb: 2 }}
                     >
                         {sightings.length} species observed in the past 14 days
+                        {dataSource === 'hotspot' &&
+                        location.ebirdHotspotIds?.length > 1
+                            ? ` at this location (${location.ebirdHotspotIds.length} eBird hotspots)`
+                            : dataSource === 'hotspot'
+                              ? ' at this location'
+                              : ' within 3 km of this location'}
                     </Typography>
                     <TableContainer
                         component={Paper}
@@ -255,8 +264,10 @@ const RecentSightingsSection = ({ location }) => {
                         color="text.secondary"
                         sx={{ mt: 1, display: 'block' }}
                     >
-                        Recent sightings within 3 km of this location. Data
-                        provided by{' '}
+                        {dataSource === 'hotspot'
+                            ? `Sightings from ${location.ebirdHotspotIds?.length > 1 ? `${location.ebirdHotspotIds.length} eBird hotspots` : 'this eBird hotspot'} at this location. `
+                            : 'Sightings within 3 km of this location. '}
+                        Data provided by{' '}
                         <a
                             href="https://ebird.org"
                             target="_blank"
