@@ -76,7 +76,7 @@ const RecentSightingsSection = ({ location }) => {
         };
 
         fetchSightings();
-    }, [location]);
+    }, [location._id, location.lat, location.lon]);
 
     return (
         <Box sx={{ mb: 4 }}>
@@ -100,7 +100,7 @@ const RecentSightingsSection = ({ location }) => {
                 </Alert>
             ) : sightings.length === 0 ? (
                 <Alert severity="info" sx={{ mb: 2 }}>
-                    No recent sightings found for this location in the past 7
+                    No recent sightings found for this location in the past 14
                     days.
                 </Alert>
             ) : (
@@ -110,7 +110,8 @@ const RecentSightingsSection = ({ location }) => {
                         color="text.secondary"
                         sx={{ mb: 2 }}
                     >
-                        {sightings.length} species observed in the past 7 days
+                        {sightings.length} species observed in the past 14 days
+                        (showing most recent)
                     </Typography>
                     <TableContainer
                         component={Paper}
