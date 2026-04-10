@@ -233,26 +233,20 @@ const RecentSightingsSection = ({ location }) => {
                         color="text.secondary"
                         sx={{ mt: 1, display: 'block' }}
                     >
-                        Data provided by eBird. Visit{' '}
-                        {ebirdHotspotIds.map((hotspotId, index) => (
-                            <React.Fragment key={hotspotId}>
-                                <a
-                                    href={`https://ebird.org/hotspot/${hotspotId}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={{
-                                        color: 'inherit',
-                                        textDecoration: 'underline'
-                                    }}
-                                >
-                                    {ebirdHotspotIds.length > 1
-                                        ? `Hotspot ${index + 1}`
-                                        : 'this hotspot'}
-                                </a>
-                                {index < ebirdHotspotIds.length - 1 && ' or '}
-                            </React.Fragment>
-                        ))}{' '}
-                        for more details.
+                        Recent sightings within 3 km of this location. Data
+                        provided by{' '}
+                        <a
+                            href="https://ebird.org"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                color: 'inherit',
+                                textDecoration: 'underline'
+                            }}
+                        >
+                            eBird
+                        </a>
+                        .
                     </Typography>
                 </>
             )}
