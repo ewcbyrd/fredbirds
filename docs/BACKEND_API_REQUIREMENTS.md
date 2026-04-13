@@ -68,6 +68,7 @@ The events should support the following structure:
 **Request Body:** Event data (see schema above)
 
 **Validation:**
+
 - `event` (title) is required
 - `start` date is required
 - `locations` array must have at least one location with valid lat/lon
@@ -75,6 +76,7 @@ The events should support the following structure:
 - If `tripLeader` provided, validate that memberId exists in members collection
 
 **Response:**
+
 - **201 Created** - Return the created event object with generated `_id`
 - **400 Bad Request** - Return validation errors
 - **500 Internal Server Error** - Database errors
@@ -88,11 +90,13 @@ The events should support the following structure:
 **Validation:** Same as POST, but all fields are optional
 
 **Special Handling:**
+
 - Preserve existing `attendees` array unless explicitly modified
 - Update `attendeeCount` if attendees changed
 - Validate event exists before updating
 
 **Response:**
+
 - **200 OK** - Return updated event object
 - **404 Not Found** - Event ID doesn't exist
 - **400 Bad Request** - Validation errors
@@ -103,10 +107,12 @@ The events should support the following structure:
 **Purpose:** Delete an event
 
 **Special Considerations:**
+
 - Consider if you want to prevent deletion of events with attendees (or warn)
 - Alternatively, cascade delete all attendance records
 
 **Response:**
+
 - **200 OK** - Return success message and deleted event data
 - **404 Not Found** - Event ID doesn't exist
 - **500 Internal Server Error** - Database errors
@@ -124,6 +130,7 @@ The events should support the following structure:
 ```
 
 **Backend should:**
+
 - Accept both old format (lat/lon) and new format (locations array)
 - Store new events with `locations` array
 - Optionally migrate existing events in database from lat/lon to locations array
@@ -131,7 +138,7 @@ The events should support the following structure:
 ## Implementation Notes
 
 1. **Database:** MongoDB (existing connection via RestDB or MongoDB Atlas)
-2. **Existing API base URL:** `https://fredbirds-api.herokuapp.com/`
+2. **Existing API base URL:** `https://fredbirds-api.azurewebsites.net/`
 3. **Authentication:** May need officer-level authentication middleware
 4. **CORS:** Ensure endpoints accept requests from the frontend domain
 5. **Error Handling:** Return consistent error format with messages
@@ -141,6 +148,7 @@ The events should support the following structure:
 ### Create Event Example
 
 **Request:**
+
 ```http
 POST /events
 Content-Type: application/json
@@ -177,6 +185,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```http
 HTTP/1.1 201 Created
 Content-Type: application/json
@@ -240,6 +249,7 @@ The frontend expects the following behavior:
 ## Related Files
 
 Frontend implementation files:
+
 - `src/components/ManageEventsDialog.jsx` - Main event management dialog
 - `src/components/EventForm.jsx` - Event creation/editing form
 - `src/components/EventList.jsx` - Event list and management
