@@ -10,12 +10,29 @@ app.use(
         contentSecurityPolicy: {
             directives: {
                 defaultSrc: ["'self'"],
-                connectSrc: ["'self'", "https://fredbirds-api.herokuapp.com", "https://api.ebird.org"],
-                imgSrc: ["'self'", "https://fredbirds-098f.restdb.io", "data:", "https:"],
-                fontSrc: ["'self'", "https://fonts.gstatic.com", "https:"],
-                styleSrc: ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
+                connectSrc: [
+                    "'self'",
+                    'https://fredbirds-api.azurewebsites.net',
+                    'https://api.ebird.org'
+                ],
+                imgSrc: [
+                    "'self'",
+                    'https://fredbirds-098f.restdb.io',
+                    'data:',
+                    'https:'
+                ],
+                fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https:'],
+                styleSrc: [
+                    "'self'",
+                    'https://fonts.googleapis.com',
+                    "'unsafe-inline'"
+                ],
                 scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-                frameSrc: ["'self'", "https://www.google.com", "https://*.google.com"]
+                frameSrc: [
+                    "'self'",
+                    'https://www.google.com',
+                    'https://*.google.com'
+                ]
             }
         }
     })

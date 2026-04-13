@@ -195,6 +195,6 @@ Access via `import.meta.env.VITE_*`. Never commit `.env` or `.env.local` files.
 
 - ES Modules only (`"type": "module"`) -- no CommonJS `require()`
 - Use `inclusive-language/use-inclusive-words` ESLint rule (enforced as error)
-- Backend API base URL: `https://fredbirds-api.herokuapp.com/`
+- Backend API base URL: `https://fredbirds-api.azurewebsites.net/`
 - All API calls go through service files in `src/services/` -- do not call APIs directly from components
 - The `dist/` directory is the build output -- never commit it
