@@ -10,7 +10,6 @@ import {
     IconButton,
     Button,
     CircularProgress,
-    Container,
     Grid
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -26,6 +25,7 @@ import {
     getRareBirds
 } from '../../services/restdbService';
 import MySightings from '../sightings/MySightings';
+import PageContainer from '../common/PageContainer';
 
 export default function Resources() {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -353,480 +353,440 @@ export default function Resources() {
     const rareCount = sightings ? sightings.filter((s) => s.isRare).length : 0;
 
     return (
-        <Box>
-            {/* Header Section */}
-            <Box
-                sx={{
-                    position: 'relative',
-                    bgcolor: 'primary.main',
-                    color: 'white',
-                    py: { xs: 6, md: 8 },
-                    mb: 6,
-                    background: (theme) =>
-                        `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.light} 100%)`,
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
-                }}
+        <PageContainer>
+            <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}
             >
-                <Container maxWidth="lg">
-                    <Typography
-                        variant="h3"
-                        sx={{
-                            fontWeight: 800,
-                            mb: 2,
-                            textShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                        }}
-                    >
-                        Recent Sightings
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        sx={{ maxWidth: 800, opacity: 0.9, fontWeight: 400 }}
-                    >
-                        Discover what's being seen in the Fredericksburg area
-                        and beyond. Browse recent checklists, find rare birds,
-                        and explore local hotspots.
-                    </Typography>
-                </Container>
-            </Box>
+                Recent Sightings
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+                Discover what's being seen in the Fredericksburg area and
+                beyond. Browse recent checklists, find rare birds, and explore
+                local hotspots.
+            </Typography>
 
-            <Container maxWidth="lg" sx={{ pb: 8 }}>
-                {/* Statistics Cards */}
-                <Grid container spacing={3} sx={{ mb: 6 }}>
-                    <Grid item xs={12} sm={4}>
-                        <Card
-                            sx={{
-                                p: 3,
-                                height: '100%',
-                                background:
-                                    'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                                borderLeft: '6px solid',
-                                borderLeftColor: 'primary.main',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    mb: 1
-                                }}
-                            >
-                                <Typography
-                                    variant="h3"
-                                    sx={{
-                                        fontWeight: 700,
-                                        color: 'primary.main',
-                                        mr: 2
-                                    }}
-                                >
-                                    {numSightings}
-                                </Typography>
-                                <Typography
-                                    variant="overline"
-                                    sx={{
-                                        lineHeight: 1.2,
-                                        color: 'text.secondary'
-                                    }}
-                                >
-                                    Species
-                                    <br />
-                                    Observed
-                                </Typography>
-                            </Box>
-                            <Typography variant="body2" color="text.secondary">
-                                Unique species reported in this view
-                            </Typography>
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <Card
-                            sx={{
-                                p: 3,
-                                height: '100%',
-                                background:
-                                    'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                                borderLeft: '6px solid #e65100',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    mb: 1
-                                }}
-                            >
-                                <Typography
-                                    variant="h3"
-                                    sx={{
-                                        fontWeight: 700,
-                                        color: '#e65100',
-                                        mr: 2
-                                    }}
-                                >
-                                    {rareCount}
-                                </Typography>
-                                <Typography
-                                    variant="overline"
-                                    sx={{
-                                        lineHeight: 1.2,
-                                        color: 'text.secondary'
-                                    }}
-                                >
-                                    Rare
-                                    <br />
-                                    Sightings
-                                </Typography>
-                            </Box>
-                            <Typography variant="body2" color="text.secondary">
-                                Notable or rare birds for the region
-                            </Typography>
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <Card
-                            sx={{
-                                p: 3,
-                                height: '100%',
-                                background:
-                                    'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                                borderLeft: '6px solid',
-                                borderLeftColor: 'info.main',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    mb: 1
-                                }}
-                            >
-                                <Typography
-                                    variant="h3"
-                                    sx={{
-                                        fontWeight: 700,
-                                        color: 'info.main',
-                                        mr: 2
-                                    }}
-                                >
-                                    {totalIndividuals}
-                                </Typography>
-                                <Typography
-                                    variant="overline"
-                                    sx={{
-                                        lineHeight: 1.2,
-                                        color: 'text.secondary'
-                                    }}
-                                >
-                                    Total
-                                    <br />
-                                    Reports
-                                </Typography>
-                            </Box>
-                            <Typography variant="body2" color="text.secondary">
-                                Individual sighting reports from birders
-                            </Typography>
-                        </Card>
-                    </Grid>
-                </Grid>
-
-                {/* Main Content Area */}
-                <Card
-                    sx={{
-                        boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                        borderRadius: 3,
-                        overflow: 'visible'
-                    }}
-                >
-                    <Box
+            {/* Statistics Cards */}
+            <Grid container spacing={3} sx={{ mb: 6 }}>
+                <Grid item xs={12} sm={4}>
+                    <Card
                         sx={{
                             p: 3,
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'flex-start',
-                            borderBottom: '1px solid rgba(0,0,0,0.06)',
-                            flexWrap: 'wrap',
-                            gap: 2
+                            height: '100%',
+                            background:
+                                'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                            borderLeft: '6px solid',
+                            borderLeftColor: 'primary.main',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
                         }}
                     >
-                        <Box>
-                            <Typography
-                                variant="h5"
-                                sx={{
-                                    fontWeight: 700,
-                                    color: 'text.primary',
-                                    mb: 0.5
-                                }}
-                            >
-                                Sighting Reports
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                Updated{' '}
-                                {lastUpdated[setting.view]
-                                    ? new Date(
-                                          lastUpdated[setting.view]
-                                      ).toLocaleString()
-                                    : '—'}
-                            </Typography>
-                        </Box>
-
-                        <Button
-                            startIcon={<RefreshIcon />}
-                            onClick={loadSightings}
-                            variant="contained"
-                            sx={{
-                                bgcolor: 'primary.main',
-                                color: 'white',
-                                boxShadow: '0 4px 8px rgba(44, 95, 45, 0.2)',
-                                '&:hover': {
-                                    bgcolor: 'primary.dark',
-                                    boxShadow:
-                                        '0 6px 12px rgba(44, 95, 45, 0.3)'
-                                }
-                            }}
-                        >
-                            Refresh Data
-                        </Button>
-                    </Box>
-
-                    <Box sx={{ p: 3 }}>
-                        {/* Filters Section */}
                         <Box
                             sx={{
                                 display: 'flex',
-                                flexDirection: { xs: 'column', md: 'row' },
-                                gap: 2,
-                                mb: 4,
-                                p: 2,
-                                bgcolor: '#f8f9fa',
-                                borderRadius: 2
+                                alignItems: 'center',
+                                mb: 1
                             }}
                         >
-                            {/* View Type */}
-                            <Box sx={{ flex: 1, minWidth: 200 }}>
-                                <Typography
-                                    variant="caption"
-                                    sx={{
-                                        display: 'block',
-                                        mb: 0.5,
-                                        fontWeight: 600,
-                                        color: 'primary.main'
-                                    }}
-                                >
-                                    DATA SOURCE
-                                </Typography>
-                                <Button
-                                    variant="outlined"
-                                    fullWidth
-                                    endIcon={<ExpandMoreIcon />}
-                                    onClick={handleMenuClick}
-                                    sx={{
-                                        justifyContent: 'space-between',
+                            <Typography
+                                variant="h3"
+                                sx={{
+                                    fontWeight: 700,
+                                    color: 'primary.main',
+                                    mr: 2
+                                }}
+                            >
+                                {numSightings}
+                            </Typography>
+                            <Typography
+                                variant="overline"
+                                sx={{
+                                    lineHeight: 1.2,
+                                    color: 'text.secondary'
+                                }}
+                            >
+                                Species
+                                <br />
+                                Observed
+                            </Typography>
+                        </Box>
+                        <Typography variant="body2" color="text.secondary">
+                            Unique species reported in this view
+                        </Typography>
+                    </Card>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                    <Card
+                        sx={{
+                            p: 3,
+                            height: '100%',
+                            background:
+                                'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                            borderLeft: '6px solid #e65100',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                mb: 1
+                            }}
+                        >
+                            <Typography
+                                variant="h3"
+                                sx={{
+                                    fontWeight: 700,
+                                    color: '#e65100',
+                                    mr: 2
+                                }}
+                            >
+                                {rareCount}
+                            </Typography>
+                            <Typography
+                                variant="overline"
+                                sx={{
+                                    lineHeight: 1.2,
+                                    color: 'text.secondary'
+                                }}
+                            >
+                                Rare
+                                <br />
+                                Sightings
+                            </Typography>
+                        </Box>
+                        <Typography variant="body2" color="text.secondary">
+                            Notable or rare birds for the region
+                        </Typography>
+                    </Card>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                    <Card
+                        sx={{
+                            p: 3,
+                            height: '100%',
+                            background:
+                                'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                            borderLeft: '6px solid',
+                            borderLeftColor: 'info.main',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                mb: 1
+                            }}
+                        >
+                            <Typography
+                                variant="h3"
+                                sx={{
+                                    fontWeight: 700,
+                                    color: 'info.main',
+                                    mr: 2
+                                }}
+                            >
+                                {totalIndividuals}
+                            </Typography>
+                            <Typography
+                                variant="overline"
+                                sx={{
+                                    lineHeight: 1.2,
+                                    color: 'text.secondary'
+                                }}
+                            >
+                                Total
+                                <br />
+                                Reports
+                            </Typography>
+                        </Box>
+                        <Typography variant="body2" color="text.secondary">
+                            Individual sighting reports from birders
+                        </Typography>
+                    </Card>
+                </Grid>
+            </Grid>
+
+            {/* Main Content Area */}
+            <Card
+                sx={{
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                    borderRadius: 3,
+                    overflow: 'visible'
+                }}
+            >
+                <Box
+                    sx={{
+                        p: 3,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        borderBottom: '1px solid rgba(0,0,0,0.06)',
+                        flexWrap: 'wrap',
+                        gap: 2
+                    }}
+                >
+                    <Box>
+                        <Typography
+                            variant="h5"
+                            sx={{
+                                fontWeight: 700,
+                                color: 'text.primary',
+                                mb: 0.5
+                            }}
+                        >
+                            Sighting Reports
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Updated{' '}
+                            {lastUpdated[setting.view]
+                                ? new Date(
+                                      lastUpdated[setting.view]
+                                  ).toLocaleString()
+                                : '—'}
+                        </Typography>
+                    </Box>
+
+                    <Button
+                        startIcon={<RefreshIcon />}
+                        onClick={loadSightings}
+                        variant="contained"
+                        sx={{
+                            bgcolor: 'primary.main',
+                            color: 'white',
+                            boxShadow: '0 4px 8px rgba(44, 95, 45, 0.2)',
+                            '&:hover': {
+                                bgcolor: 'primary.dark',
+                                boxShadow: '0 6px 12px rgba(44, 95, 45, 0.3)'
+                            }
+                        }}
+                    >
+                        Refresh Data
+                    </Button>
+                </Box>
+
+                <Box sx={{ p: 3 }}>
+                    {/* Filters Section */}
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column', md: 'row' },
+                            gap: 2,
+                            mb: 4,
+                            p: 2,
+                            bgcolor: '#f8f9fa',
+                            borderRadius: 2
+                        }}
+                    >
+                        {/* View Type */}
+                        <Box sx={{ flex: 1, minWidth: 200 }}>
+                            <Typography
+                                variant="caption"
+                                sx={{
+                                    display: 'block',
+                                    mb: 0.5,
+                                    fontWeight: 600,
+                                    color: 'primary.main'
+                                }}
+                            >
+                                DATA SOURCE
+                            </Typography>
+                            <Button
+                                variant="outlined"
+                                fullWidth
+                                endIcon={<ExpandMoreIcon />}
+                                onClick={handleMenuClick}
+                                sx={{
+                                    justifyContent: 'space-between',
+                                    bgcolor: 'white',
+                                    borderColor: '#e0e0e0',
+                                    color: '#333',
+                                    py: 1.5,
+                                    '&:hover': {
                                         bgcolor: 'white',
-                                        borderColor: '#e0e0e0',
-                                        color: '#333',
-                                        py: 1.5,
-                                        '&:hover': {
+                                        borderColor: 'primary.main'
+                                    }
+                                }}
+                            >
+                                {dropdown}
+                            </Button>
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={open}
+                                onClose={handleMenuClose}
+                            >
+                                <MenuItem
+                                    onClick={() => handleSelectView('nearby')}
+                                >
+                                    Nearby (Using Location)
+                                </MenuItem>
+                                <MenuItem
+                                    onClick={() => handleSelectView('local')}
+                                >
+                                    Local (Fredericksburg)
+                                </MenuItem>
+                                <MenuItem
+                                    onClick={() => handleSelectView('state')}
+                                >
+                                    State / County Lookup
+                                </MenuItem>
+                            </Menu>
+                        </Box>
+
+                        {/* State, County Filter - only show when view is 'state' */}
+                        {setting.view === 'state' && (
+                            <>
+                                <Box sx={{ flex: 1, minWidth: 200 }}>
+                                    <Typography
+                                        variant="caption"
+                                        sx={{
+                                            display: 'block',
+                                            mb: 0.5,
+                                            fontWeight: 600,
+                                            color: 'primary.main'
+                                        }}
+                                    >
+                                        STATE
+                                    </Typography>
+                                    <Button
+                                        variant="outlined"
+                                        fullWidth
+                                        endIcon={<ExpandMoreIcon />}
+                                        onClick={handleStateMenuClick}
+                                        sx={{
+                                            justifyContent: 'space-between',
                                             bgcolor: 'white',
-                                            borderColor: 'primary.main'
-                                        }
-                                    }}
-                                >
-                                    {dropdown}
-                                </Button>
-                                <Menu
-                                    anchorEl={anchorEl}
-                                    open={open}
-                                    onClose={handleMenuClose}
-                                >
-                                    <MenuItem
-                                        onClick={() =>
-                                            handleSelectView('nearby')
-                                        }
-                                    >
-                                        Nearby (Using Location)
-                                    </MenuItem>
-                                    <MenuItem
-                                        onClick={() =>
-                                            handleSelectView('local')
-                                        }
-                                    >
-                                        Local (Fredericksburg)
-                                    </MenuItem>
-                                    <MenuItem
-                                        onClick={() =>
-                                            handleSelectView('state')
-                                        }
-                                    >
-                                        State / County Lookup
-                                    </MenuItem>
-                                </Menu>
-                            </Box>
-
-                            {/* State, County Filter - only show when view is 'state' */}
-                            {setting.view === 'state' && (
-                                <>
-                                    <Box sx={{ flex: 1, minWidth: 200 }}>
-                                        <Typography
-                                            variant="caption"
-                                            sx={{
-                                                display: 'block',
-                                                mb: 0.5,
-                                                fontWeight: 600,
-                                                color: 'primary.main'
-                                            }}
-                                        >
-                                            STATE
-                                        </Typography>
-                                        <Button
-                                            variant="outlined"
-                                            fullWidth
-                                            endIcon={<ExpandMoreIcon />}
-                                            onClick={handleStateMenuClick}
-                                            sx={{
-                                                justifyContent: 'space-between',
+                                            borderColor: '#e0e0e0',
+                                            color: '#333',
+                                            py: 1.5,
+                                            '&:hover': {
                                                 bgcolor: 'white',
-                                                borderColor: '#e0e0e0',
-                                                color: '#333',
-                                                py: 1.5,
-                                                '&:hover': {
-                                                    bgcolor: 'white',
-                                                    borderColor: 'primary.main'
-                                                }
-                                            }}
-                                        >
-                                            {stateDropdown}
-                                        </Button>
-                                        <Menu
-                                            anchorEl={stateAnchorEl}
-                                            open={stateMenuOpen}
-                                            onClose={handleStateMenuClose}
-                                            PaperProps={{
-                                                style: {
-                                                    maxHeight: 300,
-                                                    overflow: 'auto'
-                                                }
-                                            }}
-                                        >
-                                            {stateOptions.map((state) => (
-                                                <MenuItem
-                                                    key={state.value}
-                                                    onClick={() =>
-                                                        handleSelectState(
-                                                            state.value,
-                                                            state.label
-                                                        )
-                                                    }
-                                                    dense
-                                                >
-                                                    {state.label}
-                                                </MenuItem>
-                                            ))}
-                                        </Menu>
-                                    </Box>
-
-                                    <Box sx={{ flex: 1, minWidth: 200 }}>
-                                        <Typography
-                                            variant="caption"
-                                            sx={{
-                                                display: 'block',
-                                                mb: 0.5,
-                                                fontWeight: 600,
-                                                color: 'primary.main'
-                                            }}
-                                        >
-                                            COUNTY
-                                        </Typography>
-                                        <Button
-                                            variant="outlined"
-                                            fullWidth
-                                            endIcon={<ExpandMoreIcon />}
-                                            onClick={handleCountyMenuClick}
-                                            sx={{
-                                                justifyContent: 'space-between',
-                                                bgcolor: 'white',
-                                                borderColor: '#e0e0e0',
-                                                color: '#333',
-                                                py: 1.5,
-                                                '&:hover': {
-                                                    bgcolor: 'white',
-                                                    borderColor: 'primary.main'
-                                                }
-                                            }}
-                                        >
-                                            {countyDropdown}
-                                        </Button>
-                                        <Menu
-                                            anchorEl={countyAnchorEl}
-                                            open={countyMenuOpen}
-                                            onClose={handleCountyMenuClose}
-                                            PaperProps={{
-                                                style: {
-                                                    maxHeight: 300,
-                                                    overflow: 'auto'
-                                                }
-                                            }}
-                                        >
+                                                borderColor: 'primary.main'
+                                            }
+                                        }}
+                                    >
+                                        {stateDropdown}
+                                    </Button>
+                                    <Menu
+                                        anchorEl={stateAnchorEl}
+                                        open={stateMenuOpen}
+                                        onClose={handleStateMenuClose}
+                                        PaperProps={{
+                                            style: {
+                                                maxHeight: 300,
+                                                overflow: 'auto'
+                                            }
+                                        }}
+                                    >
+                                        {stateOptions.map((state) => (
                                             <MenuItem
+                                                key={state.value}
                                                 onClick={() =>
-                                                    handleSelectCounty(
-                                                        null,
-                                                        'All'
+                                                    handleSelectState(
+                                                        state.value,
+                                                        state.label
                                                     )
                                                 }
                                                 dense
                                             >
-                                                All Counties
+                                                {state.label}
                                             </MenuItem>
-                                            {filteredCountyOptions.map(
-                                                (county) => (
-                                                    <MenuItem
-                                                        key={county.value}
-                                                        onClick={() =>
-                                                            handleSelectCounty(
-                                                                county.value,
-                                                                county.label
-                                                            )
-                                                        }
-                                                        dense
-                                                    >
-                                                        {county.label}
-                                                    </MenuItem>
-                                                )
-                                            )}
-                                        </Menu>
-                                    </Box>
-                                </>
-                            )}
-                        </Box>
+                                        ))}
+                                    </Menu>
+                                </Box>
 
-                        {loading ? (
-                            <Box sx={{ py: 12, textAlign: 'center' }}>
-                                <CircularProgress
-                                    size={60}
-                                    sx={{ color: 'primary.main', mb: 3 }}
-                                />
-                                <Typography variant="h6" color="text.secondary">
-                                    Fetching latest bird sightings...
-                                </Typography>
-                                <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                    sx={{ opacity: 0.7 }}
-                                >
-                                    Connecting to eBird API
-                                </Typography>
-                            </Box>
-                        ) : (
-                            <MySightings
-                                sightings={sightings}
-                                header={dropdown}
-                            />
+                                <Box sx={{ flex: 1, minWidth: 200 }}>
+                                    <Typography
+                                        variant="caption"
+                                        sx={{
+                                            display: 'block',
+                                            mb: 0.5,
+                                            fontWeight: 600,
+                                            color: 'primary.main'
+                                        }}
+                                    >
+                                        COUNTY
+                                    </Typography>
+                                    <Button
+                                        variant="outlined"
+                                        fullWidth
+                                        endIcon={<ExpandMoreIcon />}
+                                        onClick={handleCountyMenuClick}
+                                        sx={{
+                                            justifyContent: 'space-between',
+                                            bgcolor: 'white',
+                                            borderColor: '#e0e0e0',
+                                            color: '#333',
+                                            py: 1.5,
+                                            '&:hover': {
+                                                bgcolor: 'white',
+                                                borderColor: 'primary.main'
+                                            }
+                                        }}
+                                    >
+                                        {countyDropdown}
+                                    </Button>
+                                    <Menu
+                                        anchorEl={countyAnchorEl}
+                                        open={countyMenuOpen}
+                                        onClose={handleCountyMenuClose}
+                                        PaperProps={{
+                                            style: {
+                                                maxHeight: 300,
+                                                overflow: 'auto'
+                                            }
+                                        }}
+                                    >
+                                        <MenuItem
+                                            onClick={() =>
+                                                handleSelectCounty(null, 'All')
+                                            }
+                                            dense
+                                        >
+                                            All Counties
+                                        </MenuItem>
+                                        {filteredCountyOptions.map((county) => (
+                                            <MenuItem
+                                                key={county.value}
+                                                onClick={() =>
+                                                    handleSelectCounty(
+                                                        county.value,
+                                                        county.label
+                                                    )
+                                                }
+                                                dense
+                                            >
+                                                {county.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Menu>
+                                </Box>
+                            </>
                         )}
                     </Box>
-                </Card>
-            </Container>
-        </Box>
+
+                    {loading ? (
+                        <Box sx={{ py: 12, textAlign: 'center' }}>
+                            <CircularProgress
+                                size={60}
+                                sx={{ color: 'primary.main', mb: 3 }}
+                            />
+                            <Typography variant="h6" color="text.secondary">
+                                Fetching latest bird sightings...
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ opacity: 0.7 }}
+                            >
+                                Connecting to eBird API
+                            </Typography>
+                        </Box>
+                    ) : (
+                        <MySightings sightings={sightings} header={dropdown} />
+                    )}
+                </Box>
+            </Card>
+        </PageContainer>
     );
 }
