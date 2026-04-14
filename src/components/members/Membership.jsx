@@ -24,25 +24,18 @@ export default function Membership() {
 
     return (
         <PageContainer>
-            {/* Condensed Intro Section */}
-            <Box sx={{ mb: 4 }}>
-                <Typography
-                    variant="h4"
-                    sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}
-                >
-                    Join the Club
-                </Typography>
-                <Typography
-                    variant="body1"
-                    sx={{ color: 'text.secondary', maxWidth: 800, mb: 3 }}
-                >
-                    Whether you're just starting to notice the birds in your
-                    backyard or you're a seasoned birder, the Fredericksburg
-                    Birding Club welcomes you. <strong>Joining is free</strong>{' '}
-                    — simply register below to become a member and start birding
-                    with us!
-                </Typography>
-            </Box>
+            <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}
+            >
+                Join the Club
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+                Whether you're just starting to notice the birds in your
+                backyard or you're a seasoned birder, the Fredericksburg Birding
+                Club welcomes you. <strong>Joining is free</strong> — simply
+                register below to become a member and start birding with us!
+            </Typography>
 
             {/* Side-by-Side Layout: Benefits + Registration Form */}
             <Box

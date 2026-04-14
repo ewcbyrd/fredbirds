@@ -81,19 +81,16 @@ export default function Contact() {
 
     return (
         <PageContainer maxWidth="md">
+            <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}
+            >
+                Contact Us
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+                Need to reach us? Fill out the form and submit.
+            </Typography>
             <Box sx={{ bgcolor: 'white', p: 2, borderRadius: 1 }}>
-                <Typography
-                    variant="h4"
-                    sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}
-                >
-                    Contact Us
-                </Typography>
-                <Typography
-                    variant="body1"
-                    sx={{ color: 'text.secondary', mb: 3 }}
-                >
-                    Need to reach us? Fill out the form and submit.
-                </Typography>
                 <TextField
                     fullWidth
                     label="Name"
