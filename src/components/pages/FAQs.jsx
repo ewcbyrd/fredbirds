@@ -26,7 +26,10 @@ export default function FAQs() {
     return (
         <PageContainer maxWidth="md">
             <Box sx={{ bgcolor: 'white', p: 2, borderRadius: 1 }}>
-                <Typography variant="h5" sx={{ mb: 2 }}>
+                <Typography
+                    variant="h4"
+                    sx={{ fontWeight: 700, color: 'text.primary', mb: 3 }}
+                >
                     FAQ's
                 </Typography>
                 {loading && <Typography>Loading...</Typography>}

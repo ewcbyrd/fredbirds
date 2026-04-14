@@ -147,7 +147,7 @@ export default function Header(props) {
                 { label: 'About', path: '/about' },
                 { label: 'Officers', path: '/officers' },
                 { label: 'Members Directory', path: '/members-directory' },
-                { label: 'Membership', path: '/membership' },
+                { label: 'Membership', path: '/join' },
                 { label: "FAQ's", path: '/faqs' }
             ]
         },
@@ -175,7 +175,7 @@ export default function Header(props) {
         { label: 'Photos', path: '/photos' },
         { label: 'News', path: '/announcements' },
         { label: 'Members', path: '/members-directory' },
-        { label: 'Join', path: '/membership' }
+        { label: 'Join', path: '/join' }
     ];
 
     // Filter menu sections based on authentication

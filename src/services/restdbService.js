@@ -415,6 +415,27 @@ export const removeEventPhoto = async (eventId, photoId) => {
     return res.json();
 };
 
+// Member Registration Functions
+
+export const registerMember = async (registrationData) => {
+    const url = `${api}members/register`;
+    return post(
+        url,
+        JSON.stringify({
+            first: registrationData.first,
+            last: registrationData.last,
+            email: registrationData.email,
+            phone: registrationData.phone,
+            website: registrationData.website // honeypot — hidden field, must be empty
+        })
+    );
+};
+
+export const getPendingMembers = async () => {
+    const url = `${api}members/pending`;
+    return get(url);
+};
+
 // Announcement Management Functions
 
 export const createAnnouncement = async (announcementData) => {
@@ -469,5 +490,7 @@ export default {
     removeEventPhoto,
     createAnnouncement,
     updateAnnouncement,
-    deleteAnnouncement
+    deleteAnnouncement,
+    registerMember,
+    getPendingMembers
 };
