@@ -21,95 +21,33 @@ const ROLE_HIERARCHY = {
 };
 
 export const useUserRole = () => {
-    console.log('useUserRole hook initialized');
     const { user, isAuthenticated, isLoading } = useAuth0();
     const [userRole, setUserRole] = useState(ACCESS_LEVELS.PUBLIC);
     const [roleLoading, setRoleLoading] = useState(true);
 
     useEffect(() => {
-        console.log('useUserRole effect triggered:', {
-            user: user?.email,
-            isAuthenticated,
-            isLoading
-        });
         const determineUserRole = async () => {
             setRoleLoading(true);
 
             if (!isAuthenticated || !user) {
-                console.log('useUserRole - Setting PUBLIC (not authenticated)');
                 setUserRole(ACCESS_LEVELS.PUBLIC);
                 setRoleLoading(false);
                 return;
             }
 
             try {
-                // Method 1: Check Auth0 app_metadata (requires API setup)
-                if (user.app_metadata?.role) {
-                    setUserRole(user.app_metadata.role);
-                    setRoleLoading(false);
-                    return;
-                }
+                const data = await getUserRole(user.email, user.sub);
 
-                // Method 2: Check Auth0 custom claims
-                if (user['https://birdingclub.com/roles']) {
-                    const roles = user['https://birdingclub.com/roles'];
-                    const highestRole = Array.isArray(roles) ? roles[0] : roles;
-                    setUserRole(highestRole);
-                    setRoleLoading(false);
-                    return;
-                }
-
-                // Temporary Method 2.5: Hardcoded admin check for your email
-                if (user.email === 'scottbyrd681@gmail.com') {
-                    console.log(
-                        'Setting admin role for scottbyrd681@gmail.com'
-                    );
-                    setUserRole(ACCESS_LEVELS.ADMIN);
-                    setRoleLoading(false);
-                    return;
-                }
-
-                // Method 3: Database lookup by email using existing API
-                console.log('Making API call to check user role with:', {
-                    email: user.email,
-                    auth0Id: user.sub
-                });
-
-                try {
-                    const data = await getUserRole(user.email, user.sub);
-                    console.log('useUserRole - API Response data:', data);
-
-                    // Check if the response contains an error
-                    if (data.error) {
-                        console.log(
-                            'useUserRole - API returned error:',
-                            data.error
-                        );
-                        console.log(
-                            'useUserRole - Defaulting to PUBLIC due to member not found'
-                        );
-                        setUserRole(ACCESS_LEVELS.PUBLIC);
-                    } else {
-                        const assignedRole = data.role || ACCESS_LEVELS.PUBLIC;
-                        console.log(
-                            'useUserRole - Assigned role:',
-                            assignedRole
-                        );
-                        setUserRole(assignedRole);
-                    }
-                } catch (error) {
-                    console.error('useUserRole - API call failed:', error);
-                    console.log('useUserRole - Error status:', error.message);
-                    // For authenticated users without member records, default to PUBLIC
-                    // This prevents bypass of member record requirement
-                    console.log(
-                        'useUserRole - Defaulting to PUBLIC due to API failure'
-                    );
+                // Check if the response contains an error
+                if (data.error) {
                     setUserRole(ACCESS_LEVELS.PUBLIC);
+                } else {
+                    setUserRole(data.role || ACCESS_LEVELS.PUBLIC);
                 }
             } catch (error) {
-                console.error('Error determining user role:', error);
-                // Default to PUBLIC for authenticated users without member records
+                console.error('useUserRole - API call failed:', error);
+                // For authenticated users without member records, default to PUBLIC
+                // This prevents bypass of member record requirement
                 setUserRole(ACCESS_LEVELS.PUBLIC);
             }
 
@@ -122,16 +60,7 @@ export const useUserRole = () => {
     }, [user, isAuthenticated, isLoading]);
 
     const hasAccess = (requiredLevel) => {
-        const hasAccessResult =
-            ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredLevel];
-        console.log('useUserRole - hasAccess check:', {
-            userRole,
-            requiredLevel,
-            userRoleLevel: ROLE_HIERARCHY[userRole],
-            requiredRoleLevel: ROLE_HIERARCHY[requiredLevel],
-            hasAccess: hasAccessResult
-        });
-        return hasAccessResult;
+        return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredLevel];
     };
 
     const isRole = (role) => {

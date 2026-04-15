@@ -19,27 +19,16 @@ import {
 } from '@mui/icons-material';
 import { useUserRole, ACCESS_LEVELS } from '../../hooks/useUserRole';
 import { useMember } from '../../hooks/useMember';
-import RoleBadge from '../auth/RoleBadge';
 
 const LoginButton = () => {
     const { loginWithRedirect } = useAuth0();
 
     const handleLogin = () => {
-        console.log('Login button clicked');
-
-        // Clear any existing Auth0 state first
-        const authKeys = Object.keys(localStorage).filter((key) =>
-            key.startsWith('auth0')
-        );
-        authKeys.forEach((key) => localStorage.removeItem(key));
-        sessionStorage.clear();
-
-        try {
-            loginWithRedirect();
-            console.log('loginWithRedirect called successfully');
-        } catch (error) {
-            console.error('Error calling loginWithRedirect:', error);
-        }
+        loginWithRedirect({
+            authorizationParams: {
+                screen_hint: 'login'
+            }
+        });
     };
 
     return (
@@ -65,7 +54,6 @@ const LogoutButton = ({ onClose }) => {
     const { logout } = useAuth0();
 
     const handleLogout = () => {
-        console.log('Logout clicked');
         onClose && onClose();
         logout({
             logoutParams: {
@@ -90,19 +78,7 @@ const UserProfile = () => {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const { member: memberData } = useMember();
 
-    // Debug logging
-    React.useEffect(() => {
-        console.log('Auth0 State:', {
-            isAuthenticated,
-            isLoading,
-            error,
-            user: user?.name
-        });
-    }, [isAuthenticated, isLoading, error, user]);
-
     if (error) {
-        console.error('Auth0 Error:', error);
-
         // Clear Auth0 state on error and show login button
         return (
             <Box>
@@ -110,12 +86,11 @@ const UserProfile = () => {
                     variant="outlined"
                     startIcon={<Login />}
                     onClick={() => {
-                        console.log('Retrying login after error...');
-                        // Clear any existing Auth0 state
-                        localStorage.removeItem('auth0.is.authenticated');
-                        sessionStorage.clear();
-                        // Attempt login again
-                        loginWithRedirect();
+                        loginWithRedirect({
+                            authorizationParams: {
+                                screen_hint: 'login'
+                            }
+                        });
                     }}
                     sx={{
                         borderColor: 'orange',
@@ -141,23 +116,19 @@ const UserProfile = () => {
     }
 
     const handleMenu = (event) => {
-        console.log('Profile menu clicked', event.currentTarget);
         setAnchorEl(event.currentTarget);
     };
 
     const handleClose = () => {
-        console.log('Profile menu closing');
         setAnchorEl(null);
     };
 
     const handleProfileClick = () => {
-        console.log('Profile menu item clicked');
         handleClose();
         navigate('/profile');
     };
 
     const handleMenuItemClick = (path) => {
-        console.log(`Navigating to: ${path}`);
         handleClose();
         navigate(path);
     };
