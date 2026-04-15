@@ -8,7 +8,12 @@ import {
     Tabs,
     Tab,
     Badge,
-    Box
+    Box,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions
 } from '@mui/material';
 import {
     Edit as EditIcon,
@@ -20,7 +25,9 @@ import {
 import {
     getAllMembers,
     getPendingMembers,
-    patchMember
+    patchMember,
+    deleteMember,
+    sendEmail
 } from '../../services/restdbService';
 import MemberFormModal from '../forms/MemberFormModal';
 import AppDialog from '../common/AppDialog';
@@ -48,6 +55,10 @@ const ManageMembersDialog = ({ open, onClose }) => {
     const [pendingSearchTerm, setPendingSearchTerm] = useState('');
     const [pendingCount, setPendingCount] = useState(0);
 
+    // Reject confirmation dialog state
+    const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+    const [memberToReject, setMemberToReject] = useState(null);
+
     useEffect(() => {
         if (open) {
             fetchMembers();
@@ -62,8 +73,13 @@ const ManageMembersDialog = ({ open, onClose }) => {
             const data = await getAllMembers();
 
             if (Array.isArray(data)) {
+                // Exclude pending and rejected members from the All Members tab
+                const approvedMembers = data.filter(
+                    (m) => m.status !== 'pending' && m.status !== 'rejected'
+                );
+
                 // Sort by last name, then first name
-                const sortedMembers = data.sort((a, b) => {
+                const sortedMembers = approvedMembers.sort((a, b) => {
                     const getLastName = (member) => {
                         if (member.Name) {
                             const parts = member.Name.split(' ');
@@ -272,6 +288,60 @@ const ManageMembersDialog = ({ open, onClose }) => {
                 isActive: true
             });
 
+            // Send approval email (best-effort — don't block UI if it fails)
+            try {
+                const firstName =
+                    member.firstName ||
+                    member.first ||
+                    formatName(member).split(' ')[0];
+                await sendEmail({
+                    to: member.email,
+                    subject:
+                        "You're In! Welcome to the Fredericksburg Birding Club",
+                    html: [
+                        `<p>Hi <strong>${firstName}</strong>,</p>`,
+                        '<p>Great news &mdash; your membership with the Fredericksburg Birding Club has been approved! ',
+                        "You're now an official member.</p>",
+                        "<p>Here's how to get started:</p>",
+                        '<ul>',
+                        '<li><strong>Log in</strong> &mdash; visit <a href="https://www.fredbirds.com">www.fredbirds.com</a> and sign in to access your member dashboard</li>',
+                        '<li><strong>Member directory</strong> &mdash; find and connect with fellow club members</li>',
+                        '<li><strong>Events &amp; field trips</strong> &mdash; browse upcoming outings and register to attend</li>',
+                        '<li><strong>Bird sightings</strong> &mdash; log your sightings and see what others are spotting nearby</li>',
+                        '</ul>',
+                        "<p>You'll also be added to the club mailing list so you'll stay in the loop on all club news and activities.</p>",
+                        '<p>If you have any questions, reach out to us at ',
+                        '<a href="mailto:admin@fredbirds.com">admin@fredbirds.com</a>.</p>',
+                        '<p>Welcome aboard &mdash; we look forward to birding with you!<br/>',
+                        'Fredericksburg Birding Club<br/>',
+                        '<a href="https://www.fredbirds.com">www.fredbirds.com</a></p>'
+                    ].join(''),
+                    text: [
+                        `Hi ${firstName},`,
+                        '',
+                        'Great news - your membership with the Fredericksburg Birding Club has been approved! ',
+                        "You're now an official member.",
+                        '',
+                        "Here's how to get started:",
+                        '',
+                        '- Log in - visit www.fredbirds.com and sign in to access your member dashboard',
+                        '- Member directory - find and connect with fellow club members',
+                        '- Events & field trips - browse upcoming outings and register to attend',
+                        '- Bird sightings - log your sightings and see what others are spotting nearby',
+                        '',
+                        "You'll also be added to the club mailing list so you'll stay in the loop on all club news and activities.",
+                        '',
+                        'If you have any questions, reach out to us at admin@fredbirds.com.',
+                        '',
+                        'Welcome aboard - we look forward to birding with you!',
+                        'Fredericksburg Birding Club',
+                        'www.fredbirds.com'
+                    ].join('\n')
+                });
+            } catch (emailErr) {
+                console.error('Failed to send approval email:', emailErr);
+            }
+
             // Remove from pending list immediately
             const updated = pendingMembers.filter((m) => m._id !== member._id);
             setPendingMembers(updated);
@@ -288,25 +358,38 @@ const ManageMembersDialog = ({ open, onClose }) => {
         }
     };
 
-    const handleRejectMember = async (member, e) => {
+    const handleRejectMember = (member, e) => {
         e.stopPropagation();
+        setMemberToReject(member);
+        setRejectDialogOpen(true);
+    };
+
+    const handleConfirmReject = async () => {
+        if (!memberToReject) return;
         try {
-            await patchMember(member._id, {
-                status: 'rejected',
-                isActive: false
-            });
+            await deleteMember(memberToReject._id);
 
             // Remove from pending list immediately
-            const updated = pendingMembers.filter((m) => m._id !== member._id);
+            const updated = pendingMembers.filter(
+                (m) => m._id !== memberToReject._id
+            );
             setPendingMembers(updated);
             setFilteredPending(
-                filteredPending.filter((m) => m._id !== member._id)
+                filteredPending.filter((m) => m._id !== memberToReject._id)
             );
             setPendingCount(updated.length);
         } catch (err) {
             console.error('Error rejecting member:', err);
             setPendingError('Failed to reject registration');
+        } finally {
+            setRejectDialogOpen(false);
+            setMemberToReject(null);
         }
+    };
+
+    const handleCancelReject = () => {
+        setRejectDialogOpen(false);
+        setMemberToReject(null);
     };
 
     const handleTabChange = (event, newValue) => {
@@ -462,8 +545,9 @@ const ManageMembersDialog = ({ open, onClose }) => {
                                     badgeContent={pendingCount}
                                     color="warning"
                                     sx={{
+                                        pr: 2,
                                         '& .MuiBadge-badge': {
-                                            right: -12,
+                                            right: 2,
                                             top: 2
                                         }
                                     }}
@@ -515,6 +599,34 @@ const ManageMembersDialog = ({ open, onClose }) => {
                 member={selectedMember}
                 onSuccess={handleMemberSaved}
             />
+
+            {/* Reject Confirmation Dialog */}
+            <Dialog
+                open={rejectDialogOpen}
+                onClose={handleCancelReject}
+                maxWidth="xs"
+                fullWidth
+            >
+                <DialogTitle>Reject Registration?</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        This will permanently delete{' '}
+                        {memberToReject ? formatName(memberToReject) : ''}'s
+                        registration. They will be able to re-apply in the
+                        future.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancelReject}>Cancel</Button>
+                    <Button
+                        onClick={handleConfirmReject}
+                        color="error"
+                        variant="contained"
+                    >
+                        Reject
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };
