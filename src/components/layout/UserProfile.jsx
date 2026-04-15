@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -19,23 +19,14 @@ import {
 } from '@mui/icons-material';
 import { useUserRole, ACCESS_LEVELS } from '../../hooks/useUserRole';
 import { useMember } from '../../hooks/useMember';
+import LoginDialog from '../auth/LoginDialog';
 
-const LoginButton = () => {
-    const { loginWithRedirect } = useAuth0();
-
-    const handleLogin = () => {
-        loginWithRedirect({
-            authorizationParams: {
-                screen_hint: 'login'
-            }
-        });
-    };
-
+const LoginButton = ({ onClick }) => {
     return (
         <Button
             variant="outlined"
             startIcon={<Login />}
-            onClick={handleLogin}
+            onClick={onClick}
             sx={{
                 borderColor: 'white',
                 color: 'white',
@@ -71,27 +62,23 @@ const LogoutButton = ({ onClose }) => {
 };
 
 const UserProfile = () => {
-    const { user, isAuthenticated, isLoading, error, loginWithRedirect } =
-        useAuth0();
+    const { user, isAuthenticated, isLoading, error } = useAuth0();
     const { hasAccess, userRole } = useUserRole();
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [loginDialogOpen, setLoginDialogOpen] = useState(false);
     const { member: memberData } = useMember();
 
+    const handleOpenLogin = () => setLoginDialogOpen(true);
+    const handleCloseLogin = () => setLoginDialogOpen(false);
+
     if (error) {
-        // Clear Auth0 state on error and show login button
         return (
             <Box>
                 <Button
                     variant="outlined"
                     startIcon={<Login />}
-                    onClick={() => {
-                        loginWithRedirect({
-                            authorizationParams: {
-                                screen_hint: 'login'
-                            }
-                        });
-                    }}
+                    onClick={handleOpenLogin}
                     sx={{
                         borderColor: 'orange',
                         color: 'orange',
@@ -103,6 +90,10 @@ const UserProfile = () => {
                 >
                     Retry Login
                 </Button>
+                <LoginDialog
+                    open={loginDialogOpen}
+                    onClose={handleCloseLogin}
+                />
             </Box>
         );
     }
@@ -112,7 +103,15 @@ const UserProfile = () => {
     }
 
     if (!isAuthenticated) {
-        return <LoginButton />;
+        return (
+            <>
+                <LoginButton onClick={handleOpenLogin} />
+                <LoginDialog
+                    open={loginDialogOpen}
+                    onClose={handleCloseLogin}
+                />
+            </>
+        );
     }
 
     const handleMenu = (event) => {
