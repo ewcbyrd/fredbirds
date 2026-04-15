@@ -14,7 +14,7 @@ OpenCode skill for working with **fredbirds-api** service functions in the React
 
 **What this skill knows:**
 
-- All 62 fredbirds-api endpoints with full specifications
+- All 65 fredbirds-api endpoints with full specifications
 - Two service patterns: restdbService (CRUD) and ebirdService (eBird-specific)
 - Request/response validation rules
 - Error handling approaches
@@ -107,6 +107,7 @@ Pattern: `get<Resource>` or `get<Resource>By<Filter>`
 - `getAnnouncements()`
 - `getMemberByEmail(email)`
 - `getActiveMembers()`
+- `getPendingMembers()`
 - `getEventAttendees(eventId)`
 
 #### POST Endpoints
@@ -120,6 +121,7 @@ Pattern: `save<Resource>` or `create<Resource>` or descriptive action
 - `createEvent(eventData)`
 - `createAnnouncement(announcementData)`
 - `registerForEvent(eventId, memberData)`
+- `registerMember(registrationData)`
 - `autoRegisterMember(auth0User)`
 
 #### PATCH Endpoints
@@ -142,6 +144,7 @@ Pattern: `delete<Resource>` or descriptive action
 - `deleteEvent(eventId)`
 - `deleteAnnouncement(announcementId)`
 - `unregisterFromEvent(eventId, memberId)`
+- `deletePendingMember(memberId)`
 - `removeEventPhoto(eventId, photoId)`
 
 ---
@@ -346,6 +349,15 @@ export const getEventAttendees = async (eventId) => {
 };
 ```
 
+**GET filtered by status:**
+
+```javascript
+export const getPendingMembers = async () => {
+    const url = `${api}members/pending`;
+    return get(url);
+};
+```
+
 ### POST Examples
 
 **Simple POST:**
@@ -381,6 +393,24 @@ export const savePhoto = async (photoData) => {
             contributor: photoData.contributor,
             photoDate: photoData.photoDate,
             category: photoData.category
+        })
+    );
+};
+```
+
+**POST with honeypot field (public registration):**
+
+```javascript
+export const registerMember = async (registrationData) => {
+    const url = `${api}members/register`;
+    return post(
+        url,
+        JSON.stringify({
+            first: registrationData.first,
+            last: registrationData.last,
+            email: registrationData.email,
+            phone: registrationData.phone,
+            website: registrationData.website  // honeypot — hidden field, must be empty
         })
     );
 };
@@ -443,6 +473,19 @@ export const removeEventPhoto = async (eventId, photoId) => {
         },
         body: JSON.stringify({ _id: photoId })
     });
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    return res.json();
+};
+```
+
+**DELETE with status guard (pending only):**
+
+```javascript
+export const deletePendingMember = async (memberId) => {
+    const url = `${api}members/${memberId}`;
+    const res = await fetch(url, { method: 'DELETE' });
     if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     }
@@ -677,23 +720,68 @@ export const getNearbyHotspots = async ({ lat, long, dist = 50 }) => {
 | GET    | `/members/email`            | email (query)              | -                     | `Member`                                 | Get member by email        |
 | GET    | `/members/filter`           | first, last, email (query) | -                     | `Member[]`                               | Search members             |
 | GET    | `/members/:memberId/events` | memberId (path)            | -                     | `Event[]`                                | Get member's event history |
-| POST   | `/members`                  | -                          | `CreateMemberRequest` | `{ insertedId }`                         | Create member              |
-| POST   | `/members/role`             | -                          | `{ email: string }`   | `{ role: 'member'\|'officer'\|'admin' }` | Get member role            |
-| PATCH  | `/members/:id`              | id (path)                  | `UpdateMemberRequest` | `{ message, modifiedCount }`             | Update member              |
+| POST   | `/members`                  | -                          | `CreateMemberRequest`    | `{ insertedId }`                                | Create member                    |
+| POST   | `/members/register`         | -                          | `RegisterMemberRequest`  | `{ success, message, member }`                   | Public member registration       |
+| POST   | `/members/role`             | -                          | `{ email: string }`      | `{ role: 'member'\|'officer'\|'admin' }`         | Get member role                  |
+| GET    | `/members/pending`          | -                          | -                        | `Member[]`                                       | Get pending registrations        |
+| PATCH  | `/members/:id`              | id (path)                  | `UpdateMemberRequest`    | `{ message, modifiedCount }`                     | Update member                    |
+| DELETE | `/members/:id`              | id (path)                  | -                        | `{ success, message, deletedMember }`            | Delete pending registration      |
 
 **Member Schema:**
 
 ```typescript
 {
   _id: string (ObjectId)
-  first: string      // required
-  last: string       // required
-  email: string      // required, unique, valid email format
+  first: string         // required
+  last: string          // required
+  email: string         // required, unique, valid email format
+  phone?: string        // optional
   isActive?: boolean
   isOfficer?: boolean
   isAdmin?: boolean
+  showEmail?: boolean   // whether to display email publicly
+  showPhone?: boolean   // whether to display phone publicly
+  status?: string       // "pending" | "approved" (set by registration flow)
+  yearJoined?: string   // e.g. "2026" (stored as string, not number)
+  registeredAt?: string // ISO 8601 date (set by registration flow)
 }
 ```
+
+**RegisterMemberRequest (POST /members/register):**
+
+```typescript
+{
+  first: string     // required
+  last: string      // required
+  email: string     // required, valid email format, must not already exist
+  phone?: string    // optional
+  website?: string  // HONEYPOT field — must be included as a hidden form field
+                    // If non-empty, the server silently discards the submission
+                    // (returns 201 to not tip off bots, but does NOT insert)
+}
+```
+
+**Registration Response:**
+
+```typescript
+// Success (201)
+{
+  success: true,
+  message: "Registration submitted successfully",
+  member: Member  // the inserted member document with _id
+}
+
+// Duplicate email (409 ConflictError)
+// Invalid input (400 ValidationError)
+```
+
+**Rate Limiting:** `POST /members/register` has a stricter rate limit of **5 requests per 15 minutes** per IP (vs 500/15min for other endpoints).
+
+**Delete Pending Registration (DELETE /members/:id):**
+
+- Only members with `status: "pending"` can be deleted
+- Returns 400 `ValidationError` if the member is not pending
+- Returns 404 `NotFoundError` if member doesn't exist
 
 **Validation Rules:**
 
@@ -701,6 +789,8 @@ export const getNearbyHotspots = async ({ lat, long, dist = 50 }) => {
 - **Constraints:**
     - `email` must be unique and valid format
     - Role priority: admin > officer > member
+    - Registration creates members with `status: "pending"`, `isActive: false`
+    - Officers are automatically notified by email when a new registration is submitted
 
 ---
 
@@ -843,9 +933,9 @@ export const getNearbyHotspots = async ({ lat, long, dist = 50 }) => {
 
 ### Email
 
-| Method | Endpoint      | Params | Body           | Response                          | Description         |
-| ------ | ------------- | ------ | -------------- | --------------------------------- | ------------------- |
-| POST   | `/mailertogo` | -      | `EmailRequest` | `{ success, message, messageId }` | Send email via SMTP |
+| Method | Endpoint      | Params | Body           | Response                          | Description                                |
+| ------ | ------------- | ------ | -------------- | --------------------------------- | ------------------------------------------ |
+| POST   | `/mailertogo` | -      | `EmailRequest` | `{ success, message, messageId }` | Send email via Azure Communication Services |
 
 **EmailRequest:**
 
@@ -854,7 +944,6 @@ export const getNearbyHotspots = async ({ lat, long, dist = 50 }) => {
   to: string | string[]         // required, valid email(s)
   subject: string               // required
   html: string                  // required
-  from?: string                 // optional, defaults to noreply@domain
   text?: string
   replyTo?: string
   cc?: string | string[]
@@ -862,7 +951,7 @@ export const getNearbyHotspots = async ({ lat, long, dist = 50 }) => {
 }
 ```
 
-**Note:** Current service uses `/sendgrid` endpoint, but API uses `/mailertogo`. Update service accordingly.
+**Note:** The `from` address is configured server-side via `ACS_SENDER_ADDRESS` (`noreply@fredbirds.com`) and cannot be overridden by the client.
 
 ---
 
@@ -986,6 +1075,10 @@ All endpoints may return these error types:
 - `email` must be unique across collection
 - `first`, `last`, `email` are required
 - Role priority: `isAdmin` > `isOfficer` > regular member
+- Registration (`POST /members/register`) creates members with `status: "pending"`, `isActive: false`
+- Registration has stricter rate limit: 5 requests per 15 minutes per IP
+- Registration includes honeypot field (`website`) for spam protection
+- Only pending members can be deleted (`DELETE /members/:id`); non-pending returns 400
 
 **Announcements:**
 
@@ -1238,7 +1331,7 @@ export const getRegionalSightings = async ({ regionCode, days = 14 }) => {
 
 When this skill is loaded, OpenCode has complete knowledge of:
 
-✅ All 62 fredbirds-api endpoints  
+✅ All 65 fredbirds-api endpoints  
 ✅ HTTP methods, paths, parameters for each endpoint  
 ✅ Request body schemas and required fields  
 ✅ Response shapes and types  

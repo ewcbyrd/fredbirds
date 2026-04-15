@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
-import Container from '@mui/material/Container';
 import Chip from '@mui/material/Chip';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
@@ -13,6 +12,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
 import { getAnnouncements } from '../../services/restdbService';
+import PageContainer from '../common/PageContainer';
 
 export default function Announcements() {
     const [items, setItems] = useState([]);
@@ -127,286 +127,245 @@ export default function Announcements() {
 
     if (loading)
         return (
-            <Box sx={{ bgcolor: '#f7faf7', minHeight: '50vh', py: 6 }}>
-                <Container maxWidth="lg">
-                    <Box
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        minHeight="200px"
-                    >
-                        <CircularProgress />
-                        <Typography variant="body1" sx={{ ml: 2 }}>
-                            Loading announcements...
-                        </Typography>
-                    </Box>
-                </Container>
-            </Box>
+            <PageContainer>
+                <Typography
+                    variant="h4"
+                    sx={{ fontWeight: 700, color: 'text.primary', mb: 3 }}
+                >
+                    Club Announcements
+                </Typography>
+                <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight="200px"
+                >
+                    <CircularProgress />
+                    <Typography variant="body1" sx={{ ml: 2 }}>
+                        Loading announcements...
+                    </Typography>
+                </Box>
+            </PageContainer>
         );
 
     if (error)
         return (
-            <Box sx={{ bgcolor: '#f7faf7', minHeight: '50vh', py: 6 }}>
-                <Container maxWidth="lg">
-                    {/* Header Section */}
-                    <Box sx={{ textAlign: 'center', mb: 6 }}>
-                        <Typography
-                            variant="h3"
-                            sx={{
-                                fontWeight: 700,
-                                mb: 2,
-                                color: 'text.primary',
-                                fontSize: { xs: '2rem', md: '2.5rem' }
-                            }}
-                        >
-                            Club Announcements
-                        </Typography>
-                    </Box>
-                    <Alert
-                        severity="error"
-                        onClose={() => setError(null)}
-                        sx={{ maxWidth: 600, mx: 'auto' }}
-                    >
-                        {error}
-                    </Alert>
-                </Container>
-            </Box>
+            <PageContainer>
+                <Typography
+                    variant="h4"
+                    sx={{ fontWeight: 700, color: 'text.primary', mb: 3 }}
+                >
+                    Club Announcements
+                </Typography>
+                <Alert
+                    severity="error"
+                    onClose={() => setError(null)}
+                    sx={{ maxWidth: 600 }}
+                >
+                    {error}
+                </Alert>
+            </PageContainer>
         );
 
     if (!items.length)
         return (
-            <Box sx={{ bgcolor: '#f7faf7', minHeight: '50vh', py: 6 }}>
-                <Container maxWidth="lg">
-                    {/* Header Section */}
-                    <Box sx={{ textAlign: 'center', mb: 6 }}>
-                        <Typography
-                            variant="h3"
-                            sx={{
-                                fontWeight: 700,
-                                mb: 2,
-                                color: 'text.primary',
-                                fontSize: { xs: '2rem', md: '2.5rem' }
-                            }}
-                        >
-                            Club Announcements
-                        </Typography>
-                        <Typography
-                            variant="h6"
-                            sx={{
-                                color: 'text.secondary',
-                                fontWeight: 400,
-                                maxWidth: 600,
-                                mx: 'auto'
-                            }}
-                        >
-                            Stay updated with the latest news and important
-                            information from the Fredericksburg Birding Club
-                        </Typography>
-                    </Box>
+            <PageContainer>
+                <Typography
+                    variant="h4"
+                    sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}
+                >
+                    Club Announcements
+                </Typography>
+                <Typography
+                    variant="body1"
+                    sx={{ color: 'text.secondary', mb: 3 }}
+                >
+                    Stay updated with the latest news and important information
+                    from the Fredericksburg Birding Club
+                </Typography>
 
-                    {/* No Announcements Message */}
-                    <Box
+                {/* No Announcements Message */}
+                <Box
+                    sx={{
+                        textAlign: 'center',
+                        py: 6,
+                        bgcolor: 'white',
+                        borderRadius: 3,
+                        boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
+                    }}
+                >
+                    <AnnouncementIcon
                         sx={{
-                            textAlign: 'center',
-                            py: 6,
-                            bgcolor: 'white',
-                            borderRadius: 3,
-                            boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
+                            fontSize: 48,
+                            color: 'text.secondary',
+                            mb: 2
                         }}
+                    />
+                    <Typography
+                        variant="h6"
+                        color="text.secondary"
+                        sx={{ fontWeight: 500 }}
                     >
-                        <AnnouncementIcon
-                            sx={{
-                                fontSize: 48,
-                                color: 'text.secondary',
-                                mb: 2
-                            }}
-                        />
-                        <Typography
-                            variant="h6"
-                            color="text.secondary"
-                            sx={{ fontWeight: 500 }}
-                        >
-                            There is no current club news
-                        </Typography>
-                        <Typography
-                            variant="body1"
-                            color="text.secondary"
-                            sx={{ mt: 1 }}
-                        >
-                            Check back soon for updates and announcements
-                        </Typography>
-                    </Box>
-                </Container>
-            </Box>
+                        There is no current club news
+                    </Typography>
+                    <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{ mt: 1 }}
+                    >
+                        Check back soon for updates and announcements
+                    </Typography>
+                </Box>
+            </PageContainer>
         );
 
     return (
-        <Box sx={{ bgcolor: '#f7faf7', minHeight: '100vh', py: 6 }}>
-            <Container maxWidth="lg">
-                {/* Header Section */}
-                <Box sx={{ textAlign: 'center', mb: 6 }}>
-                    <Typography
-                        variant="h3"
-                        sx={{
-                            fontWeight: 700,
-                            mb: 2,
-                            color: 'text.primary',
-                            fontSize: { xs: '2rem', md: '2.5rem' }
-                        }}
-                    >
-                        Club Announcements
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            color: 'text.secondary',
-                            fontWeight: 400,
-                            maxWidth: 600,
-                            mx: 'auto'
-                        }}
-                    >
-                        Stay updated with the latest news and important
-                        information from the Fredericksburg Birding Club
-                    </Typography>
-                </Box>
+        <PageContainer>
+            <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}
+            >
+                Club Announcements
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+                Stay updated with the latest news and important information from
+                the Fredericksburg Birding Club
+            </Typography>
 
-                {/* Pagination - Above Cards */}
-                {totalPages > 1 && (
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            mb: 4
-                        }}
-                    >
-                        <Stack spacing={2} alignItems="center">
-                            <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                sx={{ mb: 1 }}
-                            >
-                                Showing announcement {currentPage} of{' '}
-                                {totalPages}
-                            </Typography>
-                            <Pagination
-                                count={totalPages}
-                                page={currentPage}
-                                onChange={handlePageChange}
-                                size="large"
-                                sx={{
-                                    '& .MuiPaginationItem-root': {
-                                        fontSize: '1rem',
-                                        fontWeight: 500
-                                    },
-                                    '& .MuiPaginationItem-root.Mui-selected': {
-                                        bgcolor: 'primary.main',
-                                        color: 'white',
-                                        '&:hover': {
-                                            bgcolor: 'primary.dark'
-                                        }
-                                    }
-                                }}
-                            />
-                        </Stack>
-                    </Box>
-                )}
-
-                {/* Announcements Grid */}
-                <Grid container spacing={3}>
-                    {currentItems.map((item) => (
-                        <Grid item xs={12} key={item._id}>
-                            <Card
-                                sx={{
-                                    height: '100%',
-                                    borderRadius: 3,
-                                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                                    transition: 'all 0.3s ease',
+            {/* Pagination - Above Cards */}
+            {totalPages > 1 && (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        mb: 4
+                    }}
+                >
+                    <Stack spacing={2} alignItems="center">
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mb: 1 }}
+                        >
+                            Showing announcement {currentPage} of {totalPages}
+                        </Typography>
+                        <Pagination
+                            count={totalPages}
+                            page={currentPage}
+                            onChange={handlePageChange}
+                            size="large"
+                            sx={{
+                                '& .MuiPaginationItem-root': {
+                                    fontSize: '1rem',
+                                    fontWeight: 500
+                                },
+                                '& .MuiPaginationItem-root.Mui-selected': {
+                                    bgcolor: 'primary.main',
+                                    color: 'white',
                                     '&:hover': {
-                                        boxShadow:
-                                            '0 8px 30px rgba(0,0,0,0.12)',
-                                        transform: 'translateY(-2px)'
+                                        bgcolor: 'primary.dark'
                                     }
-                                }}
-                            >
-                                <CardContent sx={{ p: 4 }}>
-                                    {/* Announcement Header */}
-                                    <Box sx={{ mb: 3 }}>
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 2,
-                                                mb: 2
-                                            }}
-                                        >
-                                            <AnnouncementIcon
-                                                sx={{
-                                                    color: 'primary.main',
-                                                    fontSize: 24
-                                                }}
-                                            />
-                                            <Chip
-                                                label="Announcement"
-                                                size="small"
-                                                sx={{
-                                                    bgcolor: 'primary.50',
-                                                    color: 'primary.700',
-                                                    fontWeight: 600
-                                                }}
-                                            />
-                                        </Box>
+                                }
+                            }}
+                        />
+                    </Stack>
+                </Box>
+            )}
 
-                                        <Typography
-                                            variant="h5"
-                                            sx={{
-                                                fontWeight: 700,
-                                                color: 'text.primary',
-                                                lineHeight: 1.3,
-                                                mb: 2
-                                            }}
-                                        >
-                                            {item.headline}
-                                        </Typography>
-
-                                        {item.date && (
-                                            <Typography
-                                                variant="caption"
-                                                sx={{
-                                                    color: 'text.secondary',
-                                                    fontWeight: 500,
-                                                    textTransform: 'uppercase',
-                                                    letterSpacing: 0.5
-                                                }}
-                                            >
-                                                {new Date(
-                                                    item.date
-                                                ).toLocaleDateString('en-US', {
-                                                    month: 'long',
-                                                    day: 'numeric',
-                                                    year: 'numeric'
-                                                })}
-                                            </Typography>
-                                        )}
-                                    </Box>
-
-                                    {/* Announcement Content */}
+            {/* Announcements Grid */}
+            <Grid container spacing={3}>
+                {currentItems.map((item) => (
+                    <Grid item xs={12} key={item._id}>
+                        <Card
+                            sx={{
+                                height: '100%',
+                                borderRadius: 3,
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+                                    transform: 'translateY(-2px)'
+                                }
+                            }}
+                        >
+                            <CardContent sx={{ p: 4 }}>
+                                {/* Announcement Header */}
+                                <Box sx={{ mb: 3 }}>
                                     <Box
                                         sx={{
-                                            '& p': { mb: 1 },
-                                            '& .MuiTypography-root': {
-                                                lineHeight: 1.6,
-                                                fontSize: '0.95rem'
-                                            }
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 2,
+                                            mb: 2
                                         }}
                                     >
-                                        {formatText(item.details)}
+                                        <AnnouncementIcon
+                                            sx={{
+                                                color: 'primary.main',
+                                                fontSize: 24
+                                            }}
+                                        />
+                                        <Chip
+                                            label="Announcement"
+                                            size="small"
+                                            sx={{
+                                                bgcolor: 'primary.50',
+                                                color: 'primary.700',
+                                                fontWeight: 600
+                                            }}
+                                        />
                                     </Box>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Container>
-        </Box>
+
+                                    <Typography
+                                        variant="h5"
+                                        sx={{
+                                            fontWeight: 700,
+                                            color: 'text.primary',
+                                            lineHeight: 1.3,
+                                            mb: 2
+                                        }}
+                                    >
+                                        {item.headline}
+                                    </Typography>
+
+                                    {item.date && (
+                                        <Typography
+                                            variant="caption"
+                                            sx={{
+                                                color: 'text.secondary',
+                                                fontWeight: 500,
+                                                textTransform: 'uppercase',
+                                                letterSpacing: 0.5
+                                            }}
+                                        >
+                                            {new Date(
+                                                item.date
+                                            ).toLocaleDateString('en-US', {
+                                                month: 'long',
+                                                day: 'numeric',
+                                                year: 'numeric'
+                                            })}
+                                        </Typography>
+                                    )}
+                                </Box>
+
+                                {/* Announcement Content */}
+                                <Box
+                                    sx={{
+                                        '& p': { mb: 1 },
+                                        '& .MuiTypography-root': {
+                                            lineHeight: 1.6,
+                                            fontSize: '0.95rem'
+                                        }
+                                    }}
+                                >
+                                    {formatText(item.details)}
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+        </PageContainer>
     );
 }

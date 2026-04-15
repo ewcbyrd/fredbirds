@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useUserRole, ACCESS_LEVELS } from '../../hooks/useUserRole';
@@ -19,9 +19,7 @@ import {
     Divider,
     ListSubheader,
     useMediaQuery,
-    useTheme,
-    Alert,
-    Collapse
+    useTheme
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
@@ -36,7 +34,6 @@ import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary'; // Photos
 import VisibilityIcon from '@mui/icons-material/Visibility'; // Sightings
 import RssFeedIcon from '@mui/icons-material/RssFeed'; // Birding News
 import ContactSupportIcon from '@mui/icons-material/ContactSupport'; // FAQs
-import { PersonAdd, Close } from '@mui/icons-material';
 import UserProfile from './UserProfile';
 
 // Component to handle scroll transparency effect
@@ -58,8 +55,6 @@ function ScrollHandler(props) {
 
 export default function Header(props) {
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [showOnboardingBanner, setShowOnboardingBanner] = useState(false);
-    const [bannerDismissed, setBannerDismissed] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const theme = useTheme();
@@ -67,30 +62,6 @@ export default function Header(props) {
     const { user, isAuthenticated } = useAuth0();
     const { hasAccess } = useUserRole();
     const { member: memberRecord, error: memberError } = useMember();
-
-    // Show onboarding banner if authenticated but no member record
-    useEffect(() => {
-        if (bannerDismissed) {
-            setShowOnboardingBanner(false);
-            return;
-        }
-        if (!isAuthenticated) {
-            setShowOnboardingBanner(false);
-            return;
-        }
-        // If there's an error (no member record found), show the banner
-        setShowOnboardingBanner(!memberRecord && !!memberError);
-    }, [isAuthenticated, memberRecord, memberError, bannerDismissed]);
-
-    const handleDismissBanner = () => {
-        setBannerDismissed(true);
-        setShowOnboardingBanner(false);
-    };
-
-    const handleCompleteOnboarding = () => {
-        navigate('/member-onboarding');
-        setDrawerOpen(false);
-    };
 
     const handleNavigate = (path) => {
         navigate(path);
@@ -100,10 +71,17 @@ export default function Header(props) {
     // Only Members Directory is restricted
     const memberOnlyPaths = ['/members-directory'];
 
+    // Hide Join for users who already have a member record (any status)
+    const hideJoinPaths = ['/join'];
+
     // Filter function to check if menu item should be shown
     const shouldShowMenuItem = (path) => {
         if (memberOnlyPaths.includes(path)) {
             return hasAccess(ACCESS_LEVELS.MEMBER);
+        }
+        if (hideJoinPaths.includes(path)) {
+            // Show Join only if not authenticated, or authenticated without a member record
+            return !isAuthenticated || (!memberRecord && !!memberError);
         }
         return true; // All other pages are public
     };
@@ -147,7 +125,7 @@ export default function Header(props) {
                 { label: 'About', path: '/about' },
                 { label: 'Officers', path: '/officers' },
                 { label: 'Members Directory', path: '/members-directory' },
-                { label: 'Membership', path: '/membership' },
+                { label: 'Membership', path: '/join' },
                 { label: "FAQ's", path: '/faqs' }
             ]
         },
@@ -175,7 +153,7 @@ export default function Header(props) {
         { label: 'Photos', path: '/photos' },
         { label: 'News', path: '/announcements' },
         { label: 'Members', path: '/members-directory' },
-        { label: 'Join', path: '/membership' }
+        { label: 'Join', path: '/join' }
     ];
 
     // Filter menu sections based on authentication
@@ -331,65 +309,8 @@ export default function Header(props) {
                 </AppBar>
             </ScrollHandler>
 
-            {/* Onboarding Banner - Pushed down by fixed header */}
-            <Box sx={{ pt: 10 }}>
-                <Collapse in={showOnboardingBanner}>
-                    <Alert
-                        severity="info"
-                        sx={{
-                            borderRadius: 0,
-                            bgcolor: '#e3f2fd',
-                            borderColor: '#2196f3',
-                            '& .MuiAlert-message': {
-                                width: '100%'
-                            }
-                        }}
-                        action={
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    gap: 1,
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <Button
-                                    size="small"
-                                    variant="contained"
-                                    startIcon={<PersonAdd />}
-                                    onClick={handleCompleteOnboarding}
-                                    sx={{
-                                        bgcolor: 'info.main',
-                                        '&:hover': { bgcolor: 'info.dark' }
-                                    }}
-                                >
-                                    Complete Setup
-                                </Button>
-                                <IconButton
-                                    aria-label="Dismiss banner"
-                                    size="small"
-                                    onClick={handleDismissBanner}
-                                    sx={{ color: 'rgba(0, 0, 0, 0.54)' }}
-                                >
-                                    <Close fontSize="small" />
-                                </IconButton>
-                            </Box>
-                        }
-                    >
-                        <Box>
-                            <Typography
-                                variant="subtitle2"
-                                sx={{ fontWeight: 600, mb: 0.5 }}
-                            >
-                                Welcome to Fredericksburg Birding Club!
-                            </Typography>
-                            <Typography variant="body2">
-                                Complete your member profile to access club
-                                features and connect with fellow birders.
-                            </Typography>
-                        </Box>
-                    </Alert>
-                </Collapse>
-            </Box>
+            {/* Spacer for fixed header */}
+            <Box sx={{ pt: 10 }} />
 
             <Drawer
                 anchor="right"

@@ -4,7 +4,6 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useUserRole } from '../../hooks/useUserRole';
 import { getPictureUrl } from '../../services/cloudinaryService';
 import {
-    Container,
     Typography,
     Card,
     CardContent,
@@ -28,6 +27,7 @@ import {
     isOwnProfile
 } from '../../utils/memberUtils';
 import AppCard from '../common/AppCard';
+import PageContainer from '../common/PageContainer';
 
 const MembersDirectory = () => {
     const [members, setMembers] = useState([]);
@@ -126,7 +126,7 @@ const MembersDirectory = () => {
 
     if (loading) {
         return (
-            <Container maxWidth="md" sx={{ py: 4 }}>
+            <PageContainer maxWidth="md">
                 <Box
                     display="flex"
                     justifyContent="center"
@@ -138,37 +138,32 @@ const MembersDirectory = () => {
                         Loading members directory...
                     </Typography>
                 </Box>
-            </Container>
+            </PageContainer>
         );
     }
 
     if (error) {
         return (
-            <Container maxWidth="md" sx={{ py: 4 }}>
+            <PageContainer maxWidth="md">
                 <Alert severity="error" sx={{ mb: 3 }}>
                     {error}
                 </Alert>
-            </Container>
+            </PageContainer>
         );
     }
 
     return (
-        <Container maxWidth="md" sx={{ py: 4 }}>
+        <PageContainer maxWidth="md">
             {/* Header */}
-            <Box sx={{ mb: 4, textAlign: 'center' }}>
-                <Group sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                <Typography
-                    variant="h4"
-                    component="h1"
-                    gutterBottom
-                    color="primary"
-                >
-                    Members Directory
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                    Connect with fellow birding enthusiasts in our club
-                </Typography>
-            </Box>
+            <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}
+            >
+                Members Directory
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+                Connect with fellow birding enthusiasts in our club
+            </Typography>
 
             {/* Search */}
             <Card sx={{ mb: 3 }}>
@@ -356,7 +351,7 @@ const MembersDirectory = () => {
                     activity
                 </Typography>
             </Box>
-        </Container>
+        </PageContainer>
     );
 };
 

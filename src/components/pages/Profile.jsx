@@ -268,7 +268,10 @@ const Profile = () => {
 
     return (
         <PageContainer maxWidth="md">
-            <Typography variant="h4" gutterBottom>
+            <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: 'text.primary', mb: 3 }}
+            >
                 My Profile
             </Typography>
 

@@ -79,14 +79,17 @@ export default function Newsletters() {
                     {error}
                 </Alert>
             )}
-            <Box sx={{ bgcolor: 'white', p: 2, borderRadius: 1 }}>
-                <Typography variant="h5" sx={{ mb: 1 }}>
-                    Newsletters
-                </Typography>
+            <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: 'text.primary', mb: 3 }}
+            >
+                Newsletters
+            </Typography>
 
-                {newsletters.length === 0 ? (
-                    <Typography>No newsletters available.</Typography>
-                ) : (
+            {newsletters.length === 0 ? (
+                <Typography>No newsletters available.</Typography>
+            ) : (
+                <Box sx={{ bgcolor: 'white', p: 2, borderRadius: 1 }}>
                     <List>
                         {newsletters.map((n) => (
                             <React.Fragment key={n._id}>
@@ -106,8 +109,8 @@ export default function Newsletters() {
                             </React.Fragment>
                         ))}
                     </List>
-                )}
-            </Box>
+                </Box>
+            )}
 
             <Dialog
                 open={!!selected}

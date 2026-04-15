@@ -74,10 +74,13 @@ export default function News() {
                     {error}
                 </Alert>
             )}
+            <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: 'text.primary', mb: 3 }}
+            >
+                Newsletters
+            </Typography>
             <Box sx={{ bgcolor: 'white', p: 2, borderRadius: 1 }}>
-                <Typography variant="h5" sx={{ mb: 1 }}>
-                    Newsletters
-                </Typography>
                 {newsletters.length === 0 ? (
                     <Typography>No newsletters available.</Typography>
                 ) : (

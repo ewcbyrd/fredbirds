@@ -56,19 +56,15 @@ export default function Contact() {
         setSubmitting(true);
         setStatus(null);
         const to = emailMap.get(form.topic);
-        const body = JSON.stringify({
+        const emailData = {
             to,
-            from: { email: 'admin@fredbirds.com', name: 'Contact Us Message' },
             subject: 'Contact Us Message',
-            content: [
-                {
-                    type: 'text/plain',
-                    value: `Name: ${form.name}\nEmail: ${form.email}\nMessage: ${form.message}`
-                }
-            ]
-        });
+            html: `<p><strong>Name:</strong> ${form.name}</p><p><strong>Email:</strong> ${form.email}</p><p><strong>Message:</strong> ${form.message}</p>`,
+            text: `Name: ${form.name}\nEmail: ${form.email}\nMessage: ${form.message}`,
+            replyTo: form.email
+        };
         try {
-            await sendEmail(body);
+            await sendEmail(emailData);
             setStatus({ type: 'success', message: 'Message sent. Thank you.' });
             setForm({ name: '', email: '', topic: '', message: '' });
         } catch (err) {
@@ -81,11 +77,16 @@ export default function Contact() {
 
     return (
         <PageContainer maxWidth="md">
+            <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}
+            >
+                Contact Us
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+                Need to reach us? Fill out the form and submit.
+            </Typography>
             <Box sx={{ bgcolor: 'white', p: 2, borderRadius: 1 }}>
-                <Typography variant="h5">Contact Us</Typography>
-                <Typography sx={{ mb: 2 }}>
-                    Need to reach us? Fill out the form and submit.
-                </Typography>
                 <TextField
                     fullWidth
                     label="Name"
