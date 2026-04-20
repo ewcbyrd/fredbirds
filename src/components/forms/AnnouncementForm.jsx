@@ -119,22 +119,16 @@ const AnnouncementForm = ({ announcement, onSuccess, onCancel }) => {
                     : null
             };
 
-            let createdAnnouncement;
             if (announcement && announcement._id) {
                 // Update existing announcement
                 await updateAnnouncement(announcement._id, announcementData);
-                createdAnnouncement = {
-                    ...announcementData,
-                    _id: announcement._id
-                };
             } else {
                 // Create new announcement
-                createdAnnouncement =
-                    await createAnnouncement(announcementData);
+                await createAnnouncement(announcementData);
             }
 
-            // Save the announcement for email sending
-            setSavedAnnouncement(createdAnnouncement);
+            // Save the announcement data for email sending (use announcementData which has headline & details)
+            setSavedAnnouncement(announcementData);
 
             // If emails should be sent, show confirmation dialog
             if (emailRecipients.length > 0) {
