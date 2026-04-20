@@ -34,7 +34,6 @@ const AnnouncementForm = ({ announcement, onSuccess, onCancel }) => {
     const [success, setSuccess] = useState(false);
     const [emailRecipients, setEmailRecipients] = useState([]);
     const [emailConfirmOpen, setEmailConfirmOpen] = useState(false);
-    const [sendingEmails, setSendingEmails] = useState(false);
     const [savedAnnouncement, setSavedAnnouncement] = useState(null);
 
     useEffect(() => {
@@ -151,37 +150,27 @@ const AnnouncementForm = ({ announcement, onSuccess, onCancel }) => {
     };
 
     const handleEmailConfirm = async () => {
-        setSendingEmails(true);
-        setError(null);
+        setEmailConfirmOpen(false);
+        setSuccess(true);
 
-        try {
-            const results = await sendAnnouncementEmails(
-                savedAnnouncement,
-                emailRecipients
-            );
-
-            setEmailConfirmOpen(false);
-            setSuccess(true);
-
-            // Show detailed results
-            if (results.failed > 0) {
-                setError(
-                    `Announcement saved. Emails sent to ${results.success} members, but ${results.failed} failed.`
+        // Fire and forget - send emails in background without blocking UI
+        sendAnnouncementEmails(savedAnnouncement, emailRecipients)
+            .then((results) => {
+                console.log(
+                    `Emails sent successfully to ${results.success} members`
                 );
-            }
+                if (results.failed > 0) {
+                    console.warn(`${results.failed} emails failed to send`);
+                }
+            })
+            .catch((err) => {
+                console.error('Error sending emails:', err);
+            });
 
-            setTimeout(() => {
-                onSuccess();
-            }, 2000);
-        } catch (err) {
-            console.error('Error sending emails:', err);
-            setError(
-                `Announcement saved, but failed to send emails: ${err.message}`
-            );
-            setEmailConfirmOpen(false);
-        } finally {
-            setSendingEmails(false);
-        }
+        // Close form immediately
+        setTimeout(() => {
+            onSuccess();
+        }, 1500);
     };
 
     const handleEmailCancel = () => {
@@ -309,7 +298,7 @@ const AnnouncementForm = ({ announcement, onSuccess, onCancel }) => {
                 announcementHeadline={formData.headline}
                 onConfirm={handleEmailConfirm}
                 onCancel={handleEmailCancel}
-                loading={sendingEmails}
+                loading={false}
             />
         </LocalizationProvider>
     );

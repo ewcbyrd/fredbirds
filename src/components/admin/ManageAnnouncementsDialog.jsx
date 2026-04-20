@@ -34,7 +34,6 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
         useState(null);
     const [emailRecipients, setEmailRecipients] = useState([]);
     const [emailConfirmOpen, setEmailConfirmOpen] = useState(false);
-    const [sendingEmails, setSendingEmails] = useState(false);
     const [emailError, setEmailError] = useState(null);
 
     useEffect(() => {
@@ -150,40 +149,26 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
     };
 
     const handleEmailConfirm = async () => {
-        setSendingEmails(true);
-        setEmailError(null);
+        setEmailConfirmOpen(false);
+        setEmailModalOpen(false);
 
-        try {
-            const results = await sendAnnouncementEmails(
-                selectedAnnouncementForEmail,
-                emailRecipients
-            );
-
-            setEmailConfirmOpen(false);
-            setEmailModalOpen(false);
-
-            // Show success or partial success message
-            if (results.failed > 0) {
-                setError(
-                    `Emails sent to ${results.success} members, but ${results.failed} failed.`
-                );
-            } else {
-                // Could show a success toast/alert here if you have one
+        // Fire and forget - send emails in background without blocking UI
+        sendAnnouncementEmails(selectedAnnouncementForEmail, emailRecipients)
+            .then((results) => {
                 console.log(
-                    `Successfully sent emails to ${results.success} members`
+                    `Emails sent successfully to ${results.success} members`
                 );
-            }
+                if (results.failed > 0) {
+                    console.warn(`${results.failed} emails failed to send`);
+                }
+            })
+            .catch((err) => {
+                console.error('Error sending emails:', err);
+            });
 
-            // Reset state
-            setSelectedAnnouncementForEmail(null);
-            setEmailRecipients([]);
-        } catch (err) {
-            console.error('Error sending emails:', err);
-            setEmailError(err.message || 'Failed to send emails');
-            setEmailConfirmOpen(false);
-        } finally {
-            setSendingEmails(false);
-        }
+        // Reset state immediately
+        setSelectedAnnouncementForEmail(null);
+        setEmailRecipients([]);
     };
 
     const handleEmailCancel = () => {
@@ -316,7 +301,6 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
 
                     <EmailRecipientSelector
                         onSelectionChange={setEmailRecipients}
-                        disabled={sendingEmails}
                     />
 
                     {emailError && (
@@ -333,18 +317,11 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
                         spacing={2}
                         justifyContent="flex-end"
                     >
-                        <Button
-                            onClick={handleEmailModalClose}
-                            disabled={sendingEmails}
-                        >
-                            Cancel
-                        </Button>
+                        <Button onClick={handleEmailModalClose}>Cancel</Button>
                         <Button
                             onClick={handleSendEmail}
                             variant="contained"
-                            disabled={
-                                sendingEmails || emailRecipients.length === 0
-                            }
+                            disabled={emailRecipients.length === 0}
                         >
                             Send Email
                         </Button>
@@ -361,7 +338,7 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
                 }
                 onConfirm={handleEmailConfirm}
                 onCancel={handleEmailCancel}
-                loading={sendingEmails}
+                loading={false}
             />
         </>
     );
