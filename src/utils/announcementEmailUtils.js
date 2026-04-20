@@ -171,46 +171,23 @@ export const sendAnnouncementEmails = async (announcement, recipientEmails) => {
         errors: []
     };
 
-    // Send emails in parallel for better performance
-    const emailPromises = recipientEmails.map(async (email) => {
-        try {
-            await sendEmail({
-                to: email,
-                subject: subject,
-                html: htmlContent,
-                text: textContent
-            });
-            console.log(`Email sent successfully to: ${email}`);
-            return { email, success: true };
-        } catch (error) {
-            console.error(`Failed to send email to ${email}:`, error);
-            return { email, success: false, error: error.message };
-        }
-    });
-
-    // Wait for all emails to complete
-    const emailResults = await Promise.all(emailPromises);
-
-    // Tally results
-    emailResults.forEach((result) => {
-        if (result.success) {
-            results.success++;
-        } else {
-            results.failed++;
-            results.errors.push({ email: result.email, error: result.error });
-        }
-    });
-
-    // If all emails failed, throw an error
-    if (results.failed === recipientEmails.length) {
-        throw new Error('Failed to send emails to all recipients');
-    }
-
-    // If some failed but not all, log warning but don't throw
-    if (results.failed > 0) {
-        console.warn(
-            `${results.failed} out of ${recipientEmails.length} emails failed to send`
+    // Send one email to all recipients (much faster than individual emails)
+    try {
+        await sendEmail({
+            to: recipientEmails,
+            subject: subject,
+            html: htmlContent,
+            text: textContent
+        });
+        results.success = recipientEmails.length;
+        console.log(
+            `Email sent successfully to ${recipientEmails.length} recipients`
         );
+    } catch (error) {
+        console.error('Failed to send emails:', error);
+        results.failed = recipientEmails.length;
+        results.errors.push({ error: error.message });
+        throw new Error('Failed to send emails to all recipients');
     }
 
     return results;
