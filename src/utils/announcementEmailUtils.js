@@ -161,6 +161,11 @@ export const sendAnnouncementEmails = async (announcement, recipientEmails) => {
         throw new Error('No recipients specified');
     }
 
+    console.log(
+        `Starting email send to ${recipientEmails.length} recipients:`,
+        recipientEmails
+    );
+
     const htmlContent = generateAnnouncementEmailHTML(announcement);
     const textContent = generateAnnouncementEmailText(announcement);
     const subject = `Announcement: ${announcement.headline}`;
@@ -177,19 +182,24 @@ export const sendAnnouncementEmails = async (announcement, recipientEmails) => {
 
     for (let i = 0; i < recipientEmails.length; i += BATCH_SIZE) {
         const batch = recipientEmails.slice(i, i + BATCH_SIZE);
+        console.log(
+            `Processing batch ${Math.floor(i / BATCH_SIZE) + 1}: ${batch.length} emails`,
+            batch
+        );
 
         const batchPromises = batch.map(async (email) => {
             try {
-                await sendEmail({
+                console.log(`Attempting to send email to: ${email}`);
+                const response = await sendEmail({
                     to: email,
                     subject: subject,
                     html: htmlContent,
                     text: textContent
                 });
-                console.log(`Email sent successfully to: ${email}`);
+                console.log(`✓ Email sent successfully to: ${email}`, response);
                 return { email, success: true };
             } catch (error) {
-                console.error(`Failed to send email to ${email}:`, error);
+                console.error(`✗ Failed to send email to ${email}:`, error);
                 return { email, success: false, error: error.message };
             }
         });
@@ -209,7 +219,15 @@ export const sendAnnouncementEmails = async (announcement, recipientEmails) => {
                 });
             }
         });
+
+        console.log(
+            `Batch complete. Success: ${results.success}, Failed: ${results.failed}`
+        );
     }
+
+    console.log(
+        `Email sending complete. Total success: ${results.success}, Total failed: ${results.failed}`
+    );
 
     // If all emails failed, throw an error
     if (results.failed === recipientEmails.length) {
@@ -219,7 +237,8 @@ export const sendAnnouncementEmails = async (announcement, recipientEmails) => {
     // If some failed but not all, log warning but don't throw
     if (results.failed > 0) {
         console.warn(
-            `${results.failed} out of ${recipientEmails.length} emails failed to send`
+            `${results.failed} out of ${recipientEmails.length} emails failed to send`,
+            results.errors
         );
     }
 
