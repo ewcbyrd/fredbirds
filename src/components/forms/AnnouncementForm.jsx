@@ -18,8 +18,10 @@ import { parseUTCDate } from '../../utils/dateUtils';
 import { sendAnnouncementEmails } from '../../utils/announcementEmailUtils';
 import EmailRecipientSelector from './EmailRecipientSelector';
 import EmailConfirmationDialog from '../common/EmailConfirmationDialog';
+import { useUserRole } from '../../hooks/useUserRole';
 
 const AnnouncementForm = ({ announcement, onSuccess, onCancel }) => {
+    const { isOfficer } = useUserRole();
     const [formData, setFormData] = useState({
         headline: '',
         details: '',
@@ -267,8 +269,8 @@ const AnnouncementForm = ({ announcement, onSuccess, onCancel }) => {
                         />
                     </Stack>
 
-                    {/* Email Recipients Selector - only show when creating new announcement */}
-                    {!announcement && (
+                    {/* Email Recipients Selector - only show to officers when creating new announcement */}
+                    {!announcement && isOfficer && (
                         <EmailRecipientSelector
                             onSelectionChange={setEmailRecipients}
                             disabled={loading}

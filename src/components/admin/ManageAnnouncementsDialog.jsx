@@ -17,8 +17,10 @@ import AdminResourceList from '../common/AdminResourceList';
 import AdminItemCard from '../common/AdminItemCard';
 import EmailRecipientSelector from '../forms/EmailRecipientSelector';
 import EmailConfirmationDialog from '../common/EmailConfirmationDialog';
+import { useUserRole } from '../../hooks/useUserRole';
 
 const ManageAnnouncementsDialog = ({ open, onClose }) => {
+    const { isOfficer } = useUserRole();
     const [announcements, setAnnouncements] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -192,14 +194,16 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
     const renderAnnouncement = (announcement) => {
         const actions = (
             <>
-                <Button
-                    size="small"
-                    startIcon={<EmailIcon />}
-                    onClick={() => handleEmailClick(announcement)}
-                    color="primary"
-                >
-                    Email
-                </Button>
+                {isOfficer && (
+                    <Button
+                        size="small"
+                        startIcon={<EmailIcon />}
+                        onClick={() => handleEmailClick(announcement)}
+                        color="primary"
+                    >
+                        Email
+                    </Button>
+                )}
                 <Button
                     size="small"
                     startIcon={<EditIcon />}
