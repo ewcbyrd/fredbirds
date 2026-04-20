@@ -21,6 +21,15 @@ const post = async (url, body) => {
         },
         body
     });
+    if (!res.ok) {
+        const errorText = await res.text();
+        console.error('POST request failed:', {
+            url,
+            status: res.status,
+            body: errorText
+        });
+        throw new Error(`HTTP ${res.status}: ${res.statusText} - ${errorText}`);
+    }
     return res.json ? res.json() : res;
 };
 
