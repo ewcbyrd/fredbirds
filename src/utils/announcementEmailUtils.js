@@ -171,23 +171,56 @@ export const sendAnnouncementEmails = async (announcement, recipientEmails) => {
         errors: []
     };
 
-    // Send one email to all recipients (much faster than individual emails)
-    try {
-        await sendEmail({
-            to: recipientEmails,
-            subject: subject,
-            html: htmlContent,
-            text: textContent
+    // Send emails individually to protect privacy (no exposed email addresses)
+    // But send in batches of 10 in parallel for better performance
+    const BATCH_SIZE = 10;
+
+    for (let i = 0; i < recipientEmails.length; i += BATCH_SIZE) {
+        const batch = recipientEmails.slice(i, i + BATCH_SIZE);
+
+        const batchPromises = batch.map(async (email) => {
+            try {
+                await sendEmail({
+                    to: email,
+                    subject: subject,
+                    html: htmlContent,
+                    text: textContent
+                });
+                console.log(`Email sent successfully to: ${email}`);
+                return { email, success: true };
+            } catch (error) {
+                console.error(`Failed to send email to ${email}:`, error);
+                return { email, success: false, error: error.message };
+            }
         });
-        results.success = recipientEmails.length;
-        console.log(
-            `Email sent successfully to ${recipientEmails.length} recipients`
-        );
-    } catch (error) {
-        console.error('Failed to send emails:', error);
-        results.failed = recipientEmails.length;
-        results.errors.push({ error: error.message });
+
+        // Wait for this batch to complete before moving to next batch
+        const batchResults = await Promise.all(batchPromises);
+
+        // Tally results
+        batchResults.forEach((result) => {
+            if (result.success) {
+                results.success++;
+            } else {
+                results.failed++;
+                results.errors.push({
+                    email: result.email,
+                    error: result.error
+                });
+            }
+        });
+    }
+
+    // If all emails failed, throw an error
+    if (results.failed === recipientEmails.length) {
         throw new Error('Failed to send emails to all recipients');
+    }
+
+    // If some failed but not all, log warning but don't throw
+    if (results.failed > 0) {
+        console.warn(
+            `${results.failed} out of ${recipientEmails.length} emails failed to send`
+        );
     }
 
     return results;
