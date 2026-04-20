@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Typography, Chip, Stack } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Button, Typography, Chip, Stack, Alert } from '@mui/material';
+import {
+    Edit as EditIcon,
+    Delete as DeleteIcon,
+    Email as EmailIcon
+} from '@mui/icons-material';
 import {
     getAnnouncements,
     deleteAnnouncement
 } from '../../services/restdbService';
+import { sendAnnouncementEmails } from '../../utils/announcementEmailUtils';
 import AnnouncementFormModal from '../forms/AnnouncementFormModal';
 import AppDialog from '../common/AppDialog';
 import ConfirmDialog from '../common/ConfirmDialog';
 import AdminResourceList from '../common/AdminResourceList';
 import AdminItemCard from '../common/AdminItemCard';
+import EmailRecipientSelector from '../forms/EmailRecipientSelector';
+import EmailConfirmationDialog from '../common/EmailConfirmationDialog';
 
 const ManageAnnouncementsDialog = ({ open, onClose }) => {
     const [announcements, setAnnouncements] = useState([]);
@@ -20,6 +27,13 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [deleteLoading, setDeleteLoading] = useState(null);
     const [deleteConfirmation, setDeleteConfirmation] = useState(null);
+    const [emailModalOpen, setEmailModalOpen] = useState(false);
+    const [selectedAnnouncementForEmail, setSelectedAnnouncementForEmail] =
+        useState(null);
+    const [emailRecipients, setEmailRecipients] = useState([]);
+    const [emailConfirmOpen, setEmailConfirmOpen] = useState(false);
+    const [sendingEmails, setSendingEmails] = useState(false);
+    const [emailError, setEmailError] = useState(null);
 
     useEffect(() => {
         if (open) {
@@ -112,10 +126,80 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
         setRefreshTrigger((prev) => prev + 1);
     };
 
+    const handleEmailClick = (announcement) => {
+        setSelectedAnnouncementForEmail(announcement);
+        setEmailModalOpen(true);
+        setEmailError(null);
+    };
+
+    const handleEmailModalClose = () => {
+        setEmailModalOpen(false);
+        setSelectedAnnouncementForEmail(null);
+        setEmailRecipients([]);
+        setEmailError(null);
+    };
+
+    const handleSendEmail = () => {
+        if (emailRecipients.length === 0) {
+            setEmailError('Please select at least one recipient');
+            return;
+        }
+        setEmailConfirmOpen(true);
+    };
+
+    const handleEmailConfirm = async () => {
+        setSendingEmails(true);
+        setEmailError(null);
+
+        try {
+            const results = await sendAnnouncementEmails(
+                selectedAnnouncementForEmail,
+                emailRecipients
+            );
+
+            setEmailConfirmOpen(false);
+            setEmailModalOpen(false);
+
+            // Show success or partial success message
+            if (results.failed > 0) {
+                setError(
+                    `Emails sent to ${results.success} members, but ${results.failed} failed.`
+                );
+            } else {
+                // Could show a success toast/alert here if you have one
+                console.log(
+                    `Successfully sent emails to ${results.success} members`
+                );
+            }
+
+            // Reset state
+            setSelectedAnnouncementForEmail(null);
+            setEmailRecipients([]);
+        } catch (err) {
+            console.error('Error sending emails:', err);
+            setEmailError(err.message || 'Failed to send emails');
+            setEmailConfirmOpen(false);
+        } finally {
+            setSendingEmails(false);
+        }
+    };
+
+    const handleEmailCancel = () => {
+        setEmailConfirmOpen(false);
+    };
+
     // Render function for individual items
     const renderAnnouncement = (announcement) => {
         const actions = (
             <>
+                <Button
+                    size="small"
+                    startIcon={<EmailIcon />}
+                    onClick={() => handleEmailClick(announcement)}
+                    color="primary"
+                >
+                    Email
+                </Button>
                 <Button
                     size="small"
                     startIcon={<EditIcon />}
@@ -211,6 +295,69 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
                 confirmText="Delete"
                 confirmColor="error"
                 loading={!!deleteLoading}
+            />
+
+            {/* Email Announcement Modal */}
+            <AppDialog
+                open={emailModalOpen}
+                onClose={handleEmailModalClose}
+                title="Email Announcement"
+                maxWidth="sm"
+            >
+                <Stack spacing={2} sx={{ p: 2 }}>
+                    <Typography variant="body1">
+                        <strong>Announcement:</strong>{' '}
+                        {selectedAnnouncementForEmail?.headline}
+                    </Typography>
+
+                    <EmailRecipientSelector
+                        onSelectionChange={setEmailRecipients}
+                        disabled={sendingEmails}
+                    />
+
+                    {emailError && (
+                        <Alert
+                            severity="error"
+                            onClose={() => setEmailError(null)}
+                        >
+                            {emailError}
+                        </Alert>
+                    )}
+
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        justifyContent="flex-end"
+                    >
+                        <Button
+                            onClick={handleEmailModalClose}
+                            disabled={sendingEmails}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleSendEmail}
+                            variant="contained"
+                            disabled={
+                                sendingEmails || emailRecipients.length === 0
+                            }
+                        >
+                            Send Email
+                        </Button>
+                    </Stack>
+                </Stack>
+            </AppDialog>
+
+            {/* Email Confirmation Dialog */}
+            <EmailConfirmationDialog
+                open={emailConfirmOpen}
+                recipientCount={emailRecipients.length}
+                announcementHeadline={
+                    selectedAnnouncementForEmail?.headline || ''
+                }
+                onConfirm={handleEmailConfirm}
+                onCancel={handleEmailCancel}
+                loading={sendingEmails}
             />
         </>
     );
