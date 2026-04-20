@@ -113,11 +113,13 @@ const AnnouncementForm = ({ announcement, onSuccess, onCancel }) => {
             const announcementData = {
                 headline: formData.headline.trim(),
                 details: formData.details.trim(),
-                date: toUTCMidnight(formData.date),
-                expires: formData.expires
-                    ? toUTCMidnight(formData.expires)
-                    : null
+                date: toUTCMidnight(formData.date)
             };
+
+            // Only add expires if it has a value
+            if (formData.expires) {
+                announcementData.expires = toUTCMidnight(formData.expires);
+            }
 
             if (announcement && announcement._id) {
                 // Update existing announcement
