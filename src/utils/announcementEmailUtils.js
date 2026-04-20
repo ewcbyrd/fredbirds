@@ -171,8 +171,8 @@ export const sendAnnouncementEmails = async (announcement, recipientEmails) => {
         errors: []
     };
 
-    // Send emails individually to each recipient
-    for (const email of recipientEmails) {
+    // Send emails in parallel for better performance
+    const emailPromises = recipientEmails.map(async (email) => {
         try {
             await sendEmail({
                 to: email,
@@ -180,14 +180,26 @@ export const sendAnnouncementEmails = async (announcement, recipientEmails) => {
                 html: htmlContent,
                 text: textContent
             });
-            results.success++;
             console.log(`Email sent successfully to: ${email}`);
+            return { email, success: true };
         } catch (error) {
-            results.failed++;
-            results.errors.push({ email, error: error.message });
             console.error(`Failed to send email to ${email}:`, error);
+            return { email, success: false, error: error.message };
         }
-    }
+    });
+
+    // Wait for all emails to complete
+    const emailResults = await Promise.all(emailPromises);
+
+    // Tally results
+    emailResults.forEach((result) => {
+        if (result.success) {
+            results.success++;
+        } else {
+            results.failed++;
+            results.errors.push({ email: result.email, error: result.error });
+        }
+    });
 
     // If all emails failed, throw an error
     if (results.failed === recipientEmails.length) {
