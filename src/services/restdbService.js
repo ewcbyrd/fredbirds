@@ -21,6 +21,15 @@ const post = async (url, body) => {
         },
         body
     });
+    if (!res.ok) {
+        const errorText = await res.text();
+        console.error('POST request failed:', {
+            url,
+            status: res.status,
+            body: errorText
+        });
+        throw new Error(`HTTP ${res.status}: ${res.statusText} - ${errorText}`);
+    }
     return res.json ? res.json() : res;
 };
 
@@ -75,7 +84,7 @@ export const saveMember = async (memberJson) => {
  * @returns {Promise<{ success: boolean, message: string, messageId?: string }>}
  */
 export const sendEmail = async (emailData) => {
-    const url = `${api}mailertogo`;
+    const url = `${api}send-email`;
     const res = await fetch(url, {
         method: 'POST',
         headers: {
