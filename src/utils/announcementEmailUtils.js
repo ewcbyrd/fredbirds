@@ -191,7 +191,12 @@ export const sendAnnouncementEmails = async (announcement, recipientEmails) => {
                     to: email,
                     subject: subject,
                     html: htmlContent,
-                    text: textContent
+                    text: textContent,
+                    headers: {
+                        'List-Unsubscribe':
+                            '<mailto:unsubscribe@fredbirds.com>',
+                        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+                    }
                 });
                 console.log(`Email sent successfully to: ${email}`);
                 return { email, success: true };
@@ -216,6 +221,11 @@ export const sendAnnouncementEmails = async (announcement, recipientEmails) => {
                 });
             }
         });
+
+        // Add 1 second delay between batches to respect rate limits (10 req/sec)
+        if (i + BATCH_SIZE < recipientEmails.length) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
     }
 
     // If all emails failed, throw an error
