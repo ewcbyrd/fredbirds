@@ -191,12 +191,7 @@ export const sendAnnouncementEmails = async (announcement, recipientEmails) => {
                     to: email,
                     subject: subject,
                     html: htmlContent,
-                    text: textContent,
-                    headers: {
-                        'List-Unsubscribe':
-                            '<mailto:unsubscribe@fredbirds.com>',
-                        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
-                    }
+                    text: textContent
                 });
                 console.log(`Email sent successfully to: ${email}`);
                 return { email, success: true };
