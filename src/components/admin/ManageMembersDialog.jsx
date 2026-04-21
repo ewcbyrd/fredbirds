@@ -20,7 +20,9 @@ import {
     CheckCircle,
     Cancel,
     HowToReg as ApproveIcon,
-    PersonOff as RejectIcon
+    PersonOff as RejectIcon,
+    MailOutline,
+    Unsubscribe
 } from '@mui/icons-material';
 import {
     getAllMembers,
@@ -280,6 +282,34 @@ const ManageMembersDialog = ({ open, onClose }) => {
         }
     };
 
+    const handleToggleEmailOptOut = async (member, e) => {
+        e.stopPropagation();
+        try {
+            const isCurrentlyOptedOut = member.emailOptOut === true;
+            const newOptOutStatus = !isCurrentlyOptedOut;
+            await patchMember(member._id, { emailOptOut: newOptOutStatus });
+
+            // Update the member in the local state
+            const updatedMembers = members.map((m) =>
+                m._id === member._id
+                    ? { ...m, emailOptOut: newOptOutStatus }
+                    : m
+            );
+            setMembers(updatedMembers);
+            // Also update filtered list to reflect changes immediately
+            setFilteredMembers(
+                filteredMembers.map((m) =>
+                    m._id === member._id
+                        ? { ...m, emailOptOut: newOptOutStatus }
+                        : m
+                )
+            );
+        } catch (err) {
+            console.error('Error toggling email opt-out:', err);
+            setError('Failed to update email preferences');
+        }
+    };
+
     const handleApproveMember = async (member, e) => {
         e.stopPropagation();
         try {
@@ -428,6 +458,20 @@ const ManageMembersDialog = ({ open, onClose }) => {
                 </Button>
                 <Button
                     size="small"
+                    startIcon={
+                        member.emailOptOut === true ? (
+                            <MailOutline />
+                        ) : (
+                            <Unsubscribe />
+                        )
+                    }
+                    color={member.emailOptOut === true ? 'success' : 'warning'}
+                    onClick={(e) => handleToggleEmailOptOut(member, e)}
+                >
+                    {member.emailOptOut === true ? 'Opt In' : 'Opt Out'}
+                </Button>
+                <Button
+                    size="small"
                     startIcon={<EditIcon />}
                     onClick={() => handleEditMember(member)}
                 >
@@ -468,6 +512,13 @@ const ManageMembersDialog = ({ open, onClose }) => {
                         <Chip label="Active" size="small" color="success" />
                     ) : (
                         <Chip label="Inactive" size="small" color="error" />
+                    )}
+                    {member.emailOptOut === true && (
+                        <Chip
+                            label="Email Opt-Out"
+                            size="small"
+                            color="warning"
+                        />
                     )}
                 </Stack>
             </AdminItemCard>

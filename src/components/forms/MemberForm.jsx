@@ -27,7 +27,8 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
         position: null,
         showInDirectory: true,
         showEmail: false,
-        showPhone: false
+        showPhone: false,
+        emailOptOut: false
     });
 
     const [loading, setLoading] = useState(false);
@@ -51,7 +52,8 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
                 position: member.position || null,
                 showInDirectory: member.showInDirectory !== false,
                 showEmail: member.showEmail === true,
-                showPhone: member.showPhone === true
+                showPhone: member.showPhone === true,
+                emailOptOut: member.emailOptOut === true
             });
         } else {
             // Creating new member
@@ -66,7 +68,8 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
                 position: null,
                 showInDirectory: true,
                 showEmail: false,
-                showPhone: false
+                showPhone: false,
+                emailOptOut: false
             });
         }
         setError(null);
@@ -197,7 +200,8 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
                 position: formData.position || null,
                 showInDirectory: formData.showInDirectory,
                 showEmail: formData.showEmail,
-                showPhone: formData.showPhone
+                showPhone: formData.showPhone,
+                emailOptOut: formData.emailOptOut
             };
 
             if (member && member._id) {
@@ -368,6 +372,18 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
                         />
                     }
                     label="Show Phone Number"
+                />
+
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            name="emailOptOut"
+                            checked={formData.emailOptOut}
+                            onChange={handleChange}
+                            disabled={loading}
+                        />
+                    }
+                    label="Opt out of announcement emails"
                 />
 
                 <Stack

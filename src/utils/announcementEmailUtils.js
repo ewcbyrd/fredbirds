@@ -206,6 +206,8 @@ export const filterAndCleanEmails = (emails) => {
 
 /**
  * Sends announcement email to selected recipients
+ * Note: Opted-out members (emailOptOut: true) should be filtered out before calling this function.
+ * The EmailRecipientSelector component handles this filtering automatically.
  * @param {Object} announcement - Announcement object with headline and details
  * @param {string[]} recipientEmails - Array of recipient email addresses
  * @returns {Promise<{success: number, failed: number, errors: Array}>} Results summary

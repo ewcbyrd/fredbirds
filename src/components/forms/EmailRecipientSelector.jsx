@@ -34,8 +34,12 @@ const EmailRecipientSelector = ({ onSelectionChange, disabled = false }) => {
             setError(null);
             try {
                 const data = await getActiveMembers();
-                setMembers(data);
-                setFilteredMembers(data);
+                // Filter out members who have opted out of emails
+                const membersWithEmails = data.filter(
+                    (m) => m.emailOptOut !== true
+                );
+                setMembers(membersWithEmails);
+                setFilteredMembers(membersWithEmails);
             } catch (err) {
                 console.error('Error fetching active members:', err);
                 setError(err.message || 'Failed to load members');
