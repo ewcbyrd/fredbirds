@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
     TextField,
     Button,
@@ -12,8 +12,8 @@ import {
     InputLabel,
     Select,
     MenuItem
-} from '@mui/material'
-import { saveMember, patchMember } from '../../services/restdbService'
+} from '@mui/material';
+import { saveMember, patchMember } from '../../services/restdbService';
 
 const MemberForm = ({ member, onSuccess, onCancel }) => {
     const [formData, setFormData] = useState({
@@ -27,17 +27,20 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
         position: null,
         showInDirectory: true,
         showEmail: false,
-        showPhone: false
-    })
+        showPhone: false,
+        emailOptOut: false
+    });
 
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(null)
-    const [success, setSuccess] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(false);
 
     useEffect(() => {
         if (member) {
             // Editing existing member
-            const memberRole = member.role ? member.role.charAt(0).toUpperCase() + member.role.slice(1) : 'Member'
+            const memberRole = member.role
+                ? member.role.charAt(0).toUpperCase() + member.role.slice(1)
+                : 'Member';
             setFormData({
                 firstName: member.firstName || member.first || '',
                 lastName: member.lastName || member.last || '',
@@ -49,8 +52,9 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
                 position: member.position || null,
                 showInDirectory: member.showInDirectory !== false,
                 showEmail: member.showEmail === true,
-                showPhone: member.showPhone === true
-            })
+                showPhone: member.showPhone === true,
+                emailOptOut: member.emailOptOut === true
+            });
         } else {
             // Creating new member
             setFormData({
@@ -64,47 +68,54 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
                 position: null,
                 showInDirectory: true,
                 showEmail: false,
-                showPhone: false
-            })
+                showPhone: false,
+                emailOptOut: false
+            });
         }
-        setError(null)
-        setSuccess(false)
-    }, [member])
+        setError(null);
+        setSuccess(false);
+    }, [member]);
 
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target
-        let finalValue = type === 'checkbox' ? checked : value
+        const { name, value, type, checked } = e.target;
+        let finalValue = type === 'checkbox' ? checked : value;
 
         // Format phone number if it's the phone field
         if (name === 'phone' && type !== 'checkbox') {
-            finalValue = formatPhoneInput(value)
+            finalValue = formatPhoneInput(value);
+        }
+
+        // Trim whitespace from email in real-time
+        if (name === 'email' && type !== 'checkbox') {
+            finalValue = value.trim();
         }
 
         const updates = {
             [name]: finalValue
-        }
+        };
 
         // If unchecking isOfficer, clear the position
         if (name === 'isOfficer' && !checked) {
-            updates.position = null
+            updates.position = null;
         }
 
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
             ...updates
-        }))
-    }
+        }));
+    };
 
     const formatPhoneInput = (value) => {
         // Remove all non-digit characters
-        const cleaned = value.replace(/\D/g, '')
+        const cleaned = value.replace(/\D/g, '');
 
         // Format as ###-###-#### (up to 10 digits)
-        if (cleaned.length === 0) return ''
-        if (cleaned.length <= 3) return cleaned
-        if (cleaned.length <= 6) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`
-        return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`
-    }
+        if (cleaned.length === 0) return '';
+        if (cleaned.length <= 3) return cleaned;
+        if (cleaned.length <= 6)
+            return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
+        return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
+    };
 
     const validateForm = () => {
         if (!formData.firstName.trim()) {
@@ -117,6 +128,11 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
         }
         if (!formData.email.trim()) {
             setError('Email is required')
+            return false
+        }
+        // Check for whitespace characters in email
+        if (formData.email !== formData.email.trim() || /\s/.test(formData.email)) {
+            setError('Email cannot contain spaces, tabs, or other whitespace characters')
             return false
         }
         // Use HTML5 email validation which is more standard
@@ -137,14 +153,40 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
         }
         return true
     }
+        if (!formData.lastName.trim()) {
+            setError('Last name is required');
+            return false;
+        }
+        if (!formData.email.trim()) {
+            setError('Email is required');
+            return false;
+        }
+        // Use HTML5 email validation which is more standard
+        const emailInput = document.createElement('input');
+        emailInput.type = 'email';
+        emailInput.value = formData.email.trim();
+        if (!emailInput.checkValidity()) {
+            setError('Please enter a valid email address');
+            return false;
+        }
+        if (formData.isOfficer && !formData.position) {
+            setError('Position is required when marking as an officer');
+            return false;
+        }
+        if (formData.isOfficer && formData.role.toLowerCase() === 'member') {
+            setError('Officer role cannot be "Member"');
+            return false;
+        }
+        return true;
+    };
 
     const handleSubmit = async () => {
         if (!validateForm()) {
-            return
+            return;
         }
 
-        setLoading(true)
-        setError(null)
+        setLoading(true);
+        setError(null);
 
         try {
             const memberData = {
@@ -158,29 +200,30 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
                 position: formData.position || null,
                 showInDirectory: formData.showInDirectory,
                 showEmail: formData.showEmail,
-                showPhone: formData.showPhone
-            }
+                showPhone: formData.showPhone,
+                emailOptOut: formData.emailOptOut
+            };
 
             if (member && member._id) {
                 // Update existing member
-                await patchMember(member._id, memberData)
-                setSuccess(true)
+                await patchMember(member._id, memberData);
+                setSuccess(true);
             } else {
                 // Create new member
-                await saveMember(JSON.stringify(memberData))
-                setSuccess(true)
+                await saveMember(JSON.stringify(memberData));
+                setSuccess(true);
             }
 
             setTimeout(() => {
-                onSuccess()
-            }, 2000)
+                onSuccess();
+            }, 2000);
         } catch (err) {
-            console.error('Error saving member:', err)
-            setError(err.message || 'Failed to save member')
+            console.error('Error saving member:', err);
+            setError(err.message || 'Failed to save member');
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     return (
         <Box sx={{ pt: 1 }}>
@@ -276,7 +319,9 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
                         <MenuItem value="">None</MenuItem>
                         <MenuItem value="President">President</MenuItem>
                         <MenuItem value="Treasurer">Treasurer</MenuItem>
-                        <MenuItem value="Trip Coordinator">Trip Coordinator</MenuItem>
+                        <MenuItem value="Trip Coordinator">
+                            Trip Coordinator
+                        </MenuItem>
                         <MenuItem value="Web Master">Web Master</MenuItem>
                     </Select>
                 </FormControl>
@@ -329,7 +374,24 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
                     label="Show Phone Number"
                 />
 
-                <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ pt: 2 }}>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            name="emailOptOut"
+                            checked={formData.emailOptOut}
+                            onChange={handleChange}
+                            disabled={loading}
+                        />
+                    }
+                    label="Opt out of announcement emails"
+                />
+
+                <Stack
+                    direction="row"
+                    spacing={2}
+                    justifyContent="flex-end"
+                    sx={{ pt: 2 }}
+                >
                     <Button onClick={onCancel} disabled={loading}>
                         Cancel
                     </Button>
@@ -339,13 +401,18 @@ const MemberForm = ({ member, onSuccess, onCancel }) => {
                         disabled={loading}
                         sx={{ position: 'relative' }}
                     >
-                        {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
+                        {loading && (
+                            <CircularProgress
+                                size={24}
+                                sx={{ position: 'absolute' }}
+                            />
+                        )}
                         {member ? 'Update Member' : 'Create Member'}
                     </Button>
                 </Stack>
             </Stack>
         </Box>
-    )
-}
+    );
+};
 
-export default MemberForm
+export default MemberForm;
