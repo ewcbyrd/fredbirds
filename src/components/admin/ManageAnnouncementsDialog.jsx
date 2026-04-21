@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Typography, Chip, Stack, Alert } from '@mui/material';
+import {
+    Button,
+    Typography,
+    Chip,
+    Stack,
+    Alert,
+    Snackbar
+} from '@mui/material';
 import {
     Edit as EditIcon,
     Delete as DeleteIcon,
@@ -35,6 +42,11 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
     const [emailRecipients, setEmailRecipients] = useState([]);
     const [emailConfirmOpen, setEmailConfirmOpen] = useState(false);
     const [emailError, setEmailError] = useState(null);
+    const [emailResultsSnackbar, setEmailResultsSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'info'
+    });
 
     useEffect(() => {
         if (open) {
@@ -158,12 +170,51 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
                 console.log(
                     `Emails sent successfully to ${results.success} members`
                 );
+
+                let message = '';
+                let severity = 'success';
+
+                if (results.invalidEmails && results.invalidEmails.length > 0) {
+                    console.warn(
+                        `${results.invalidEmails.length} invalid email addresses were filtered out`
+                    );
+                }
+
+                if (results.retried > 0) {
+                    console.log(
+                        `${results.retried} emails succeeded after retrying`
+                    );
+                }
+
                 if (results.failed > 0) {
                     console.warn(`${results.failed} emails failed to send`);
+                    severity = 'warning';
+                    message = `Emails sent to ${results.success} members. ${results.failed} failed to send.`;
+                } else {
+                    message = `Emails sent successfully to ${results.success} members!`;
                 }
+
+                if (results.retried > 0) {
+                    message += ` (${results.retried} retried)`;
+                }
+
+                if (results.invalidEmails && results.invalidEmails.length > 0) {
+                    message += ` (${results.invalidEmails.length} invalid addresses skipped)`;
+                }
+
+                setEmailResultsSnackbar({
+                    open: true,
+                    message,
+                    severity
+                });
             })
             .catch((err) => {
                 console.error('Error sending emails:', err);
+                setEmailResultsSnackbar({
+                    open: true,
+                    message: 'Failed to send emails. Please try again.',
+                    severity: 'error'
+                });
             });
 
         // Reset state immediately
@@ -340,6 +391,32 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
                 onCancel={handleEmailCancel}
                 loading={false}
             />
+
+            {/* Email Results Snackbar */}
+            <Snackbar
+                open={emailResultsSnackbar.open}
+                autoHideDuration={6000}
+                onClose={() =>
+                    setEmailResultsSnackbar({
+                        ...emailResultsSnackbar,
+                        open: false
+                    })
+                }
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={() =>
+                        setEmailResultsSnackbar({
+                            ...emailResultsSnackbar,
+                            open: false
+                        })
+                    }
+                    severity={emailResultsSnackbar.severity}
+                    sx={{ width: '100%' }}
+                >
+                    {emailResultsSnackbar.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 };
