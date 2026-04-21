@@ -84,7 +84,7 @@ export const saveMember = async (memberJson) => {
  * @returns {Promise<{ success: boolean, message: string, messageId?: string }>}
  */
 export const sendEmail = async (emailData) => {
-    const url = `${api}mailertogo`;
+    const url = `${api}send-email`;
     const res = await fetch(url, {
         method: 'POST',
         headers: {

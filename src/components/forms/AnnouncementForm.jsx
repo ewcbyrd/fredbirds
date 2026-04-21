@@ -76,7 +76,11 @@ const AnnouncementForm = ({ announcement, onSuccess, onCancel }) => {
             setError('Date is required');
             return false;
         }
-        if (formData.expires && formData.expires < formData.date) {
+        if (!formData.expires) {
+            setError('Expiration date is required');
+            return false;
+        }
+        if (formData.expires < formData.date) {
             setError('Expiration date must be after creation date');
             return false;
         }
@@ -112,13 +116,9 @@ const AnnouncementForm = ({ announcement, onSuccess, onCancel }) => {
             const announcementData = {
                 headline: formData.headline.trim(),
                 details: formData.details.trim(),
-                date: toUTCMidnight(formData.date)
+                date: toUTCMidnight(formData.date),
+                expires: toUTCMidnight(formData.expires)
             };
-
-            // Only add expires if it has a value
-            if (formData.expires) {
-                announcementData.expires = toUTCMidnight(formData.expires);
-            }
 
             if (announcement && announcement._id) {
                 // Update existing announcement
@@ -239,13 +239,14 @@ const AnnouncementForm = ({ announcement, onSuccess, onCancel }) => {
                             }}
                         />
                         <DatePicker
-                            label="Expires (Optional)"
+                            label="Expires"
                             value={formData.expires}
                             onChange={(date) => handleChange('expires', date)}
                             minDate={formData.date}
                             slotProps={{
                                 textField: {
                                     fullWidth: true,
+                                    required: true,
                                     disabled: loading,
                                     helperText:
                                         'Announcement will be hidden after this date'
