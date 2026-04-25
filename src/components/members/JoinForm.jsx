@@ -11,7 +11,8 @@ import {
     CardContent
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import { registerMember, sendEmail } from '../../services/restdbService';
+import { registerMember } from '../../services/restdbService';
+import { sendRegistrationEmail } from '../../utils/emailTemplates';
 
 /**
  * Parse a full name string into first and last name.
@@ -140,46 +141,10 @@ const JoinForm = () => {
             // Send confirmation email (best-effort — don't block success if it fails)
             try {
                 const firstName = formData.first.trim();
-                await sendEmail({
-                    to: formData.email.trim().toLowerCase(),
-                    subject: 'Welcome to the Fredericksburg Birding Club',
-                    html: [
-                        `<p>Hi <strong>${firstName}</strong>,</p>`,
-                        '<p>Thank you for registering with the Fredericksburg Birding Club! ',
-                        "We've received your membership request and it is now being reviewed by our officers.</p>",
-                        "<p>You'll receive another email once your membership has been approved. ",
-                        "In the meantime, here's what to look forward to as a member:</p>",
-                        '<ul>',
-                        '<li><strong>Club mailing list</strong> &mdash; stay informed about upcoming events, field trips, and club news</li>',
-                        '<li><strong>Members-only content</strong> &mdash; access the member directory and bird sighting logs</li>',
-                        '<li><strong>Local birding community</strong> &mdash; connect with fellow birders in the Fredericksburg area</li>',
-                        '</ul>',
-                        '<p>If you have any questions, feel free to reach out to us at ',
-                        '<a href="mailto:admin@fredbirds.com">admin@fredbirds.com</a>.</p>',
-                        '<p>Happy birding!<br/>',
-                        'Fredericksburg Birding Club<br/>',
-                        '<a href="https://www.fredbirds.com">www.fredbirds.com</a></p>'
-                    ].join(''),
-                    text: [
-                        `Hi ${firstName},`,
-                        '',
-                        'Thank you for registering with the Fredericksburg Birding Club! ',
-                        "We've received your membership request and it is now being reviewed by our officers.",
-                        '',
-                        "You'll receive another email once your membership has been approved. ",
-                        "In the meantime, here's what to look forward to as a member:",
-                        '',
-                        '- Club mailing list - stay informed about upcoming events, field trips, and club news',
-                        '- Members-only content - access the member directory and bird sighting logs',
-                        '- Local birding community - connect with fellow birders in the Fredericksburg area',
-                        '',
-                        'If you have any questions, feel free to reach out to us at admin@fredbirds.com.',
-                        '',
-                        'Happy birding!',
-                        'Fredericksburg Birding Club',
-                        'www.fredbirds.com'
-                    ].join('\n')
-                });
+                await sendRegistrationEmail(
+                    firstName,
+                    formData.email.trim().toLowerCase()
+                );
             } catch (emailErr) {
                 console.error('Failed to send confirmation email:', emailErr);
             }

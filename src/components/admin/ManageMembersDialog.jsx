@@ -28,9 +28,9 @@ import {
     getAllMembers,
     getPendingMembers,
     patchMember,
-    deleteMember,
-    sendEmail
+    deleteMember
 } from '../../services/restdbService';
+import { sendWelcomeEmail } from '../../utils/emailTemplates';
 import MemberFormModal from '../forms/MemberFormModal';
 import AppDialog from '../common/AppDialog';
 import AdminResourceList from '../common/AdminResourceList';
@@ -324,67 +324,7 @@ const ManageMembersDialog = ({ open, onClose }) => {
                     member.firstName ||
                     member.first ||
                     formatName(member).split(' ')[0];
-                await sendEmail({
-                    to: member.email,
-                    subject:
-                        "You're In! Welcome to the Fredericksburg Birding Club",
-                    html: [
-                        `<p>Hi <strong>${firstName}</strong>,</p>`,
-                        '<p>Great news &mdash; your membership with the Fredericksburg Birding Club has been approved! ',
-                        "You're now an official member.</p>",
-                        '<h3 style="margin-bottom: 8px;">Set Up Your Login</h3>',
-                        '<ol>',
-                        '<li>Visit <a href="https://www.fredbirds.com">www.fredbirds.com</a></li>',
-                        '<li>Click <strong>&ldquo;Member Login&rdquo;</strong> in the top right corner</li>',
-                        `<li>Enter your email address (<strong>${member.email}</strong>) and click <strong>&ldquo;Continue&rdquo;</strong></li>`,
-                        "<li>You'll be redirected to our secure login page &mdash; click <strong>&ldquo;Sign Up&rdquo;</strong> to create your account</li>",
-                        "<li>Once logged in, you'll have full access to all member features</li>",
-                        '</ol>',
-                        `<p><strong>Important:</strong> You must sign up with <strong>${member.email}</strong> so we can match your login to your membership.</p>`,
-                        '<p>As a member you can:</p>',
-                        '<ul>',
-                        '<li><strong>Member directory</strong> &mdash; find and connect with fellow club members</li>',
-                        '<li><strong>Events &amp; field trips</strong> &mdash; browse upcoming outings and register to attend</li>',
-                        '<li><strong>Bird sightings</strong> &mdash; log your sightings and see what others are spotting nearby</li>',
-                        '</ul>',
-                        "<p>You'll also be added to the club mailing list so you'll stay in the loop on all club news and activities.</p>",
-                        '<p>If you have any questions, reach out to us at ',
-                        '<a href="mailto:admin@fredbirds.com">admin@fredbirds.com</a>.</p>',
-                        '<p>Welcome aboard &mdash; we look forward to birding with you!<br/>',
-                        'Fredericksburg Birding Club<br/>',
-                        '<a href="https://www.fredbirds.com">www.fredbirds.com</a></p>'
-                    ].join(''),
-                    text: [
-                        `Hi ${firstName},`,
-                        '',
-                        'Great news - your membership with the Fredericksburg Birding Club has been approved! ',
-                        "You're now an official member.",
-                        '',
-                        'SET UP YOUR LOGIN',
-                        '',
-                        '1. Visit www.fredbirds.com',
-                        '2. Click "Member Login" in the top right corner',
-                        `3. Enter your email address (${member.email}) and click "Continue"`,
-                        '4. You\'ll be redirected to our secure login page - click "Sign Up" to create your account',
-                        "5. Once logged in, you'll have full access to all member features",
-                        '',
-                        `Important: You must sign up with ${member.email} so we can match your login to your membership.`,
-                        '',
-                        'As a member you can:',
-                        '',
-                        '- Member directory - find and connect with fellow club members',
-                        '- Events & field trips - browse upcoming outings and register to attend',
-                        '- Bird sightings - log your sightings and see what others are spotting nearby',
-                        '',
-                        "You'll also be added to the club mailing list so you'll stay in the loop on all club news and activities.",
-                        '',
-                        'If you have any questions, reach out to us at admin@fredbirds.com.',
-                        '',
-                        'Welcome aboard - we look forward to birding with you!',
-                        'Fredericksburg Birding Club',
-                        'www.fredbirds.com'
-                    ].join('\n')
-                });
+                await sendWelcomeEmail(firstName, member.email);
             } catch (emailErr) {
                 console.error('Failed to send approval email:', emailErr);
             }
