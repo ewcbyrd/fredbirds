@@ -1,11 +1,12 @@
 import { generateAnnouncementEmail } from './emailTemplates';
-import { sendBulkEmails } from './emailBatchService';
-
-// Re-export validation utilities from emailBatchService for backwards compatibility
-export {
+import {
+    sendBulkEmails,
     validateAndCleanEmail,
     filterAndCleanEmails
 } from './emailBatchService';
+
+// Re-export validation utilities from emailBatchService for backwards compatibility
+export { validateAndCleanEmail, filterAndCleanEmails };
 
 /**
  * Generates HTML email template for an announcement
