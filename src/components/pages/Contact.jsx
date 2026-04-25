@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
-import { sendEmail } from '../../services/restdbService';
+import { sendContactEmail } from '../../utils/emailTemplates';
 import PageContainer from '../common/PageContainer';
 
 const options = [
@@ -56,15 +56,8 @@ export default function Contact() {
         setSubmitting(true);
         setStatus(null);
         const to = emailMap.get(form.topic);
-        const emailData = {
-            to,
-            subject: 'Contact Us Message',
-            html: `<p><strong>Name:</strong> ${form.name}</p><p><strong>Email:</strong> ${form.email}</p><p><strong>Message:</strong> ${form.message}</p>`,
-            text: `Name: ${form.name}\nEmail: ${form.email}\nMessage: ${form.message}`,
-            replyTo: form.email
-        };
         try {
-            await sendEmail(emailData);
+            await sendContactEmail(form, to);
             setStatus({ type: 'success', message: 'Message sent. Thank you.' });
             setForm({ name: '', email: '', topic: '', message: '' });
         } catch (err) {

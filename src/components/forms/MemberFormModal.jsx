@@ -18,6 +18,7 @@ import {
     patchMember,
     getMember
 } from '../../services/restdbService';
+import { sendWelcomeEmail } from '../../utils/emailTemplates';
 import AppDialog from '../common/AppDialog';
 
 const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
@@ -32,7 +33,8 @@ const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
         position: null,
         showInDirectory: true,
         showEmail: false,
-        showPhone: false
+        showPhone: false,
+        sendWelcomeEmail: true
     });
 
     const [loading, setLoading] = useState(false);
@@ -71,7 +73,8 @@ const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
                 position: null,
                 showInDirectory: true,
                 showEmail: false,
-                showPhone: false
+                showPhone: false,
+                sendWelcomeEmail: true
             });
         }
         setError(null);
@@ -177,6 +180,23 @@ const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
                 // Create new member
                 await saveMember(JSON.stringify(memberData));
                 setSuccess(true);
+
+                // Send welcome email if checkbox was checked (best-effort)
+                if (formData.sendWelcomeEmail) {
+                    try {
+                        await sendWelcomeEmail(
+                            formData.firstName.trim(),
+                            formData.email.trim().toLowerCase()
+                        );
+                        console.log('Welcome email sent to new member');
+                    } catch (emailErr) {
+                        console.error(
+                            'Failed to send welcome email:',
+                            emailErr
+                        );
+                        // Don't fail the whole operation if email fails
+                    }
+                }
             }
 
             setTimeout(() => {
@@ -366,6 +386,20 @@ const MemberFormModal = ({ open, onClose, member, onSuccess }) => {
                         }
                         label="Show Phone Number"
                     />
+
+                    {!member && (
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    name="sendWelcomeEmail"
+                                    checked={formData.sendWelcomeEmail}
+                                    onChange={handleChange}
+                                    disabled={loading}
+                                />
+                            }
+                            label="Send Welcome Email"
+                        />
+                    )}
                 </Stack>
             </Box>
         </AppDialog>
