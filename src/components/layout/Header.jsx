@@ -154,7 +154,6 @@ export default function Header(props) {
 
     const primaryNav = [
         { label: 'Events', path: '/events' },
-        { label: 'Locations', path: '/locations' },
         { label: 'Sightings', path: '/sightings' },
         { label: 'Photos', path: '/photos' },
         { label: 'News', path: '/announcements' },
