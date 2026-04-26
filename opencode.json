@@ -30,6 +30,13 @@
             },
             "enabled": true
         },
+        "fredbirds-api": {
+            "type": "local",
+            "command": [
+                "/Users/scottbyrd/Repos/fredbirds/run-fredbirds-mcp.sh"
+            ],
+            "enabled": true
+        },
         "auth0": {
             "type": "local",
             "command": [

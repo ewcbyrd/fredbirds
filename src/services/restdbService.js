@@ -406,6 +406,36 @@ export const deleteAnnouncement = async (announcementId) => {
     return res.json();
 };
 
+// Location CRUD operations
+export const getLocations = async () => {
+    const url = `${api}locations`;
+    return get(url);
+};
+
+export const getLocationById = async (locationId) => {
+    const url = `${api}locations/${locationId}`;
+    return get(url);
+};
+
+export const createLocation = async (locationData) => {
+    const url = `${api}locations`;
+    return post(url, JSON.stringify(locationData));
+};
+
+export const updateLocation = async (locationId, locationData) => {
+    const url = `${api}locations/${locationId}`;
+    return patch(url, locationData);
+};
+
+export const deleteLocation = async (locationId) => {
+    const url = `${api}locations/${locationId}`;
+    const res = await fetch(url, { method: 'DELETE' });
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    return res.json();
+};
+
 export default {
     getEventsByYear,
     getFutureEvents,
@@ -441,5 +471,10 @@ export default {
     deleteAnnouncement,
     registerMember,
     getPendingMembers,
-    deleteMember
+    deleteMember,
+    getLocations,
+    getLocationById,
+    createLocation,
+    updateLocation,
+    deleteLocation
 };
