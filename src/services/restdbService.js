@@ -1,4 +1,4 @@
-const api = 'https://fredbirds-api.herokuapp.com/';
+const api = 'https://fredbirds-api.azurewebsites.net/';
 
 const get = async (url) => {
     const res = await fetch(url, { method: 'GET' });
@@ -21,6 +21,15 @@ const post = async (url, body) => {
         },
         body
     });
+    if (!res.ok) {
+        const errorText = await res.text();
+        console.error('POST request failed:', {
+            url,
+            status: res.status,
+            body: errorText
+        });
+        throw new Error(`HTTP ${res.status}: ${res.statusText} - ${errorText}`);
+    }
     return res.json ? res.json() : res;
 };
 
@@ -69,17 +78,25 @@ export const saveMember = async (memberJson) => {
     return post(url, memberJson);
 };
 
-export const sendEmail = async (emailJson) => {
-    const url = `${api}sendgrid`;
-    // some endpoints return the fetch promise directly
-    return fetch(url, {
+/**
+ * Send an email via Azure Communication Services.
+ * @param {{ to: string|string[], subject: string, html: string, text?: string, replyTo?: string }} emailData
+ * @returns {Promise<{ success: boolean, message: string, messageId?: string }>}
+ */
+export const sendEmail = async (emailData) => {
+    const url = `${api}send-email`;
+    const res = await fetch(url, {
         method: 'POST',
         headers: {
             'cache-control': 'no-cache',
             'content-type': 'application/json'
         },
-        body: emailJson
+        body: JSON.stringify(emailData)
     });
+    if (!res.ok) {
+        throw new Error(`Email failed: HTTP ${res.status}`);
+    }
+    return res.json();
 };
 
 export const getPhotos = async () => {
@@ -138,83 +155,6 @@ export const getMemberByEmail = async (email) => {
     return get(url);
 };
 
-export const autoRegisterMember = async (auth0User) => {
-    const parseName = (fullName, email, directFirstName, directLastName) => {
-        // If we have direct name inputs from form, use those
-        if (directFirstName !== undefined || directLastName !== undefined) {
-            return {
-                firstName: directFirstName || '',
-                lastName: directLastName || ''
-            };
-        }
-
-        // If no name provided, try to extract from email
-        if (!fullName || fullName === email) {
-            const emailLocal = email.split('@')[0];
-            // Handle common email formats like first.last@domain.com
-            if (emailLocal.includes('.')) {
-                const parts = emailLocal.split('.');
-                return {
-                    firstName:
-                        parts[0].charAt(0).toUpperCase() + parts[0].slice(1),
-                    lastName: parts
-                        .slice(1)
-                        .map(
-                            (part) =>
-                                part.charAt(0).toUpperCase() + part.slice(1)
-                        )
-                        .join(' ')
-                };
-            } else {
-                // Use email local part as first name if no dots
-                return {
-                    firstName:
-                        emailLocal.charAt(0).toUpperCase() +
-                        emailLocal.slice(1),
-                    lastName: ''
-                };
-            }
-        }
-
-        // Parse actual name
-        const parts = fullName.trim().split(/\s+/);
-        return {
-            firstName: parts[0] || '',
-            lastName: parts.slice(1).join(' ') || ''
-        };
-    };
-
-    const { firstName, lastName } = parseName(
-        auth0User.name,
-        auth0User.email,
-        auth0User.firstName,
-        auth0User.lastName
-    );
-
-    const url = `${api}members/auto-register`;
-    return post(
-        url,
-        JSON.stringify({
-            email: auth0User.email,
-            name: auth0User.name, // Keep full name
-            firstName: firstName, // Parsed first name
-            lastName: lastName, // Parsed last name
-            phone: auth0User.phone || '', // Optional phone from form
-            showEmail:
-                auth0User.showEmail !== undefined ? auth0User.showEmail : true, // Privacy setting
-            showPhone:
-                auth0User.showPhone !== undefined ? auth0User.showPhone : false, // Privacy setting
-            showInDirectory:
-                auth0User.showInDirectory !== undefined
-                    ? auth0User.showInDirectory
-                    : true, // Privacy setting - default true
-            auth0Id: auth0User.sub,
-            emailVerified: auth0User.email_verified,
-            picture: auth0User.picture
-        })
-    );
-};
-
 export const updateMember = async (memberId, memberData) => {
     const url = `${api}members/${memberId}`;
     return post(url, JSON.stringify(memberData));
@@ -223,6 +163,15 @@ export const updateMember = async (memberId, memberData) => {
 export const patchMember = async (memberId, updates) => {
     const url = `${api}members/${memberId}`;
     return patch(url, updates);
+};
+
+export const deleteMember = async (memberId) => {
+    const url = `${api}members/${memberId}`;
+    const res = await fetch(url, { method: 'DELETE' });
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    return res.json();
 };
 
 export const getStates = async () => {
@@ -415,6 +364,27 @@ export const removeEventPhoto = async (eventId, photoId) => {
     return res.json();
 };
 
+// Member Registration Functions
+
+export const registerMember = async (registrationData) => {
+    const url = `${api}members/register`;
+    return post(
+        url,
+        JSON.stringify({
+            first: registrationData.first,
+            last: registrationData.last,
+            email: registrationData.email,
+            phone: registrationData.phone,
+            website: registrationData.website // honeypot — hidden field, must be empty
+        })
+    );
+};
+
+export const getPendingMembers = async () => {
+    const url = `${api}members/pending`;
+    return get(url);
+};
+
 // Announcement Management Functions
 
 export const createAnnouncement = async (announcementData) => {
@@ -479,7 +449,6 @@ export default {
     getActiveMembers,
     getUserRole,
     getMemberByEmail,
-    autoRegisterMember,
     updateMember,
     patchMember,
     getStates,
@@ -500,6 +469,9 @@ export default {
     createAnnouncement,
     updateAnnouncement,
     deleteAnnouncement,
+    registerMember,
+    getPendingMembers,
+    deleteMember,
     getLocations,
     getLocationById,
     createLocation,

@@ -1,17 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Typography, Chip, Stack } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import {
+    Button,
+    Typography,
+    Chip,
+    Stack,
+    Alert,
+    Snackbar
+} from '@mui/material';
+import {
+    Edit as EditIcon,
+    Delete as DeleteIcon,
+    Email as EmailIcon
+} from '@mui/icons-material';
 import {
     getAnnouncements,
     deleteAnnouncement
 } from '../../services/restdbService';
+import { sendAnnouncementEmails } from '../../utils/announcementEmailUtils';
 import AnnouncementFormModal from '../forms/AnnouncementFormModal';
 import AppDialog from '../common/AppDialog';
 import ConfirmDialog from '../common/ConfirmDialog';
 import AdminResourceList from '../common/AdminResourceList';
 import AdminItemCard from '../common/AdminItemCard';
+import EmailRecipientSelector from '../forms/EmailRecipientSelector';
+import EmailConfirmationDialog from '../common/EmailConfirmationDialog';
+import { useUserRole } from '../../hooks/useUserRole';
 
 const ManageAnnouncementsDialog = ({ open, onClose }) => {
+    const { isOfficer } = useUserRole();
     const [announcements, setAnnouncements] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -20,6 +36,17 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [deleteLoading, setDeleteLoading] = useState(null);
     const [deleteConfirmation, setDeleteConfirmation] = useState(null);
+    const [emailModalOpen, setEmailModalOpen] = useState(false);
+    const [selectedAnnouncementForEmail, setSelectedAnnouncementForEmail] =
+        useState(null);
+    const [emailRecipients, setEmailRecipients] = useState([]);
+    const [emailConfirmOpen, setEmailConfirmOpen] = useState(false);
+    const [emailError, setEmailError] = useState(null);
+    const [emailResultsSnackbar, setEmailResultsSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'info'
+    });
 
     useEffect(() => {
         if (open) {
@@ -112,10 +139,107 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
         setRefreshTrigger((prev) => prev + 1);
     };
 
+    const handleEmailClick = (announcement) => {
+        setSelectedAnnouncementForEmail(announcement);
+        setEmailModalOpen(true);
+        setEmailError(null);
+    };
+
+    const handleEmailModalClose = () => {
+        setEmailModalOpen(false);
+        setSelectedAnnouncementForEmail(null);
+        setEmailRecipients([]);
+        setEmailError(null);
+    };
+
+    const handleSendEmail = () => {
+        if (emailRecipients.length === 0) {
+            setEmailError('Please select at least one recipient');
+            return;
+        }
+        setEmailConfirmOpen(true);
+    };
+
+    const handleEmailConfirm = async () => {
+        setEmailConfirmOpen(false);
+        setEmailModalOpen(false);
+
+        // Fire and forget - send emails in background without blocking UI
+        sendAnnouncementEmails(selectedAnnouncementForEmail, emailRecipients)
+            .then((results) => {
+                console.log(
+                    `Emails sent successfully to ${results.success} members`
+                );
+
+                let message = '';
+                let severity = 'success';
+
+                if (results.invalidEmails && results.invalidEmails.length > 0) {
+                    console.warn(
+                        `${results.invalidEmails.length} invalid email addresses were filtered out`
+                    );
+                }
+
+                if (results.retried > 0) {
+                    console.log(
+                        `${results.retried} emails succeeded after retrying`
+                    );
+                }
+
+                if (results.failed > 0) {
+                    console.warn(`${results.failed} emails failed to send`);
+                    severity = 'warning';
+                    message = `Emails sent to ${results.success} members. ${results.failed} failed to send.`;
+                } else {
+                    message = `Emails sent successfully to ${results.success} members!`;
+                }
+
+                if (results.retried > 0) {
+                    message += ` (${results.retried} retried)`;
+                }
+
+                if (results.invalidEmails && results.invalidEmails.length > 0) {
+                    message += ` (${results.invalidEmails.length} invalid addresses skipped)`;
+                }
+
+                setEmailResultsSnackbar({
+                    open: true,
+                    message,
+                    severity
+                });
+            })
+            .catch((err) => {
+                console.error('Error sending emails:', err);
+                setEmailResultsSnackbar({
+                    open: true,
+                    message: 'Failed to send emails. Please try again.',
+                    severity: 'error'
+                });
+            });
+
+        // Reset state immediately
+        setSelectedAnnouncementForEmail(null);
+        setEmailRecipients([]);
+    };
+
+    const handleEmailCancel = () => {
+        setEmailConfirmOpen(false);
+    };
+
     // Render function for individual items
     const renderAnnouncement = (announcement) => {
         const actions = (
             <>
+                {isOfficer && (
+                    <Button
+                        size="small"
+                        startIcon={<EmailIcon />}
+                        onClick={() => handleEmailClick(announcement)}
+                        color="primary"
+                    >
+                        Email
+                    </Button>
+                )}
                 <Button
                     size="small"
                     startIcon={<EditIcon />}
@@ -212,6 +336,87 @@ const ManageAnnouncementsDialog = ({ open, onClose }) => {
                 confirmColor="error"
                 loading={!!deleteLoading}
             />
+
+            {/* Email Announcement Modal */}
+            <AppDialog
+                open={emailModalOpen}
+                onClose={handleEmailModalClose}
+                title="Email Announcement"
+                maxWidth="sm"
+            >
+                <Stack spacing={2} sx={{ p: 2 }}>
+                    <Typography variant="body1">
+                        <strong>Announcement:</strong>{' '}
+                        {selectedAnnouncementForEmail?.headline}
+                    </Typography>
+
+                    <EmailRecipientSelector
+                        onSelectionChange={setEmailRecipients}
+                    />
+
+                    {emailError && (
+                        <Alert
+                            severity="error"
+                            onClose={() => setEmailError(null)}
+                        >
+                            {emailError}
+                        </Alert>
+                    )}
+
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        justifyContent="flex-end"
+                    >
+                        <Button onClick={handleEmailModalClose}>Cancel</Button>
+                        <Button
+                            onClick={handleSendEmail}
+                            variant="contained"
+                            disabled={emailRecipients.length === 0}
+                        >
+                            Send Email
+                        </Button>
+                    </Stack>
+                </Stack>
+            </AppDialog>
+
+            {/* Email Confirmation Dialog */}
+            <EmailConfirmationDialog
+                open={emailConfirmOpen}
+                recipientCount={emailRecipients.length}
+                announcementHeadline={
+                    selectedAnnouncementForEmail?.headline || ''
+                }
+                onConfirm={handleEmailConfirm}
+                onCancel={handleEmailCancel}
+                loading={false}
+            />
+
+            {/* Email Results Snackbar */}
+            <Snackbar
+                open={emailResultsSnackbar.open}
+                autoHideDuration={6000}
+                onClose={() =>
+                    setEmailResultsSnackbar({
+                        ...emailResultsSnackbar,
+                        open: false
+                    })
+                }
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={() =>
+                        setEmailResultsSnackbar({
+                            ...emailResultsSnackbar,
+                            open: false
+                        })
+                    }
+                    severity={emailResultsSnackbar.severity}
+                    sx={{ width: '100%' }}
+                >
+                    {emailResultsSnackbar.message}
+                </Alert>
+            </Snackbar>
         </>
     );
 };

@@ -1,4 +1,4 @@
-const api = 'https://fredbirds-api.herokuapp.com/';
+const api = 'https://fredbirds-api.azurewebsites.net/';
 
 const callout = async (url) => {
     try {

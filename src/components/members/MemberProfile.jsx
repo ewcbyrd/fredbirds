@@ -3,7 +3,6 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { getPictureUrl } from '../../services/cloudinaryService';
 import {
-    Container,
     Typography,
     Box,
     Card,
@@ -19,7 +18,6 @@ import {
     ListItemIcon,
     ListItemText,
     Button,
-    IconButton,
     Paper,
     Table,
     TableBody,
@@ -62,6 +60,7 @@ import {
 } from '../../utils/memberUtils';
 import { formatMemberEventDate } from '../../utils/dateUtils';
 import Breadcrumbs from '../common/Breadcrumbs';
+import PageContainer from '../common/PageContainer';
 
 const MemberProfile = () => {
     const { email } = useParams();
@@ -159,7 +158,13 @@ const MemberProfile = () => {
 
     if (loading) {
         return (
-            <Container maxWidth="md" sx={{ py: 4 }}>
+            <PageContainer maxWidth={900}>
+                <Typography
+                    variant="h4"
+                    sx={{ fontWeight: 700, color: 'text.primary', mb: 3 }}
+                >
+                    Member Profile
+                </Typography>
                 <Box
                     display="flex"
                     justifyContent="center"
@@ -171,13 +176,19 @@ const MemberProfile = () => {
                         Loading member profile...
                     </Typography>
                 </Box>
-            </Container>
+            </PageContainer>
         );
     }
 
     if (error) {
         return (
-            <Container maxWidth="md" sx={{ py: 4 }}>
+            <PageContainer maxWidth={900}>
+                <Typography
+                    variant="h4"
+                    sx={{ fontWeight: 700, color: 'text.primary', mb: 3 }}
+                >
+                    Member Profile
+                </Typography>
                 <Button
                     startIcon={<ArrowBack />}
                     onClick={() => navigate('/members-directory')}
@@ -186,7 +197,7 @@ const MemberProfile = () => {
                     Back to Directory
                 </Button>
                 <Alert severity="error">{error}</Alert>
-            </Container>
+            </PageContainer>
         );
     }
 
@@ -201,8 +212,14 @@ const MemberProfile = () => {
     ];
 
     return (
-        <Container maxWidth="md" sx={{ py: 4 }}>
+        <PageContainer maxWidth={900}>
             <Breadcrumbs customCrumbs={breadcrumbItems} />
+            <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: 'text.primary', mb: 3 }}
+            >
+                {formatName(memberData)}
+            </Typography>
 
             <Card>
                 <CardContent sx={{ p: 4 }}>
@@ -249,13 +266,6 @@ const MemberProfile = () => {
                                     mb: 2
                                 }}
                             >
-                                <Typography
-                                    variant="h4"
-                                    component="h1"
-                                    color="primary"
-                                >
-                                    {formatName(memberData)}
-                                </Typography>
                                 {(() => {
                                     const milestone =
                                         getMilestoneInfo(memberData);
@@ -297,7 +307,7 @@ const MemberProfile = () => {
                         <Grid item xs={12} md={8}>
                             <Typography
                                 variant="h6"
-                                gutterBottom
+                                sx={{ mb: 1 }}
                                 color="primary"
                             >
                                 Contact Information
@@ -384,7 +394,7 @@ const MemberProfile = () => {
                             <Divider sx={{ my: 3 }} />
                             <Typography
                                 variant="h6"
-                                gutterBottom
+                                sx={{ mb: 1 }}
                                 color="primary"
                             >
                                 Social Links
@@ -552,7 +562,7 @@ const MemberProfile = () => {
                             <Divider sx={{ my: 3 }} />
                             <Typography
                                 variant="h6"
-                                gutterBottom
+                                sx={{ mb: 1 }}
                                 color="primary"
                             >
                                 Birding Activity
@@ -652,16 +662,16 @@ const MemberProfile = () => {
                                                         >
                                                             {milestone.level ===
                                                                 'master' &&
-                                                                '💎'}
+                                                                '\u{1F48E}'}
                                                             {milestone.level ===
                                                                 'expert' &&
-                                                                '🏆'}
+                                                                '\u{1F3C6}'}
                                                             {milestone.level ===
                                                                 'advanced' &&
-                                                                '🏅'}
+                                                                '\u{1F3C5}'}
                                                             {milestone.level ===
                                                                 'accomplished' &&
-                                                                '⭐'}{' '}
+                                                                '\u2B50'}{' '}
                                                             {milestone.text}
                                                         </Typography>
                                                     )}
@@ -813,7 +823,7 @@ const MemberProfile = () => {
                     </>
                 </CardContent>
             </Card>
-        </Container>
+        </PageContainer>
     );
 };
 

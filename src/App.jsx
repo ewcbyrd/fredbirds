@@ -23,17 +23,15 @@ import Resources from './components/pages/Resources';
 import Officers from './components/pages/Officers';
 import Photos from './components/pages/Photos';
 import Locations from './components/locations/Locations';
-import ProtectedRoute from './components/auth/ProtectedRoute';
 
 import Profile from './components/pages/Profile';
 import MembersDirectory from './components/members/MembersDirectory';
 import MemberProfile from './components/members/MemberProfile';
-import MemberOnboarding from './components/auth/MemberOnboarding';
 import OfficerTools from './components/admin/OfficerTools';
 import AdminPanel from './components/admin/AdminPanel';
 import MemberAccessControl from './components/auth/MemberAccessControl';
 import { ACCESS_LEVELS } from './hooks/useUserRole';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 const theme = createTheme({
     palette: {
@@ -221,7 +219,17 @@ export default function App() {
                         <Route
                             path="/"
                             element={
-                                isAuthenticated ? <MemberDashboard /> : <Home />
+                                isAuthenticated ? (
+                                    <MemberAccessControl
+                                        requiredLevel={ACCESS_LEVELS.MEMBER}
+                                        fallback={<Home />}
+                                        showMessage={false}
+                                    >
+                                        <MemberDashboard />
+                                    </MemberAccessControl>
+                                ) : (
+                                    <Home />
+                                )
                             }
                         />
                         <Route path="/about" element={<About />} />
@@ -239,7 +247,11 @@ export default function App() {
                         <Route path="/news" element={<News />} />
                         <Route path="/newsfeed" element={<NewsFeed />} />
                         <Route path="/newsletters" element={<Newsletters />} />
-                        <Route path="/membership" element={<Membership />} />
+                        <Route path="/join" element={<Membership />} />
+                        <Route
+                            path="/membership"
+                            element={<Navigate to="/join" replace />}
+                        />
                         <Route
                             path="/membership/list"
                             element={<MembershipList />}
@@ -257,16 +269,6 @@ export default function App() {
                                 >
                                     <Profile />
                                 </MemberAccessControl>
-                            }
-                        />
-
-                        {/* Member Onboarding */}
-                        <Route
-                            path="/member-onboarding"
-                            element={
-                                <ProtectedRoute title="Complete Your Registration">
-                                    <MemberOnboarding />
-                                </ProtectedRoute>
                             }
                         />
 

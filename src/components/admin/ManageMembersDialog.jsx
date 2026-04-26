@@ -1,13 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Avatar, Typography, Chip, Stack } from '@mui/material';
-import { Edit as EditIcon, CheckCircle, Cancel } from '@mui/icons-material';
-import { getAllMembers, patchMember } from '../../services/restdbService';
+import {
+    Button,
+    Avatar,
+    Typography,
+    Chip,
+    Stack,
+    Tabs,
+    Tab,
+    Badge,
+    Box,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions
+} from '@mui/material';
+import {
+    Edit as EditIcon,
+    CheckCircle,
+    Cancel,
+    HowToReg as ApproveIcon,
+    PersonOff as RejectIcon,
+    MailOutline,
+    Unsubscribe
+} from '@mui/icons-material';
+import {
+    getAllMembers,
+    getPendingMembers,
+    patchMember,
+    deleteMember
+} from '../../services/restdbService';
+import { sendWelcomeEmail } from '../../utils/emailTemplates';
 import MemberFormModal from '../forms/MemberFormModal';
 import AppDialog from '../common/AppDialog';
 import AdminResourceList from '../common/AdminResourceList';
 import AdminItemCard from '../common/AdminItemCard';
 
 const ManageMembersDialog = ({ open, onClose }) => {
+    const [activeTab, setActiveTab] = useState(0);
+
+    // All Members tab state
     const [members, setMembers] = useState([]);
     const [filteredMembers, setFilteredMembers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -17,9 +49,22 @@ const ManageMembersDialog = ({ open, onClose }) => {
     const [selectedMember, setSelectedMember] = useState(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+    // Pending tab state
+    const [pendingMembers, setPendingMembers] = useState([]);
+    const [filteredPending, setFilteredPending] = useState([]);
+    const [pendingLoading, setPendingLoading] = useState(false);
+    const [pendingError, setPendingError] = useState(null);
+    const [pendingSearchTerm, setPendingSearchTerm] = useState('');
+    const [pendingCount, setPendingCount] = useState(0);
+
+    // Reject confirmation dialog state
+    const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+    const [memberToReject, setMemberToReject] = useState(null);
+
     useEffect(() => {
         if (open) {
             fetchMembers();
+            fetchPendingMembers();
         }
     }, [open, refreshTrigger]);
 
@@ -30,8 +75,13 @@ const ManageMembersDialog = ({ open, onClose }) => {
             const data = await getAllMembers();
 
             if (Array.isArray(data)) {
+                // Exclude pending and rejected members from the All Members tab
+                const approvedMembers = data.filter(
+                    (m) => m.status !== 'pending' && m.status !== 'rejected'
+                );
+
                 // Sort by last name, then first name
-                const sortedMembers = data.sort((a, b) => {
+                const sortedMembers = approvedMembers.sort((a, b) => {
                     const getLastName = (member) => {
                         if (member.Name) {
                             const parts = member.Name.split(' ');
@@ -75,6 +125,39 @@ const ManageMembersDialog = ({ open, onClose }) => {
         }
     };
 
+    const fetchPendingMembers = async () => {
+        try {
+            setPendingLoading(true);
+            setPendingError(null);
+            const data = await getPendingMembers();
+
+            if (Array.isArray(data)) {
+                // Sort by registration date, newest first
+                const sorted = data.sort((a, b) => {
+                    const dateA = a.registeredAt
+                        ? new Date(a.registeredAt)
+                        : new Date(0);
+                    const dateB = b.registeredAt
+                        ? new Date(b.registeredAt)
+                        : new Date(0);
+                    return dateB - dateA;
+                });
+                setPendingMembers(sorted);
+                setFilteredPending(sorted);
+                setPendingCount(sorted.length);
+            } else {
+                setPendingMembers([]);
+                setFilteredPending([]);
+                setPendingCount(0);
+            }
+        } catch (err) {
+            console.error('Error fetching pending members:', err);
+            setPendingError('Unable to load pending registrations');
+        } finally {
+            setPendingLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (!searchTerm) {
             setFilteredMembers(members);
@@ -91,6 +174,23 @@ const ManageMembersDialog = ({ open, onClose }) => {
 
         setFilteredMembers(filtered);
     }, [searchTerm, members]);
+
+    useEffect(() => {
+        if (!pendingSearchTerm) {
+            setFilteredPending(pendingMembers);
+            return;
+        }
+
+        const filtered = pendingMembers.filter((member) => {
+            const fullName = formatName(member).toLowerCase();
+            const email = (member.email || '').toLowerCase();
+            const search = pendingSearchTerm.toLowerCase();
+
+            return fullName.includes(search) || email.includes(search);
+        });
+
+        setFilteredPending(filtered);
+    }, [pendingSearchTerm, pendingMembers]);
 
     const formatName = (member) => {
         if (member.Name) {
@@ -121,6 +221,20 @@ const ManageMembersDialog = ({ open, onClose }) => {
                 .join('')
                 .toUpperCase() || 'M'
         );
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        } catch {
+            return dateString;
+        }
     };
 
     const handleCreateClick = () => {
@@ -168,6 +282,107 @@ const ManageMembersDialog = ({ open, onClose }) => {
         }
     };
 
+    const handleToggleEmailOptOut = async (member, e) => {
+        e.stopPropagation();
+        try {
+            const isCurrentlyOptedOut = member.emailOptOut === true;
+            const newOptOutStatus = !isCurrentlyOptedOut;
+            await patchMember(member._id, { emailOptOut: newOptOutStatus });
+
+            // Update the member in the local state
+            const updatedMembers = members.map((m) =>
+                m._id === member._id
+                    ? { ...m, emailOptOut: newOptOutStatus }
+                    : m
+            );
+            setMembers(updatedMembers);
+            // Also update filtered list to reflect changes immediately
+            setFilteredMembers(
+                filteredMembers.map((m) =>
+                    m._id === member._id
+                        ? { ...m, emailOptOut: newOptOutStatus }
+                        : m
+                )
+            );
+        } catch (err) {
+            console.error('Error toggling email opt-out:', err);
+            setError('Failed to update email preferences');
+        }
+    };
+
+    const handleApproveMember = async (member, e) => {
+        e.stopPropagation();
+        try {
+            await patchMember(member._id, {
+                status: 'approved',
+                isActive: true
+            });
+
+            // Send approval email (best-effort — don't block UI if it fails)
+            try {
+                const firstName =
+                    member.firstName ||
+                    member.first ||
+                    formatName(member).split(' ')[0];
+                await sendWelcomeEmail(firstName, member.email);
+            } catch (emailErr) {
+                console.error('Failed to send approval email:', emailErr);
+            }
+
+            // Remove from pending list immediately
+            const updated = pendingMembers.filter((m) => m._id !== member._id);
+            setPendingMembers(updated);
+            setFilteredPending(
+                filteredPending.filter((m) => m._id !== member._id)
+            );
+            setPendingCount(updated.length);
+
+            // Refresh all members list to include the newly approved member
+            setRefreshTrigger((prev) => prev + 1);
+        } catch (err) {
+            console.error('Error approving member:', err);
+            setPendingError('Failed to approve member');
+        }
+    };
+
+    const handleRejectMember = (member, e) => {
+        e.stopPropagation();
+        setMemberToReject(member);
+        setRejectDialogOpen(true);
+    };
+
+    const handleConfirmReject = async () => {
+        if (!memberToReject) return;
+        try {
+            await deleteMember(memberToReject._id);
+
+            // Remove from pending list immediately
+            const updated = pendingMembers.filter(
+                (m) => m._id !== memberToReject._id
+            );
+            setPendingMembers(updated);
+            setFilteredPending(
+                filteredPending.filter((m) => m._id !== memberToReject._id)
+            );
+            setPendingCount(updated.length);
+        } catch (err) {
+            console.error('Error rejecting member:', err);
+            setPendingError('Failed to reject registration');
+        } finally {
+            setRejectDialogOpen(false);
+            setMemberToReject(null);
+        }
+    };
+
+    const handleCancelReject = () => {
+        setRejectDialogOpen(false);
+        setMemberToReject(null);
+    };
+
+    const handleTabChange = (event, newValue) => {
+        setActiveTab(newValue);
+    };
+
     const renderMember = (member) => {
         const actions = (
             <>
@@ -180,6 +395,20 @@ const ManageMembersDialog = ({ open, onClose }) => {
                     onClick={(e) => handleToggleActive(member, e)}
                 >
                     {member.isActive !== false ? 'Deactivate' : 'Activate'}
+                </Button>
+                <Button
+                    size="small"
+                    startIcon={
+                        member.emailOptOut === true ? (
+                            <MailOutline />
+                        ) : (
+                            <Unsubscribe />
+                        )
+                    }
+                    color={member.emailOptOut === true ? 'success' : 'warning'}
+                    onClick={(e) => handleToggleEmailOptOut(member, e)}
+                >
+                    {member.emailOptOut === true ? 'Opt In' : 'Opt Out'}
                 </Button>
                 <Button
                     size="small"
@@ -224,6 +453,74 @@ const ManageMembersDialog = ({ open, onClose }) => {
                     ) : (
                         <Chip label="Inactive" size="small" color="error" />
                     )}
+                    {member.emailOptOut === true && (
+                        <Chip
+                            label="Email Opt-Out"
+                            size="small"
+                            color="warning"
+                        />
+                    )}
+                </Stack>
+            </AdminItemCard>
+        );
+    };
+
+    const renderPendingMember = (member) => {
+        const actions = (
+            <>
+                <Button
+                    size="small"
+                    startIcon={<ApproveIcon />}
+                    color="success"
+                    onClick={(e) => handleApproveMember(member, e)}
+                >
+                    Approve
+                </Button>
+                <Button
+                    size="small"
+                    startIcon={<RejectIcon />}
+                    color="error"
+                    onClick={(e) => handleRejectMember(member, e)}
+                >
+                    Reject
+                </Button>
+            </>
+        );
+
+        return (
+            <AdminItemCard
+                key={member._id}
+                title={formatName(member)}
+                subtitle={member.email}
+                icon={
+                    <Avatar
+                        sx={{
+                            bgcolor: 'secondary.main',
+                            width: 56,
+                            height: 56
+                        }}
+                    >
+                        {getInitials(member)}
+                    </Avatar>
+                }
+                actions={actions}
+            >
+                {member.phone && (
+                    <Typography variant="body2" color="text.secondary">
+                        {member.phone}
+                    </Typography>
+                )}
+                <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                    <Chip label="Pending" size="small" color="warning" />
+                    {member.registeredAt && (
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ display: 'flex', alignItems: 'center' }}
+                        >
+                            Registered {formatDate(member.registeredAt)}
+                        </Typography>
+                    )}
                 </Stack>
             </AdminItemCard>
         );
@@ -243,21 +540,65 @@ const ManageMembersDialog = ({ open, onClose }) => {
                     }
                 }}
             >
-                <AdminResourceList
-                    items={filteredMembers}
-                    renderItem={renderMember}
-                    onAdd={handleCreateClick}
-                    onSearch={setSearchTerm}
-                    loading={loading}
-                    error={error}
-                    addButtonText="Add New Member"
-                    searchPlaceholder="Search members..."
-                    emptyMessage={
-                        searchTerm
-                            ? 'No members found matching your search.'
-                            : 'No members found. Create your first member!'
-                    }
-                />
+                <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+                    <Tabs
+                        value={activeTab}
+                        onChange={handleTabChange}
+                        aria-label="member management tabs"
+                    >
+                        <Tab label="All Members" />
+                        <Tab
+                            label={
+                                <Badge
+                                    badgeContent={pendingCount}
+                                    color="warning"
+                                    sx={{
+                                        pr: 2,
+                                        '& .MuiBadge-badge': {
+                                            right: 2,
+                                            top: 2
+                                        }
+                                    }}
+                                >
+                                    Pending
+                                </Badge>
+                            }
+                        />
+                    </Tabs>
+                </Box>
+
+                {/* All Members Tab */}
+                {activeTab === 0 && (
+                    <AdminResourceList
+                        items={filteredMembers}
+                        renderItem={renderMember}
+                        onAdd={handleCreateClick}
+                        onSearch={setSearchTerm}
+                        loading={loading}
+                        error={error}
+                        addButtonText="Add New Member"
+                        searchPlaceholder="Search members..."
+                        emptyMessage={
+                            searchTerm
+                                ? 'No members found matching your search.'
+                                : 'No members found. Create your first member!'
+                        }
+                    />
+                )}
+
+                {/* Pending Tab */}
+                {activeTab === 1 && (
+                    <AdminResourceList
+                        items={filteredPending}
+                        renderItem={renderPendingMember}
+                        onSearch={setPendingSearchTerm}
+                        loading={pendingLoading}
+                        error={pendingError}
+                        searchPlaceholder="Search pending registrations..."
+                        emptyMessage="No pending registrations to review."
+                        showSearch={pendingMembers.length > 0}
+                    />
+                )}
             </AppDialog>
 
             <MemberFormModal
@@ -266,6 +607,34 @@ const ManageMembersDialog = ({ open, onClose }) => {
                 member={selectedMember}
                 onSuccess={handleMemberSaved}
             />
+
+            {/* Reject Confirmation Dialog */}
+            <Dialog
+                open={rejectDialogOpen}
+                onClose={handleCancelReject}
+                maxWidth="xs"
+                fullWidth
+            >
+                <DialogTitle>Reject Registration?</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        This will permanently delete{' '}
+                        {memberToReject ? formatName(memberToReject) : ''}'s
+                        registration. They will be able to re-apply in the
+                        future.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancelReject}>Cancel</Button>
+                    <Button
+                        onClick={handleConfirmReject}
+                        color="error"
+                        variant="contained"
+                    >
+                        Reject
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };

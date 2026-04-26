@@ -9,7 +9,7 @@ import {
     Alert,
     Button
 } from '@mui/material';
-import { PersonAdd, Lock } from '@mui/icons-material';
+import { HowToReg, Lock, PendingActions } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 const MemberAccessControl = ({
@@ -24,7 +24,7 @@ const MemberAccessControl = ({
         requiredLevel
     );
     const { user, isAuthenticated, isLoading: authLoading } = useAuth0();
-    const { hasAccess, roleLoading } = useUserRole();
+    const { hasAccess, isPending, roleLoading } = useUserRole();
     const navigate = useNavigate();
     const {
         member: memberRecord,
@@ -67,12 +67,55 @@ const MemberAccessControl = ({
         console.log('MemberAccessControl Debug:', {
             requiredLevel,
             isAuthenticated,
+            isPending,
             hasAccess: hasAccess(requiredLevel),
             memberRecord: !!memberRecord,
             memberError
         });
 
-        // For authenticated users, check member record first
+        // Authenticated but pending approval — application is under review
+        if (isAuthenticated && isPending) {
+            if (fallback) return fallback;
+            if (!showMessage) return null;
+
+            return (
+                <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    p={4}
+                    textAlign="center"
+                >
+                    <PendingActions
+                        color="warning"
+                        sx={{ fontSize: 64, mb: 2 }}
+                    />
+                    <Typography
+                        variant="h5"
+                        sx={{ mb: 1, fontWeight: 600, color: 'text.primary' }}
+                    >
+                        Application Under Review
+                    </Typography>
+                    <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{ mb: 3, maxWidth: 500 }}
+                    >
+                        Your membership request has been received and is being
+                        reviewed by a club officer. You'll receive an email once
+                        your membership has been approved.
+                    </Typography>
+                    <Alert severity="info" sx={{ maxWidth: 500 }}>
+                        If you have questions, contact us at{' '}
+                        <a href="mailto:admin@fredbirds.com">
+                            admin@fredbirds.com
+                        </a>
+                    </Alert>
+                </Box>
+            );
+        }
+
+        // Authenticated but no member record — need to register first
         if (isAuthenticated && (!memberRecord || memberError)) {
             console.log('Access denied due to missing member record');
             if (fallback) return fallback;
@@ -86,26 +129,28 @@ const MemberAccessControl = ({
                     p={4}
                     textAlign="center"
                 >
-                    <PersonAdd color="primary" sx={{ fontSize: 64, mb: 2 }} />
-                    <Typography variant="h5" gutterBottom color="primary">
-                        Complete Member Registration
+                    <HowToReg color="primary" sx={{ fontSize: 64, mb: 2 }} />
+                    <Typography
+                        variant="h5"
+                        sx={{ mb: 1, fontWeight: 600, color: 'text.primary' }}
+                    >
+                        Join the Club
                     </Typography>
                     <Typography
                         variant="body1"
                         color="text.secondary"
                         sx={{ mb: 3, maxWidth: 500 }}
                     >
-                        You're logged in, but need to complete your member
-                        profile to access club features. This will only take a
-                        minute!
+                        You're logged in, but you need to register as a member
+                        to access club features.
                     </Typography>
                     <Button
                         variant="contained"
                         size="large"
-                        startIcon={<PersonAdd />}
-                        onClick={() => navigate('/member-onboarding')}
+                        startIcon={<HowToReg />}
+                        onClick={() => navigate('/join')}
                     >
-                        Complete Registration
+                        Register to Join
                     </Button>
                 </Box>
             );

@@ -145,7 +145,7 @@ export default function Photos() {
             >
                 <Typography
                     variant="h4"
-                    sx={{ fontWeight: 700, color: 'text.primary' }}
+                    sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}
                 >
                     Photo Gallery
                 </Typography>
