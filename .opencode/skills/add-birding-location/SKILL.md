@@ -30,6 +30,18 @@ This skill guides you through creating a new birding location entry in the fredb
 
 ## Workflow
 
+**Phase Overview:**
+
+1. Collect Basic Information (location details, coordinates, amenities)
+2. eBird Integration (hotspot IDs, species data)
+3. Species Analysis & Categorization (group by family, identify notable birds)
+4. Web Research (optional - scrape website for context)
+5. Gather User Knowledge (optional - seasonal patterns, specialty birds)
+6. Generate Description (create comprehensive description)
+7. Review & Edit Description (get user approval)
+8. Create Location (deploy to database via MCP)
+9. Confirmation & Next Steps
+
 ### Phase 1: Collect Basic Information
 
 **Prompt for required fields:**
@@ -213,7 +225,44 @@ const webContent = await webfetch({
 
 **Fallback**: If web scraping fails or no website provided, skip this enrichment
 
-### Phase 5: Generate Description
+### Phase 5: Gather User Knowledge (Optional)
+
+**Ask if user has personal knowledge of the site:**
+
+"Have you visited this location or do you have knowledge about what birds are commonly found here? This can help emphasize the most reliable species in the description."
+
+**If yes, prompt for:**
+
+1. **Seasonal patterns** (optional):
+    - "Are there particular seasons when certain birds are most abundant? (e.g., 'shorebirds peak in May and August', 'waterfowl in winter')"
+    - Use this to prioritize species mentions in description
+
+2. **Specialty/target birds** (optional):
+    - "Are there any specialty or target species that birders specifically visit this location to see?"
+    - Highlight these prominently in description
+
+3. **Habitat emphasis** (optional):
+    - "Should the description emphasize any particular habitats? (e.g., 'the marsh is the main attraction', 'focus on forest breeding birds')"
+    - Use this to structure species paragraphs
+
+4. **General notes** (optional):
+    - "Any other context about the site that would help birders? (e.g., 'best viewing from observation deck', 'early morning is best')"
+    - Incorporate into facilities/access section
+
+**If no personal knowledge:**
+
+- Skip this phase entirely
+- Rely on eBird data patterns and web-scraped context
+- Focus on species with highest observation frequencies in eBird data
+
+**Use this information to:**
+
+- Filter the species list to emphasize regularly occurring birds
+- De-emphasize rare vagrants (even if they appear in eBird data)
+- Structure description around actual birding patterns at the site
+- Add practical visiting tips
+
+### Phase 6: Generate Description
 
 **Use the description template** (see description-template.md for details)
 
@@ -251,13 +300,16 @@ const webContent = await webfetch({
 - Use active, descriptive language
 - **Focus on reliable, regularly occurring species** - avoid over-emphasizing rare vagrants
 - **Emphasize expected species** that birders can reasonably expect to see during appropriate seasons
+- **Use user knowledge** (from Phase 5) to prioritize seasonal patterns and target species
+- **Filter out rare vagrants**: If a species appears in eBird data but is not mentioned in user knowledge or website context, it may be a vagrant - don't emphasize it
 - Organize species logically (by habitat, behavior, or family)
 - Include specific counts when impressive, but don't list every rarity in the eBird database
 - Keep sentences varied in structure
 - Match the professional tone of existing examples
 - **Quality over quantity** - it's better to accurately describe 50 reliable species than to list 200+ including all vagrants
+- **When in doubt about seasonal abundance**, describe species generally rather than overpromising specific species
 
-### Phase 6: Review & Edit Description
+### Phase 7: Review & Edit Description
 
 **Display generated description to user:**
 
@@ -278,7 +330,7 @@ Present the complete generated description with clear formatting.
 
 **Validation**: Ensure final description is not empty and is reasonably detailed
 
-### Phase 7: Create Location
+### Phase 8: Create Location
 
 **IMPORTANT: MCP Tool Limitation**
 
@@ -362,7 +414,7 @@ Next steps:
 2. Or wait for the fredbirds-api_locations_create MCP tool to be added
 ```
 
-### Phase 8: Confirmation & Next Steps
+### Phase 9: Confirmation & Next Steps
 
 **Current Workflow (JSON Export):**
 
