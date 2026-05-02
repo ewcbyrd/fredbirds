@@ -215,7 +215,7 @@ const GetStartedDialog = ({ open, onClose }) => {
                                                     }}
                                                 />
                                                 <Typography variant="body2">
-                                                    Monthly newsletters
+                                                    Field trip notifications
                                                 </Typography>
                                             </Box>
                                         </Box>
