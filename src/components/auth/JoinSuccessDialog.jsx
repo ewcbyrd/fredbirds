@@ -100,7 +100,7 @@ const JoinSuccessDialog = ({ open, onClose, email, firstName }) => {
                             <EventIcon color="primary" />
                         </ListItemIcon>
                         <ListItemText
-                            primary="Event Registration & RSVP"
+                            primary="Event Attendance Tracking"
                             primaryTypographyProps={{ variant: 'body2' }}
                         />
                     </ListItem>

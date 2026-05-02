@@ -332,7 +332,7 @@ const GetStartedDialog = ({ open, onClose }) => {
                                                     }}
                                                 />
                                                 <Typography variant="body2">
-                                                    Event registration
+                                                    Event attendance tracking
                                                 </Typography>
                                             </Box>
                                             <Box
