@@ -19,6 +19,7 @@ import EventIcon from '@mui/icons-material/Event';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import GroupIcon from '@mui/icons-material/Group';
 import PersonIcon from '@mui/icons-material/Person';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 
 const JoinSuccessDialog = ({ open, onClose, email, firstName }) => {
     const { loginWithRedirect } = useAuth0();
@@ -119,6 +120,15 @@ const JoinSuccessDialog = ({ open, onClose, email, firstName }) => {
                         </ListItemIcon>
                         <ListItemText
                             primary="Member Directory Access"
+                            primaryTypographyProps={{ variant: 'body2' }}
+                        />
+                    </ListItem>
+                    <ListItem sx={{ py: 1 }}>
+                        <ListItemIcon sx={{ minWidth: 40 }}>
+                            <PhotoCameraIcon color="primary" />
+                        </ListItemIcon>
+                        <ListItemText
+                            primary="Photo Upload & Gallery"
                             primaryTypographyProps={{ variant: 'body2' }}
                         />
                     </ListItem>

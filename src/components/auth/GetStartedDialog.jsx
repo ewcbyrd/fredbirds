@@ -370,6 +370,25 @@ const GetStartedDialog = ({ open, onClose }) => {
                                                     }}
                                                 />
                                                 <Typography variant="body2">
+                                                    Photo upload & gallery
+                                                </Typography>
+                                            </Box>
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center'
+                                                }}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        width: 6,
+                                                        height: 6,
+                                                        borderRadius: '50%',
+                                                        bgcolor: 'primary.main',
+                                                        mr: 1.5
+                                                    }}
+                                                />
+                                                <Typography variant="body2">
                                                     Profile & directory
                                                 </Typography>
                                             </Box>
