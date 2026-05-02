@@ -28,7 +28,7 @@ const parseName = (name) => {
     };
 };
 
-const JoinForm = () => {
+const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
     const { user, isAuthenticated } = useAuth0();
 
     // Pre-fill from Auth0 user context when authenticated
@@ -149,7 +149,17 @@ const JoinForm = () => {
                 console.error('Failed to send confirmation email:', emailErr);
             }
 
-            setSuccess(true);
+            // If onSuccess callback provided (embedded mode), call it
+            if (onSuccess) {
+                onSuccess({
+                    first: formData.first.trim(),
+                    last: formData.last.trim(),
+                    email: formData.email.trim().toLowerCase()
+                });
+            } else {
+                // Standalone mode - show success state
+                setSuccess(true);
+            }
         } catch (err) {
             console.error('Error submitting registration:', err);
             setError(
@@ -165,8 +175,8 @@ const JoinForm = () => {
         return (
             <Card
                 sx={{
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                    borderRadius: 2,
+                    boxShadow: embedded ? 'none' : '0 2px 8px rgba(0,0,0,0.08)',
+                    borderRadius: embedded ? 0 : 2,
                     height: '100%'
                 }}
             >
@@ -187,31 +197,35 @@ const JoinForm = () => {
     return (
         <Card
             sx={{
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                borderRadius: 2,
-                transition: 'box-shadow 0.3s ease',
-                '&:hover': { boxShadow: '0 4px 16px rgba(0,0,0,0.12)' },
+                boxShadow: embedded ? 'none' : '0 2px 8px rgba(0,0,0,0.08)',
+                borderRadius: embedded ? 0 : 2,
+                transition: embedded ? 'none' : 'box-shadow 0.3s ease',
+                '&:hover': embedded
+                    ? {}
+                    : { boxShadow: '0 4px 16px rgba(0,0,0,0.12)' },
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column'
             }}
         >
-            <Box
-                sx={{
-                    bgcolor: 'primary.main',
-                    color: 'white',
-                    p: 3,
-                    textAlign: 'center'
-                }}
-            >
-                <PersonAddIcon sx={{ fontSize: 36, mb: 1 }} />
-                <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                    Register to Join
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 1, opacity: 0.9 }}>
-                    Fill out the form below to apply for membership.
-                </Typography>
-            </Box>
+            {!embedded && (
+                <Box
+                    sx={{
+                        bgcolor: 'primary.main',
+                        color: 'white',
+                        p: 3,
+                        textAlign: 'center'
+                    }}
+                >
+                    <PersonAddIcon sx={{ fontSize: 36, mb: 1 }} />
+                    <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                        Register to Join
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 1, opacity: 0.9 }}>
+                        Fill out the form below to apply for membership.
+                    </Typography>
+                </Box>
+            )}
             <CardContent sx={{ p: { xs: 3, md: 4 }, flexGrow: 1 }}>
                 {error && (
                     <Alert
@@ -298,30 +312,57 @@ const JoinForm = () => {
                         }}
                     />
 
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        size="large"
-                        onClick={handleSubmit}
-                        disabled={loading}
+                    <Box
                         sx={{
-                            py: 1.5,
-                            fontSize: '1.05rem',
-                            fontWeight: 600,
-                            textTransform: 'none',
-                            borderRadius: 50,
-                            position: 'relative'
+                            display: 'flex',
+                            gap: 2,
+                            flexDirection: embedded ? 'row' : 'column'
                         }}
                     >
-                        {loading ? (
-                            <CircularProgress
-                                size={24}
-                                sx={{ color: 'white' }}
-                            />
-                        ) : (
-                            'Submit Registration'
+                        {embedded && onBack && (
+                            <Button
+                                variant="outlined"
+                                color="inherit"
+                                size="large"
+                                onClick={onBack}
+                                sx={{
+                                    py: 1.5,
+                                    fontSize: '1.05rem',
+                                    fontWeight: 600,
+                                    textTransform: 'none',
+                                    borderRadius: 50
+                                }}
+                            >
+                                Back
+                            </Button>
                         )}
-                    </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            size="large"
+                            onClick={handleSubmit}
+                            disabled={loading}
+                            fullWidth={!embedded}
+                            sx={{
+                                py: 1.5,
+                                fontSize: '1.05rem',
+                                fontWeight: 600,
+                                textTransform: 'none',
+                                borderRadius: 50,
+                                position: 'relative',
+                                flexGrow: embedded ? 1 : 0
+                            }}
+                        >
+                            {loading ? (
+                                <CircularProgress
+                                    size={24}
+                                    sx={{ color: 'white' }}
+                                />
+                            ) : (
+                                'Submit Registration'
+                            )}
+                        </Button>
+                    </Box>
                 </Box>
             </CardContent>
         </Card>
