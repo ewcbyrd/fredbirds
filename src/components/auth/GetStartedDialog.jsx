@@ -181,7 +181,8 @@ const GetStartedDialog = ({ open, onClose }) => {
                                                     }}
                                                 />
                                                 <Typography variant="body2">
-                                                    Event emails
+                                                    Event & field trip
+                                                    notifications
                                                 </Typography>
                                             </Box>
                                             <Box
@@ -199,23 +200,6 @@ const GetStartedDialog = ({ open, onClose }) => {
                                                 />
                                                 <Typography variant="body2">
                                                     Club news & announcements
-                                                </Typography>
-                                            </Box>
-                                            <Box
-                                                sx={{
-                                                    display: 'flex',
-                                                    alignItems: 'center'
-                                                }}
-                                            >
-                                                <CheckCircleIcon
-                                                    sx={{
-                                                        color: 'primary.main',
-                                                        mr: 1.5,
-                                                        fontSize: 20
-                                                    }}
-                                                />
-                                                <Typography variant="body2">
-                                                    Field trip notifications
                                                 </Typography>
                                             </Box>
                                         </Box>
