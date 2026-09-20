@@ -178,10 +178,9 @@ export const generateBrandedEmailTemplate = ({
 export const generateRegistrationEmail = (firstName, email) => {
     const content = `
         <p>Hi <strong>${firstName}</strong>,</p>
-        <p>Thank you for registering with the Fredericksburg Birding Club! 
-        We've received your membership request and it is now being reviewed by our officers.</p>
-        <p>You'll receive another email once your membership has been approved. 
-        In the meantime, here's what to look forward to as a member:</p>
+        <p>Thank you for joining the Fredericksburg Birding Club! 
+        Your membership is active.</p>
+        <p>Here's what you can look forward to as a member:</p>
         <ul>
             <li><strong>Club mailing list</strong> &mdash; stay informed about upcoming events, field trips, and club news</li>
             <li><strong>Members-only content</strong> &mdash; access the member directory and bird sighting logs</li>
@@ -209,7 +208,7 @@ export const generateRegistrationEmail = (firstName, email) => {
 };
 
 /**
- * Generates approval welcome email with login setup instructions
+ * Generates welcome email with login setup instructions
  * @param {string} firstName - Member's first name
  * @param {string} email - Member's email address
  * @returns {Object} Email data with subject, html, and text
@@ -217,8 +216,7 @@ export const generateRegistrationEmail = (firstName, email) => {
 export const generateWelcomeEmail = (firstName, email) => {
     const content = `
         <p>Hi <strong>${firstName}</strong>,</p>
-        <p>Great news &mdash; your membership with the Fredericksburg Birding Club has been approved! 
-        You're now an official member.</p>
+        <p>Welcome to the Fredericksburg Birding Club &mdash; you're now an official member!</p>
         <h3 style="margin-bottom: 8px;">Set Up Your Login</h3>
         <ol>
             <li>Visit <a href="https://www.fredbirds.com">www.fredbirds.com</a></li>
