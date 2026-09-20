@@ -22,6 +22,7 @@ import MembershipList from './components/members/MembershipList';
 import Resources from './components/pages/Resources';
 import Officers from './components/pages/Officers';
 import Photos from './components/pages/Photos';
+import Locations from './components/locations/Locations';
 
 import Profile from './components/pages/Profile';
 import MembersDirectory from './components/members/MembersDirectory';
@@ -235,6 +236,7 @@ export default function App() {
                         <Route path="/contact" element={<Contact />} />
                         <Route path="/faqs" element={<FAQs />} />
                         <Route path="/events" element={<Events />} />
+                        <Route path="/locations" element={<Locations />} />
 
                         {/* All features public except Members Directory */}
                         <Route

@@ -12,20 +12,20 @@ import {
 } from '@mui/material';
 import {
     AccountCircle,
-    Login,
     Logout,
     Settings,
     EventNote
 } from '@mui/icons-material';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { useUserRole, ACCESS_LEVELS } from '../../hooks/useUserRole';
 import { useMember } from '../../hooks/useMember';
-import LoginDialog from '../auth/LoginDialog';
+import GetStartedDialog from '../auth/GetStartedDialog';
 
-const LoginButton = ({ onClick }) => {
+const GetStartedButton = ({ onClick }) => {
     return (
         <Button
             variant="outlined"
-            startIcon={<Login />}
+            startIcon={<RocketLaunchIcon />}
             onClick={onClick}
             sx={{
                 borderColor: 'white',
@@ -36,7 +36,7 @@ const LoginButton = ({ onClick }) => {
                 }
             }}
         >
-            Member Login
+            Get Started
         </Button>
     );
 };
@@ -66,19 +66,19 @@ const UserProfile = () => {
     const { hasAccess, userRole } = useUserRole();
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+    const [getStartedDialogOpen, setGetStartedDialogOpen] = useState(false);
     const { member: memberData } = useMember();
 
-    const handleOpenLogin = () => setLoginDialogOpen(true);
-    const handleCloseLogin = () => setLoginDialogOpen(false);
+    const handleOpenGetStarted = () => setGetStartedDialogOpen(true);
+    const handleCloseGetStarted = () => setGetStartedDialogOpen(false);
 
     if (error) {
         return (
             <Box>
                 <Button
                     variant="outlined"
-                    startIcon={<Login />}
-                    onClick={handleOpenLogin}
+                    startIcon={<RocketLaunchIcon />}
+                    onClick={handleOpenGetStarted}
                     sx={{
                         borderColor: 'orange',
                         color: 'orange',
@@ -90,9 +90,9 @@ const UserProfile = () => {
                 >
                     Retry Login
                 </Button>
-                <LoginDialog
-                    open={loginDialogOpen}
-                    onClose={handleCloseLogin}
+                <GetStartedDialog
+                    open={getStartedDialogOpen}
+                    onClose={handleCloseGetStarted}
                 />
             </Box>
         );
@@ -105,10 +105,10 @@ const UserProfile = () => {
     if (!isAuthenticated) {
         return (
             <>
-                <LoginButton onClick={handleOpenLogin} />
-                <LoginDialog
-                    open={loginDialogOpen}
-                    onClose={handleCloseLogin}
+                <GetStartedButton onClick={handleOpenGetStarted} />
+                <GetStartedDialog
+                    open={getStartedDialogOpen}
+                    onClose={handleCloseGetStarted}
                 />
             </>
         );

@@ -19,13 +19,24 @@ import AppDialog from '../common/AppDialog';
  * Custom login dialog that checks email against the member database
  * before handing off to Auth0 for authentication.
  *
+ * Props:
+ * - open: Dialog open state
+ * - onClose: Close handler
+ * - standalone: If false, removes internal "Join the club" link (parent handles navigation)
+ * - onNavigateToJoin: Callback when user wants to join (used when standalone=false)
+ *
  * States:
  * - 'entry': Email input form
  * - 'checking': Loading while API call runs
  * - 'pending': Member found but pending approval
  * - 'not-found': No member record for this email
  */
-const LoginDialog = ({ open, onClose }) => {
+const LoginDialog = ({
+    open,
+    onClose,
+    standalone = true,
+    onNavigateToJoin
+}) => {
     const { loginWithRedirect } = useAuth0();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
@@ -107,7 +118,15 @@ const LoginDialog = ({ open, onClose }) => {
 
     const handleJoinClick = () => {
         handleClose();
-        navigate('/join');
+        if (standalone) {
+            // Standalone mode - navigate to /join page
+            navigate('/join');
+        } else {
+            // Embedded mode - call parent navigation handler
+            if (onNavigateToJoin) {
+                onNavigateToJoin();
+            }
+        }
     };
 
     const getTitle = () => {
@@ -175,22 +194,24 @@ const LoginDialog = ({ open, onClose }) => {
                         {state === 'checking' ? 'Checking...' : 'Continue'}
                     </Button>
 
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ textAlign: 'center' }}
-                    >
-                        Not a member yet?{' '}
-                        <Link
-                            component="button"
-                            type="button"
+                    {standalone && (
+                        <Typography
                             variant="body2"
-                            onClick={handleJoinClick}
-                            sx={{ fontWeight: 600 }}
+                            color="text.secondary"
+                            sx={{ textAlign: 'center' }}
                         >
-                            Join the club
-                        </Link>
-                    </Typography>
+                            Not a member yet?{' '}
+                            <Link
+                                component="button"
+                                type="button"
+                                variant="body2"
+                                onClick={handleJoinClick}
+                                sx={{ fontWeight: 600 }}
+                            >
+                                Join the club
+                            </Link>
+                        </Typography>
+                    )}
                 </Box>
             )}
 

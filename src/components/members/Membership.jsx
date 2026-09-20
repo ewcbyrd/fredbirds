@@ -33,8 +33,9 @@ export default function Membership() {
             <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
                 Whether you're just starting to notice the birds in your
                 backyard or you're a seasoned birder, the Fredericksburg Birding
-                Club welcomes you. <strong>Joining is free</strong> — simply
-                register below to become a member and start birding with us!
+                Club welcomes you. <strong>Joining is free</strong> — register
+                below or click <strong>Get Started</strong> in the header for a
+                quick registration form!
             </Typography>
 
             {/* Side-by-Side Layout: Benefits + Registration Form */}

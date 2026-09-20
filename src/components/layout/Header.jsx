@@ -34,6 +34,8 @@ import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary'; // Photos
 import VisibilityIcon from '@mui/icons-material/Visibility'; // Sightings
 import RssFeedIcon from '@mui/icons-material/RssFeed'; // Birding News
 import ContactSupportIcon from '@mui/icons-material/ContactSupport'; // FAQs
+import LocationOnIcon from '@mui/icons-material/LocationOn'; // Locations
+import { PersonAdd, Close } from '@mui/icons-material';
 import UserProfile from './UserProfile';
 
 // Component to handle scroll transparency effect
@@ -71,17 +73,10 @@ export default function Header(props) {
     // Only Members Directory is restricted
     const memberOnlyPaths = ['/members-directory'];
 
-    // Hide Join for users who already have a member record (any status)
-    const hideJoinPaths = ['/join'];
-
     // Filter function to check if menu item should be shown
     const shouldShowMenuItem = (path) => {
         if (memberOnlyPaths.includes(path)) {
             return hasAccess(ACCESS_LEVELS.MEMBER);
-        }
-        if (hideJoinPaths.includes(path)) {
-            // Show Join only if not authenticated, or authenticated without a member record
-            return !isAuthenticated || (!memberRecord && !!memberError);
         }
         return true; // All other pages are public
     };
@@ -102,6 +97,8 @@ export default function Header(props) {
                 return <ContactSupportIcon />;
             case '/events':
                 return <CalendarTodayIcon />;
+            case '/locations':
+                return <LocationOnIcon />;
             case '/announcements':
                 return <AnnouncementIcon />;
             case '/newsletters':
@@ -125,7 +122,7 @@ export default function Header(props) {
                 { label: 'About', path: '/about' },
                 { label: 'Officers', path: '/officers' },
                 { label: 'Members Directory', path: '/members-directory' },
-                { label: 'Membership', path: '/join' },
+                { label: 'About Membership', path: '/join' },
                 { label: "FAQ's", path: '/faqs' }
             ]
         },
@@ -141,6 +138,7 @@ export default function Header(props) {
         {
             title: 'Birding Resources',
             items: [
+                { label: 'Locations', path: '/locations' },
                 { label: 'Sightings', path: '/sightings' },
                 { label: 'Birding News', path: '/newsfeed' }
             ]
@@ -152,8 +150,7 @@ export default function Header(props) {
         { label: 'Sightings', path: '/sightings' },
         { label: 'Photos', path: '/photos' },
         { label: 'News', path: '/announcements' },
-        { label: 'Members', path: '/members-directory' },
-        { label: 'Join', path: '/join' }
+        { label: 'Members', path: '/members-directory' }
     ];
 
     // Filter menu sections based on authentication
