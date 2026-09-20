@@ -380,11 +380,6 @@ export const registerMember = async (registrationData) => {
     );
 };
 
-export const getPendingMembers = async () => {
-    const url = `${api}members/pending`;
-    return get(url);
-};
-
 // Announcement Management Functions
 
 export const createAnnouncement = async (announcementData) => {
@@ -440,6 +435,5 @@ export default {
     updateAnnouncement,
     deleteAnnouncement,
     registerMember,
-    getPendingMembers,
     deleteMember
 };

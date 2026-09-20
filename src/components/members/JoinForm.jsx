@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { registerMember } from '../../services/restdbService';
-import { sendRegistrationEmail } from '../../utils/emailTemplates';
+import { sendWelcomeEmail } from '../../utils/emailTemplates';
 
 /**
  * Parse a full name string into first and last name.
@@ -138,15 +138,15 @@ const JoinForm = () => {
                 return;
             }
 
-            // Send confirmation email (best-effort — don't block success if it fails)
+            // Send welcome email with login steps (best-effort — don't block success if it fails)
             try {
                 const firstName = formData.first.trim();
-                await sendRegistrationEmail(
+                await sendWelcomeEmail(
                     firstName,
                     formData.email.trim().toLowerCase()
                 );
             } catch (emailErr) {
-                console.error('Failed to send confirmation email:', emailErr);
+                console.error('Failed to send welcome email:', emailErr);
             }
 
             setSuccess(true);
@@ -172,12 +172,13 @@ const JoinForm = () => {
             >
                 <CardContent sx={{ p: 4 }}>
                     <Alert severity="success" sx={{ mb: 2 }}>
-                        Registration submitted successfully!
+                        Welcome to the club!
                     </Alert>
                     <Typography variant="body1" sx={{ textAlign: 'center' }}>
-                        Thank you for your interest in the Fredericksburg
-                        Birding Club! Your application has been submitted and
-                        will be reviewed by a club officer.
+                        You&apos;re now a member of the Fredericksburg Birding
+                        Club. Check your email for login instructions, then use
+                        Member Login with the same email address you registered
+                        with.
                     </Typography>
                 </CardContent>
             </Card>
@@ -209,7 +210,7 @@ const JoinForm = () => {
                     Register to Join
                 </Typography>
                 <Typography variant="body2" sx={{ mt: 1, opacity: 0.9 }}>
-                    Fill out the form below to apply for membership.
+                    Fill out the form below to join the club.
                 </Typography>
             </Box>
             <CardContent sx={{ p: { xs: 3, md: 4 }, flexGrow: 1 }}>

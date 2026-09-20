@@ -107,7 +107,6 @@ Pattern: `get<Resource>` or `get<Resource>By<Filter>`
 - `getAnnouncements()`
 - `getMemberByEmail(email)`
 - `getActiveMembers()`
-- `getPendingMembers()`
 - `getEventAttendees(eventId)`
 
 #### POST Endpoints
@@ -352,8 +351,8 @@ export const getEventAttendees = async (eventId) => {
 **GET filtered by status:**
 
 ```javascript
-export const getPendingMembers = async () => {
-    const url = `${api}members/pending`;
+export const getActiveMembers = async () => {
+    const url = `${api}members/active`;
     return get(url);
 };
 ```
@@ -741,7 +740,7 @@ export const getNearbyHotspots = async ({ lat, long, dist = 50 }) => {
   isAdmin?: boolean
   showEmail?: boolean   // whether to display email publicly
   showPhone?: boolean   // whether to display phone publicly
-  status?: string       // "pending" | "approved" (set by registration flow)
+  status?: string       // "pending" | "approved" (public register sets "approved")
   yearJoined?: string   // e.g. "2026" (stored as string, not number)
   registeredAt?: string // ISO 8601 date (set by registration flow)
 }
@@ -789,8 +788,8 @@ export const getNearbyHotspots = async ({ lat, long, dist = 50 }) => {
 - **Constraints:**
     - `email` must be unique and valid format
     - Role priority: admin > officer > member
-    - Registration creates members with `status: "pending"`, `isActive: false`
-    - Officers are automatically notified by email when a new registration is submitted
+    - Registration creates members with `status: "approved"`, `isActive: true`
+    - Officers are automatically notified by email when a new member joins (no approval required)
 
 ---
 
@@ -1075,9 +1074,10 @@ All endpoints may return these error types:
 - `email` must be unique across collection
 - `first`, `last`, `email` are required
 - Role priority: `isAdmin` > `isOfficer` > regular member
-- Registration (`POST /members/register`) creates members with `status: "pending"`, `isActive: false`
+- Registration (`POST /members/register`) creates members with `status: "approved"`, `isActive: true`
 - Registration has stricter rate limit: 5 requests per 15 minutes per IP
 - Registration includes honeypot field (`website`) for spam protection
+- Officers are notified by email when a new member joins; no approval step
 - Only pending members can be deleted (`DELETE /members/:id`); non-pending returns 400
 
 **Announcements:**
