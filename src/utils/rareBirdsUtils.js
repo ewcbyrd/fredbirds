@@ -28,18 +28,3 @@ export const isRareBird = (scientificName) => {
     rareBird['Scientific Name'].toLowerCase() === scientificName.toLowerCase()
   )
 }
-
-/**
- * Get rare bird record by scientific name
- * @param {string} scientificName - The scientific name of the bird to check
- * @returns {Object|null} The rare bird record if found, null otherwise
- */
-export const getRareBirdRecord = (scientificName) => {
-  if (!scientificName) return null
-  
-  const rareBirds = getCachedRareBirds()
-  return rareBirds.find(rareBird => 
-    rareBird['Scientific Name'] && 
-    rareBird['Scientific Name'].toLowerCase() === scientificName.toLowerCase()
-  )
-}
