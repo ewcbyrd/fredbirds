@@ -23,7 +23,7 @@ A React-based website for the Fredericksburg Regional Bird Club, featuring event
 - **Authentication**: Auth0 for member access
 - **Image Storage**: Cloudinary CDN with automatic optimization
 - **Calendar**: react-big-calendar for event display
-- **Photo Gallery**: react-photo-album with yet-another-react-lightbox
+- **Photo Gallery**: yet-another-react-lightbox
 - **Backend API**: Node.js API hosted on Heroku
 - **Database**: MongoDB with RestDB interface
 - **Deployment**: GitHub Pages with GitHub Actions

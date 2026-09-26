@@ -120,11 +120,6 @@ export const savePhoto = async (photoData) => {
     );
 };
 
-export const getMember = async (member) => {
-    const url = `${api}members/filter?first=${member.first}&last=${member.last}&email=${member.email}`;
-    return get(url);
-};
-
 export const getFaqs = async () => {
     const url = `${api}faqs`;
     return get(url);
@@ -155,23 +150,9 @@ export const getMemberByEmail = async (email) => {
     return get(url);
 };
 
-export const updateMember = async (memberId, memberData) => {
-    const url = `${api}members/${memberId}`;
-    return post(url, JSON.stringify(memberData));
-};
-
 export const patchMember = async (memberId, updates) => {
     const url = `${api}members/${memberId}`;
     return patch(url, updates);
-};
-
-export const deleteMember = async (memberId) => {
-    const url = `${api}members/${memberId}`;
-    const res = await fetch(url, { method: 'DELETE' });
-    if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    }
-    return res.json();
 };
 
 export const getStates = async () => {
@@ -348,22 +329,6 @@ export const addEventPhoto = async (eventId, photoData) => {
     return post(url, JSON.stringify(photoData));
 };
 
-export const removeEventPhoto = async (eventId, photoId) => {
-    const url = `${api}events/${eventId}/photos`;
-    const res = await fetch(url, {
-        method: 'DELETE',
-        headers: {
-            'cache-control': 'no-cache',
-            'content-type': 'application/json'
-        },
-        body: JSON.stringify({ _id: photoId })
-    });
-    if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    }
-    return res.json();
-};
-
 // Member Registration Functions
 
 export const registerMember = async (registrationData) => {
@@ -407,11 +372,6 @@ export const getLocations = async () => {
     return get(url);
 };
 
-export const getLocationById = async (locationId) => {
-    const url = `${api}locations/${locationId}`;
-    return get(url);
-};
-
 export const createLocation = async (locationData) => {
     const url = `${api}locations`;
     return post(url, JSON.stringify(locationData));
@@ -422,15 +382,6 @@ export const updateLocation = async (locationId, locationData) => {
     return patch(url, locationData);
 };
 
-export const deleteLocation = async (locationId) => {
-    const url = `${api}locations/${locationId}`;
-    const res = await fetch(url, { method: 'DELETE' });
-    if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    }
-    return res.json();
-};
-
 export default {
     getEventsByYear,
     getFutureEvents,
@@ -438,13 +389,11 @@ export default {
     getNewsletters,
     saveMember,
     sendEmail,
-    getMember,
     getFaqs,
     getMembers,
     getActiveMembers,
     getUserRole,
     getMemberByEmail,
-    updateMember,
     patchMember,
     getStates,
     getCounties,
@@ -460,15 +409,11 @@ export default {
     deleteEvent,
     getEventPhotos,
     addEventPhoto,
-    removeEventPhoto,
     createAnnouncement,
     updateAnnouncement,
     deleteAnnouncement,
     registerMember,
-    deleteMember,
     getLocations,
-    getLocationById,
     createLocation,
-    updateLocation,
-    deleteLocation
+    updateLocation
 };

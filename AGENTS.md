@@ -58,7 +58,7 @@ src/
     auth/                  # Auth & access control (AccessControl, ProtectedRoute, RoleBadge)
     common/                # Reusable shared components (AppCard, PageContainer, AppDialog, etc.)
     events/                # Event feature (Events, EventForm, EventList, EventMap, etc.)
-    forms/                 # Form components (AnnouncementForm, MemberForm, *FormModal, PhotoUploadForm)
+    forms/                 # Form components (AnnouncementForm, *FormModal, PhotoUploadForm)
     layout/                # App shell (Header, UserProfile, ContactTile)
     members/               # Member feature (MemberDashboard, MemberProfile, MembersDirectory, etc.)
     news/                  # News & announcements (News, NewsFeed, Announcements, Newsletters)
