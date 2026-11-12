@@ -34,6 +34,7 @@ import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary'; // Photos
 import VisibilityIcon from '@mui/icons-material/Visibility'; // Sightings
 import RssFeedIcon from '@mui/icons-material/RssFeed'; // Birding News
 import ContactSupportIcon from '@mui/icons-material/ContactSupport'; // FAQs
+import EmailIcon from '@mui/icons-material/Email'; // Contact Us
 import LocationOnIcon from '@mui/icons-material/LocationOn'; // Locations
 import { PersonAdd, Close } from '@mui/icons-material';
 import UserProfile from './UserProfile';
@@ -95,6 +96,8 @@ export default function Header(props) {
                 return <BadgeIcon />;
             case '/faqs':
                 return <ContactSupportIcon />;
+            case '/contact':
+                return <EmailIcon />;
             case '/events':
                 return <CalendarTodayIcon />;
             case '/locations':
@@ -123,7 +126,8 @@ export default function Header(props) {
                 { label: 'Officers', path: '/officers' },
                 { label: 'Members Directory', path: '/members-directory' },
                 { label: 'About Membership', path: '/join' },
-                { label: "FAQ's", path: '/faqs' }
+                { label: "FAQ's", path: '/faqs' },
+                { label: 'Contact Us', path: '/contact' }
             ]
         },
         {
@@ -150,7 +154,8 @@ export default function Header(props) {
         { label: 'Sightings', path: '/sightings' },
         { label: 'Photos', path: '/photos' },
         { label: 'News', path: '/announcements' },
-        { label: 'Members', path: '/members-directory' }
+        { label: 'Members', path: '/members-directory' },
+        { label: 'Contact', path: '/contact' }
     ];
 
     // Filter menu sections based on authentication
@@ -278,6 +283,25 @@ export default function Header(props) {
                                     </Button>
                                 ))}
                             </Box>
+                        )}
+
+                        {/* Mobile Contact Us shortcut */}
+                        {isMobile && (
+                            <IconButton
+                                aria-label="Contact Us"
+                                color="inherit"
+                                onClick={() => handleNavigate('/contact')}
+                                sx={{
+                                    mr: 1,
+                                    bgcolor: 'rgba(255,255,255,0.1)',
+                                    backdropFilter: 'blur(4px)',
+                                    '&:hover': {
+                                        bgcolor: 'rgba(255, 255, 255, 0.2)'
+                                    }
+                                }}
+                            >
+                                <EmailIcon sx={{ fontSize: 24 }} />
+                            </IconButton>
                         )}
 
                         {/* Menu Icon */}

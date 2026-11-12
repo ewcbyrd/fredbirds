@@ -44,7 +44,7 @@ with React Testing Library.
 
 - **PR checks:** `npm ci && npm run build` (build verification only, no lint/test gate)
 - **Deploy:** Push to `main` triggers GitHub Pages deploy to `gh-pages` branch
-- **Environment:** Build requires `VITE_*` env vars (Auth0, Google Maps, OpenWeather, eBird, Cloudinary)
+- **Environment:** Build requires `VITE_*` env vars (Auth0, Google Maps, OpenWeather, eBird, Cloudinary, optional Contact Us emails)
 
 ## Project Structure
 
@@ -188,6 +188,7 @@ All client-side env vars use the `VITE_` prefix (required by Vite):
 - `VITE_OPENWEATHER_API_KEY`
 - `VITE_EBIRD_KEY`
 - `VITE_CLOUDINARY_UPLOAD_PRESET`, `VITE_CLOUDINARY_CLOUD_NAME`
+- `VITE_CONTACT_EMAIL_MEMBERSHIP`, `VITE_CONTACT_EMAIL_WEBSITE`, `VITE_CONTACT_EMAIL_EVENT`, `VITE_CONTACT_EMAIL_BIRDING`, `VITE_CONTACT_EMAIL_OTHER` (Contact Us topic recipients; fall back to club defaults if unset)
 
 Access via `import.meta.env.VITE_*`. Never commit `.env` or `.env.local` files.
 
