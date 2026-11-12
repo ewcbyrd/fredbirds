@@ -35,6 +35,11 @@ jobs:
           VITE_EBIRD_KEY: ${{ secrets.VITE_EBIRD_KEY }}
           VITE_CLOUDINARY_UPLOAD_PRESET: ${{ secrets.VITE_CLOUDINARY_UPLOAD_PRESET }}
           VITE_CLOUDINARY_CLOUD_NAME: ${{ secrets.VITE_CLOUDINARY_CLOUD_NAME }}
+          VITE_CONTACT_EMAIL_MEMBERSHIP: ${{ secrets.VITE_CONTACT_EMAIL_MEMBERSHIP }}
+          VITE_CONTACT_EMAIL_WEBSITE: ${{ secrets.VITE_CONTACT_EMAIL_WEBSITE }}
+          VITE_CONTACT_EMAIL_EVENT: ${{ secrets.VITE_CONTACT_EMAIL_EVENT }}
+          VITE_CONTACT_EMAIL_BIRDING: ${{ secrets.VITE_CONTACT_EMAIL_BIRDING }}
+          VITE_CONTACT_EMAIL_OTHER: ${{ secrets.VITE_CONTACT_EMAIL_OTHER }}
 
       - name: Add .nojekyll file
         run: touch ./dist/.nojekyll
