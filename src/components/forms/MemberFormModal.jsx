@@ -13,11 +13,7 @@ import {
     Select,
     MenuItem
 } from '@mui/material';
-import {
-    saveMember,
-    patchMember,
-    getMember
-} from '../../services/restdbService';
+import { saveMember, patchMember } from '../../services/restdbService';
 import { sendWelcomeEmail } from '../../utils/emailTemplates';
 import AppDialog from '../common/AppDialog';
 

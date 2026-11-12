@@ -14,10 +14,7 @@ import Skeleton from '@mui/material/Skeleton';
 import Box from '@mui/material/Box';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import Divider from '@mui/material/Divider';
 import { useTheme } from '@mui/material/styles';
-
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 import ReactMarkdown from 'react-markdown';
 import { parseUTCDate } from '../../utils/dateUtils';
@@ -78,124 +75,6 @@ const formatEventDetails = (details) => {
             }}
         >
             <ReactMarkdown>{details}</ReactMarkdown>
-        </Box>
-    );
-};
-
-// Component to render event location map(s)
-const EventMap = ({ lat, lon, title, locations }) => {
-    // Support both old single location format (lat/lon) and new multiple locations format
-    const eventLocations =
-        locations && locations.length > 0
-            ? locations
-            : lat && lon
-              ? [{ lat, lon, name: '', address: '' }]
-              : [];
-
-    if (eventLocations.length === 0) return null;
-
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
-    return (
-        <Box>
-            <Divider sx={{ mb: 2 }} />
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                <LocationOnIcon color="primary" fontSize="small" />
-                <Typography
-                    variant="h6"
-                    sx={{ fontWeight: 600, color: 'text.primary' }}
-                >
-                    {eventLocations.length === 1
-                        ? 'Event Location'
-                        : `Event Locations (${eventLocations.length})`}
-                </Typography>
-            </Box>
-
-            {eventLocations.map((location, idx) => {
-                const mapSrc = apiKey
-                    ? `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${location.lat},${location.lon}&zoom=15`
-                    : `https://www.google.com/maps?q=${location.lat},${location.lon}&output=embed&z=15`;
-
-                return (
-                    <Box
-                        key={idx}
-                        sx={{
-                            bgcolor: 'info.50',
-                            p: 2,
-                            borderRadius: 2,
-                            border: 1,
-                            borderColor: 'info.200',
-                            mb:
-                                eventLocations.length > 1 &&
-                                idx < eventLocations.length - 1
-                                    ? 2
-                                    : 3
-                        }}
-                    >
-                        {eventLocations.length > 1 && (
-                            <Typography
-                                variant="subtitle2"
-                                sx={{ mb: 1, fontWeight: 600 }}
-                            >
-                                Location {idx + 1}
-                                {location.name ? `: ${location.name}` : ''}
-                            </Typography>
-                        )}
-                        {eventLocations.length === 1 && location.name && (
-                            <Typography
-                                variant="subtitle2"
-                                sx={{ mb: 1, fontWeight: 600 }}
-                            >
-                                {location.name}
-                            </Typography>
-                        )}
-                        {location.address && (
-                            <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                sx={{ mb: 1 }}
-                            >
-                                {location.address}
-                            </Typography>
-                        )}
-                        <Box
-                            sx={{
-                                position: 'relative',
-                                width: '100%',
-                                height: 250,
-                                borderRadius: 2,
-                                overflow: 'hidden',
-                                border: 1,
-                                borderColor: 'grey.300'
-                            }}
-                        >
-                            <iframe
-                                src={mapSrc}
-                                width="100%"
-                                height="100%"
-                                style={{ border: 0 }}
-                                allowFullScreen
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
-                                title={`Map for ${location.name || title} - Location ${idx + 1}`}
-                            />
-                        </Box>
-                        <Typography
-                            variant="caption"
-                            sx={{
-                                display: 'block',
-                                mt: 1,
-                                color: 'text.secondary',
-                                textAlign: 'center'
-                            }}
-                        >
-                            {apiKey
-                                ? 'Interactive Google Maps • Click and drag to explore'
-                                : 'Basic map view • Click to open in Google Maps'}
-                        </Typography>
-                    </Box>
-                );
-            })}
         </Box>
     );
 };

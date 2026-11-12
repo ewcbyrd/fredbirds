@@ -1,34 +1,5 @@
 import { generateAnnouncementEmail } from './emailTemplates';
-import {
-    sendBulkEmails,
-    validateAndCleanEmail,
-    filterAndCleanEmails
-} from './emailBatchService';
-
-// Re-export validation utilities from emailBatchService for backwards compatibility
-export { validateAndCleanEmail, filterAndCleanEmails };
-
-/**
- * Generates HTML email template for an announcement
- * @deprecated Use generateAnnouncementEmail from emailTemplates.js instead
- * @param {Object} announcement - Announcement object with headline and details
- * @returns {string} HTML content for the email
- */
-export const generateAnnouncementEmailHTML = (announcement) => {
-    const { html } = generateAnnouncementEmail(announcement);
-    return html;
-};
-
-/**
- * Generates plain text version of announcement email
- * @deprecated Use generateAnnouncementEmail from emailTemplates.js instead
- * @param {Object} announcement - Announcement object
- * @returns {string} Plain text content for the email
- */
-export const generateAnnouncementEmailText = (announcement) => {
-    const { text } = generateAnnouncementEmail(announcement);
-    return text;
-};
+import { sendBulkEmails } from './emailBatchService';
 
 /**
  * Sends announcement email to selected recipients
@@ -64,9 +35,5 @@ export const sendAnnouncementEmails = async (announcement, recipientEmails) => {
 };
 
 export default {
-    validateAndCleanEmail,
-    filterAndCleanEmails,
-    generateAnnouncementEmailHTML,
-    generateAnnouncementEmailText,
     sendAnnouncementEmails
 };

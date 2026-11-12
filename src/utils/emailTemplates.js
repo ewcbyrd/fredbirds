@@ -170,46 +170,7 @@ export const generateBrandedEmailTemplate = ({
 };
 
 /**
- * Generates registration confirmation email for new member signups
- * @param {string} firstName - Member's first name
- * @param {string} email - Member's email address
- * @returns {Object} Email data with subject, html, and text
- */
-export const generateRegistrationEmail = (firstName, email) => {
-    const content = `
-        <p>Hi <strong>${firstName}</strong>,</p>
-        <p>Thank you for registering with the Fredericksburg Birding Club! 
-        We've received your membership request and it is now being reviewed by our officers.</p>
-        <p>You'll receive another email once your membership has been approved. 
-        In the meantime, here's what to look forward to as a member:</p>
-        <ul>
-            <li><strong>Club mailing list</strong> &mdash; stay informed about upcoming events, field trips, and club news</li>
-            <li><strong>Members-only content</strong> &mdash; access the member directory and bird sighting logs</li>
-            <li><strong>Local birding community</strong> &mdash; connect with fellow birders in the Fredericksburg area</li>
-        </ul>
-        <p>If you have any questions, feel free to reach out to us at 
-        <a href="mailto:admin@fredbirds.com">admin@fredbirds.com</a>.</p>
-        <p>Happy birding!<br/>
-        Fredericksburg Birding Club<br/>
-        <a href="https://www.fredbirds.com">www.fredbirds.com</a></p>
-    `;
-
-    const html = generateBrandedEmailTemplate({
-        headerTitle: 'Welcome to the Club!',
-        content
-    });
-
-    const text = generatePlainText(content);
-
-    return {
-        subject: 'Welcome to the Fredericksburg Birding Club',
-        html,
-        text
-    };
-};
-
-/**
- * Generates approval welcome email with login setup instructions
+ * Generates welcome email with login setup instructions
  * @param {string} firstName - Member's first name
  * @param {string} email - Member's email address
  * @returns {Object} Email data with subject, html, and text
@@ -217,8 +178,7 @@ export const generateRegistrationEmail = (firstName, email) => {
 export const generateWelcomeEmail = (firstName, email) => {
     const content = `
         <p>Hi <strong>${firstName}</strong>,</p>
-        <p>Great news &mdash; your membership with the Fredericksburg Birding Club has been approved! 
-        You're now an official member.</p>
+        <p>Welcome to the Fredericksburg Birding Club &mdash; you're now an official member!</p>
         <h3 style="margin-bottom: 8px;">Set Up Your Login</h3>
         <ol>
             <li>Visit <a href="https://www.fredbirds.com">www.fredbirds.com</a></li>
@@ -328,20 +288,6 @@ export const generateAnnouncementEmail = (announcement) => {
 };
 
 /**
- * Send registration confirmation email
- * @param {string} firstName - Member's first name
- * @param {string} email - Member's email address
- * @returns {Promise<Object>} Send result
- */
-export const sendRegistrationEmail = async (firstName, email) => {
-    const emailContent = generateRegistrationEmail(firstName, email);
-    return sendEmail({
-        to: email,
-        ...emailContent
-    });
-};
-
-/**
  * Send welcome email with login setup instructions
  * @param {string} firstName - Member's first name
  * @param {string} email - Member's email address
@@ -371,11 +317,9 @@ export const sendContactEmail = async (formData, recipientEmail) => {
 
 export default {
     generateBrandedEmailTemplate,
-    generateRegistrationEmail,
     generateWelcomeEmail,
     generateContactEmail,
     generateAnnouncementEmail,
-    sendRegistrationEmail,
     sendWelcomeEmail,
     sendContactEmail
 };

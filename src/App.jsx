@@ -8,7 +8,6 @@ import Container from '@mui/material/Container';
 import Header from './components/layout/Header';
 import Events from './components/events/Events';
 import Announcements from './components/news/Announcements';
-import NearbySightings from './components/sightings/NearbySightings';
 import Home from './components/pages/Home';
 import MemberDashboard from './components/members/MemberDashboard';
 import About from './components/pages/About';
