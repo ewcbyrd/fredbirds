@@ -15,7 +15,12 @@ const Auth0ProviderWithNavigate = ({ children }) => {
     const navigate = useNavigate();
 
     const onRedirectCallback = (appState) => {
-        navigate(appState?.returnTo || window.location.pathname);
+        const returnTo = appState?.returnTo;
+        const isSafePath =
+            typeof returnTo === 'string' &&
+            returnTo.startsWith('/') &&
+            !returnTo.startsWith('//');
+        navigate(isSafePath ? returnTo : '/');
     };
 
     const onError = (error) => {

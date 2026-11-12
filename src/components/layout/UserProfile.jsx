@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
+import { useNavigate } from 'react-router-dom'
 import {
     Button,
     Box,
@@ -9,128 +9,127 @@ import {
     Menu,
     MenuItem,
     Divider
-} from '@mui/material';
+} from '@mui/material'
 import {
     AccountCircle,
     Logout,
     Settings,
-    EventNote
-} from '@mui/icons-material';
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { useUserRole, ACCESS_LEVELS } from '../../hooks/useUserRole';
-import { useMember } from '../../hooks/useMember';
-import GetStartedDialog from '../auth/GetStartedDialog';
+    EventNote,
+    Login as LoginIcon,
+    HowToReg
+} from '@mui/icons-material'
+import { useUserRole, ACCESS_LEVELS } from '../../hooks/useUserRole'
+import { useMember } from '../../hooks/useMember'
+import { startLogin } from '../../utils/authUtils'
+import JoinDialog from '../auth/JoinDialog'
 
-const GetStartedButton = ({ onClick }) => {
-    return (
-        <Button
-            variant="outlined"
-            startIcon={<RocketLaunchIcon />}
-            onClick={onClick}
-            sx={{
-                borderColor: 'white',
-                color: 'white',
-                '&:hover': {
-                    borderColor: 'white',
-                    bgcolor: 'rgba(255, 255, 255, 0.1)'
-                }
-            }}
-        >
-            Get Started
-        </Button>
-    );
-};
+const DISMISS_KEY = 'fredbirds_skip_register_prompt_v2'
+
+const headerButtonSx = (color = 'white') => ({
+    borderColor: color,
+    color: color,
+    textTransform: 'none',
+    '&:hover': {
+        borderColor: color,
+        bgcolor:
+            color === 'orange'
+                ? 'rgba(255, 165, 0, 0.1)'
+                : 'rgba(255, 255, 255, 0.1)'
+    }
+})
 
 const LogoutButton = ({ onClose }) => {
-    const { logout } = useAuth0();
+    const { logout } = useAuth0()
 
     const handleLogout = () => {
-        onClose && onClose();
+        onClose && onClose()
+        sessionStorage.removeItem(DISMISS_KEY)
         logout({
             logoutParams: {
                 returnTo: window.location.origin
             }
-        });
-    };
+        })
+    }
 
     return (
         <MenuItem onClick={handleLogout}>
             <Logout fontSize="small" sx={{ mr: 1 }} />
             Logout
         </MenuItem>
-    );
-};
+    )
+}
 
 const UserProfile = () => {
-    const { user, isAuthenticated, isLoading, error } = useAuth0();
-    const { hasAccess, userRole } = useUserRole();
-    const navigate = useNavigate();
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const [getStartedDialogOpen, setGetStartedDialogOpen] = useState(false);
-    const { member: memberData } = useMember();
+    const { user, isAuthenticated, isLoading, error, loginWithRedirect } =
+        useAuth0()
+    const { hasAccess, isPending } = useUserRole()
+    const navigate = useNavigate()
+    const [anchorEl, setAnchorEl] = useState(null)
+    const [joinDialogOpen, setJoinDialogOpen] = useState(false)
+    const { member: memberData } = useMember()
 
-    const handleOpenGetStarted = () => setGetStartedDialogOpen(true);
-    const handleCloseGetStarted = () => setGetStartedDialogOpen(false);
+    const handleLogin = () => {
+        startLogin(loginWithRedirect)
+    }
 
     if (error) {
         return (
             <Box>
                 <Button
                     variant="outlined"
-                    startIcon={<RocketLaunchIcon />}
-                    onClick={handleOpenGetStarted}
-                    sx={{
-                        borderColor: 'orange',
-                        color: 'orange',
-                        '&:hover': {
-                            borderColor: 'orange',
-                            bgcolor: 'rgba(255, 165, 0, 0.1)'
-                        }
-                    }}
+                    startIcon={<LoginIcon />}
+                    onClick={handleLogin}
+                    sx={headerButtonSx('orange')}
                 >
                     Retry Login
                 </Button>
-                <GetStartedDialog
-                    open={getStartedDialogOpen}
-                    onClose={handleCloseGetStarted}
-                />
             </Box>
-        );
+        )
     }
 
     if (isLoading) {
-        return <Typography>Loading...</Typography>;
+        return <Typography>Loading...</Typography>
     }
 
     if (!isAuthenticated) {
         return (
-            <>
-                <GetStartedButton onClick={handleOpenGetStarted} />
-                <GetStartedDialog
-                    open={getStartedDialogOpen}
-                    onClose={handleCloseGetStarted}
-                />
-            </>
-        );
+            <Button
+                variant="outlined"
+                startIcon={<LoginIcon />}
+                onClick={handleLogin}
+                sx={headerButtonSx('white')}
+            >
+                Log in
+            </Button>
+        )
     }
 
     const handleMenu = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+        setAnchorEl(event.currentTarget)
+    }
 
     const handleClose = () => {
-        setAnchorEl(null);
-    };
+        setAnchorEl(null)
+    }
 
     const handleProfileClick = () => {
-        handleClose();
-        navigate('/profile');
-    };
+        handleClose()
+        navigate('/profile')
+    }
 
     const handleMenuItemClick = (path) => {
-        handleClose();
-        navigate(path);
-    };
+        handleClose()
+        navigate(path)
+    }
+
+    const handleCompleteRegistration = () => {
+        handleClose()
+        sessionStorage.removeItem(DISMISS_KEY)
+        setJoinDialogOpen(true)
+    }
+
+    const needsRegistration =
+        !isPending && !hasAccess(ACCESS_LEVELS.MEMBER)
 
     return (
         <Box>
@@ -184,6 +183,13 @@ const UserProfile = () => {
                     }
                 }}
             >
+                {needsRegistration && (
+                    <MenuItem onClick={handleCompleteRegistration}>
+                        <HowToReg fontSize="small" sx={{ mr: 1 }} />
+                        Complete registration
+                    </MenuItem>
+                )}
+
                 <MenuItem onClick={handleProfileClick}>
                     <AccountCircle fontSize="small" sx={{ mr: 1 }} />
                     My Profile
@@ -208,8 +214,13 @@ const UserProfile = () => {
                 <Divider />
                 <LogoutButton onClose={handleClose} />
             </Menu>
-        </Box>
-    );
-};
 
-export default UserProfile;
+            <JoinDialog
+                open={joinDialogOpen}
+                onClose={() => setJoinDialogOpen(false)}
+            />
+        </Box>
+    )
+}
+
+export default UserProfile

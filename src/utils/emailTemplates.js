@@ -179,15 +179,7 @@ export const generateWelcomeEmail = (firstName, email) => {
     const content = `
         <p>Hi <strong>${firstName}</strong>,</p>
         <p>Welcome to the Fredericksburg Birding Club &mdash; you're now an official member!</p>
-        <h3 style="margin-bottom: 8px;">Set Up Your Login</h3>
-        <ol>
-            <li>Visit <a href="https://www.fredbirds.com">www.fredbirds.com</a></li>
-            <li>Click <strong>&ldquo;Member Login&rdquo;</strong> in the top right corner</li>
-            <li>Enter your email address (<strong>${email}</strong>) and click <strong>&ldquo;Continue&rdquo;</strong></li>
-            <li>You'll be redirected to our secure login page &mdash; click <strong>&ldquo;Sign Up&rdquo;</strong> to create your account</li>
-            <li>Once logged in, you'll have full access to all member features</li>
-        </ol>
-        <p><strong>Important:</strong> You must sign up with <strong>${email}</strong> so we can match your login to your membership.</p>
+        <p>You're registered with <strong>${email}</strong> and can use the account you're already logged in with to access member features on <a href="https://www.fredbirds.com">www.fredbirds.com</a>.</p>
         <p>As a member you can:</p>
         <ul>
             <li><strong>Member directory</strong> &mdash; find and connect with fellow club members</li>

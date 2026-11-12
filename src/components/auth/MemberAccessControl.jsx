@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useUserRole, ACCESS_LEVELS } from '../../hooks/useUserRole';
 import { useMember } from '../../hooks/useMember';
@@ -9,8 +9,14 @@ import {
     Alert,
     Button
 } from '@mui/material';
-import { HowToReg, Lock, PendingActions } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import {
+    HowToReg,
+    Lock,
+    PendingActions,
+    Login as LoginIcon
+} from '@mui/icons-material';
+import { startLogin } from '../../utils/authUtils';
+import JoinDialog from './JoinDialog';
 
 const MemberAccessControl = ({
     children,
@@ -23,9 +29,14 @@ const MemberAccessControl = ({
         'MemberAccessControl component loaded with requiredLevel:',
         requiredLevel
     );
-    const { user, isAuthenticated, isLoading: authLoading } = useAuth0();
+    const {
+        user,
+        isAuthenticated,
+        isLoading: authLoading,
+        loginWithRedirect
+    } = useAuth0();
     const { hasAccess, isPending, roleLoading } = useUserRole();
-    const navigate = useNavigate();
+    const [joinDialogOpen, setJoinDialogOpen] = useState(false);
     const {
         member: memberRecord,
         loading: memberLoading,
@@ -148,10 +159,14 @@ const MemberAccessControl = ({
                         variant="contained"
                         size="large"
                         startIcon={<HowToReg />}
-                        onClick={() => navigate('/join')}
+                        onClick={() => setJoinDialogOpen(true)}
                     >
                         Register to Join
                     </Button>
+                    <JoinDialog
+                        open={joinDialogOpen}
+                        onClose={() => setJoinDialogOpen(false)}
+                    />
                 </Box>
             );
         }
@@ -174,9 +189,21 @@ const MemberAccessControl = ({
                     p={4}
                 >
                     <Lock color="action" sx={{ fontSize: 48, mb: 2 }} />
-                    <Alert severity="warning">
+                    <Alert
+                        severity="warning"
+                        sx={{ mb: !isAuthenticated ? 2 : 0 }}
+                    >
                         {customMessage || defaultMessage}
                     </Alert>
+                    {!isAuthenticated && (
+                        <Button
+                            variant="contained"
+                            startIcon={<LoginIcon />}
+                            onClick={() => startLogin(loginWithRedirect)}
+                        >
+                            Log in
+                        </Button>
+                    )}
                 </Box>
             );
         }
