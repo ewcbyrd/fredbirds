@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import React, { useEffect, useState } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
 import {
     Box,
     TextField,
@@ -9,10 +9,12 @@ import {
     Typography,
     Card,
     CardContent
-} from '@mui/material';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import { registerMember } from '../../services/restdbService';
-import { sendWelcomeEmail } from '../../utils/emailTemplates';
+} from '@mui/material'
+import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import LoginIcon from '@mui/icons-material/Login'
+import { registerMember } from '../../services/restdbService'
+import { sendWelcomeEmail } from '../../utils/emailTemplates'
+import { startLogin } from '../../utils/authUtils'
 
 /**
  * Parse a full name string into first and last name.
@@ -20,104 +22,134 @@ import { sendWelcomeEmail } from '../../utils/emailTemplates';
  * @returns {{ first: string, last: string }}
  */
 const parseName = (name) => {
-    if (!name) return { first: '', last: '' };
-    const parts = name.trim().split(/\s+/);
+    if (!name) return { first: '', last: '' }
+    const parts = name.trim().split(/\s+/)
     return {
         first: parts[0] || '',
         last: parts.slice(1).join(' ') || ''
-    };
-};
+    }
+}
+
+/** Auth0 often sets name/given_name to the email for database signups. */
+const looksLikeEmail = (value) =>
+    typeof value === 'string' && /@/.test(value.trim())
+
+/**
+ * Prefer real given/family names; never prefill from an email-like Auth0 name.
+ * @param {Object|null|undefined} user
+ * @returns {{ first: string, last: string }}
+ */
+const namesFromAuth0User = (user) => {
+    const given =
+        user?.given_name && !looksLikeEmail(user.given_name)
+            ? user.given_name.trim()
+            : ''
+    const family =
+        user?.family_name && !looksLikeEmail(user.family_name)
+            ? user.family_name.trim()
+            : ''
+
+    if (given || family) {
+        return { first: given, last: family }
+    }
+
+    if (user?.name && !looksLikeEmail(user.name)) {
+        return parseName(user.name)
+    }
+
+    return { first: '', last: '' }
+}
 
 const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
-    const { user, isAuthenticated } = useAuth0();
+    const { user, isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
 
-    // Pre-fill from Auth0 user context when authenticated
-    const auth0First = user?.given_name || parseName(user?.name).first || '';
-    const auth0Last = user?.family_name || parseName(user?.name).last || '';
-    const auth0Email = user?.email || '';
+    const auth0Email = user?.email || ''
+    const { first: auth0First, last: auth0Last } = namesFromAuth0User(user)
 
     const [formData, setFormData] = useState({
         first: auth0First,
         last: auth0Last,
-        email: auth0Email,
         phone: '',
         website: '' // honeypot field — bots fill this, humans don't see it
-    });
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(false);
+    })
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
+    const [success, setSuccess] = useState(false)
+
+    // Prefill once Auth0 user is available; never keep an email in name fields
+    useEffect(() => {
+        if (!user) return
+        const { first, last } = namesFromAuth0User(user)
+        setFormData((prev) => ({
+            ...prev,
+            first:
+                !prev.first || looksLikeEmail(prev.first) ? first : prev.first,
+            last: !prev.last || looksLikeEmail(prev.last) ? last : prev.last
+        }))
+    }, [user?.sub, user?.given_name, user?.family_name, user?.name])
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value } = e.target
         setFormData((prev) => ({
             ...prev,
             [name]: value
-        }));
-    };
+        }))
+    }
 
     const formatPhone = (value) => {
-        // Strip non-digits
-        const digits = value.replace(/\D/g, '');
-        // Format as ###-###-####
-        if (digits.length <= 3) return digits;
+        const digits = value.replace(/\D/g, '')
+        if (digits.length <= 3) return digits
         if (digits.length <= 6)
-            return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-        return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
-    };
+            return `${digits.slice(0, 3)}-${digits.slice(3)}`
+        return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6, 10)}`
+    }
 
     const handlePhoneChange = (e) => {
-        const formatted = formatPhone(e.target.value);
+        const formatted = formatPhone(e.target.value)
         setFormData((prev) => ({
             ...prev,
             phone: formatted
-        }));
-    };
+        }))
+    }
 
     const validateForm = () => {
+        if (!isAuthenticated || !auth0Email) {
+            setError('You must be logged in to register.')
+            return false
+        }
         if (!formData.first.trim()) {
-            setError('First name is required');
-            return false;
+            setError('First name is required')
+            return false
         }
         if (!formData.last.trim()) {
-            setError('Last name is required');
-            return false;
+            setError('Last name is required')
+            return false
         }
-        if (!formData.email.trim()) {
-            setError('Email address is required');
-            return false;
-        }
-        // Validate email format using a temporary input element
-        const emailInput = document.createElement('input');
-        emailInput.type = 'email';
-        emailInput.value = formData.email.trim();
-        if (!emailInput.checkValidity()) {
-            setError('Please enter a valid email address');
-            return false;
-        }
-        return true;
-    };
+        return true
+    }
 
     const handleSubmit = async () => {
-        if (!validateForm()) return;
+        if (!validateForm()) return
 
-        setLoading(true);
-        setError(null);
+        setLoading(true)
+        setError(null)
+
+        const email = auth0Email.trim().toLowerCase()
 
         try {
             const result = await registerMember({
                 first: formData.first.trim(),
                 last: formData.last.trim(),
-                email: formData.email.trim().toLowerCase(),
+                email,
                 phone: formData.phone.trim(),
-                website: formData.website // honeypot value (should be empty for real users)
-            });
+                website: formData.website
+            })
 
-            // Check for error responses that still return JSON
             if (result.error === 'ConflictError' || result.statusCode === 409) {
                 setError(
                     'This email address is already registered. If you believe this is an error, please contact admin@fredbirds.com.'
-                );
-                return;
+                )
+                return
             }
 
             if (
@@ -127,49 +159,90 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
                 setError(
                     result.message ||
                         'Please check your information and try again.'
-                );
-                return;
+                )
+                return
             }
 
             if (result.error) {
                 setError(
                     result.message || 'Something went wrong. Please try again.'
-                );
-                return;
+                )
+                return
             }
 
-            // Send welcome email with login steps (best-effort — don't block success if it fails)
             try {
-                const firstName = formData.first.trim();
-                await sendWelcomeEmail(
-                    firstName,
-                    formData.email.trim().toLowerCase()
-                );
+                await sendWelcomeEmail(formData.first.trim(), email)
             } catch (emailErr) {
-                console.error('Failed to send welcome email:', emailErr);
+                console.error('Failed to send welcome email:', emailErr)
             }
 
-            // If onSuccess callback provided (embedded mode), call it
+            const submitted = {
+                first: formData.first.trim(),
+                last: formData.last.trim(),
+                email
+            }
+
             if (onSuccess) {
-                onSuccess({
-                    first: formData.first.trim(),
-                    last: formData.last.trim(),
-                    email: formData.email.trim().toLowerCase()
-                });
+                onSuccess(submitted)
             } else {
-                // Standalone mode - show success state
-                setSuccess(true);
+                setSuccess(true)
             }
         } catch (err) {
-            console.error('Error submitting registration:', err);
+            console.error('Error submitting registration:', err)
             setError(
                 err.message ||
                     'Unable to submit registration. Please try again later.'
-            );
+            )
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
+    }
+
+    if (isLoading) {
+        return (
+            <Box display="flex" justifyContent="center" p={4}>
+                <CircularProgress />
+            </Box>
+        )
+    }
+
+    if (!isAuthenticated) {
+        return (
+            <Card
+                sx={{
+                    boxShadow: embedded ? 'none' : '0 2px 8px rgba(0,0,0,0.08)',
+                    borderRadius: embedded ? 0 : 2,
+                    height: '100%'
+                }}
+            >
+                <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                    <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                        Log in to register
+                    </Typography>
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 3 }}
+                    >
+                        Create or sign in to your account first, then complete
+                        your free club membership registration.
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        size="large"
+                        startIcon={<LoginIcon />}
+                        onClick={() =>
+                            startLogin(loginWithRedirect, {
+                                returnTo: '/join'
+                            })
+                        }
+                    >
+                        Log in
+                    </Button>
+                </CardContent>
+            </Card>
+        )
+    }
 
     if (success) {
         return (
@@ -185,14 +258,21 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
                         Welcome to the club!
                     </Alert>
                     <Typography variant="body1" sx={{ textAlign: 'center' }}>
-                        You&apos;re now a member of the Fredericksburg Birding
-                        Club. Check your email for login instructions, then use
-                        Member Login with the same email address you registered
-                        with.
+                        You&apos;re registered as a member. Member features are
+                        ready to use with the account you&apos;re already logged
+                        in with.
                     </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                        <Button
+                            variant="contained"
+                            onClick={() => window.location.assign('/')}
+                        >
+                            Go to dashboard
+                        </Button>
+                    </Box>
                 </CardContent>
             </Card>
-        );
+        )
     }
 
     return (
@@ -223,7 +303,8 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
                         Register to Join
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 1, opacity: 0.9 }}>
-                        Fill out the form below to join the club.
+                        Complete your membership for the account you&apos;re
+                        logged in with.
                     </Typography>
                 </Box>
             )}
@@ -276,11 +357,11 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
                         label="Email Address"
                         name="email"
                         type="email"
-                        value={formData.email}
-                        onChange={handleChange}
+                        value={auth0Email}
                         required
                         fullWidth
-                        autoComplete="email"
+                        disabled
+                        helperText="Tied to your logged-in account"
                     />
 
                     <TextField
@@ -294,7 +375,6 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
                         helperText="Optional"
                     />
 
-                    {/* Honeypot field — hidden from real users, bots will fill it */}
                     <input
                         type="text"
                         name="website"
@@ -367,7 +447,7 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
                 </Box>
             </CardContent>
         </Card>
-    );
-};
+    )
+}
 
-export default JoinForm;
+export default JoinForm

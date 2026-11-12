@@ -93,6 +93,7 @@ export default function Header(props) {
             case '/members-directory':
                 return <GroupsIcon />;
             case '/membership':
+            case '/join':
                 return <BadgeIcon />;
             case '/faqs':
                 return <ContactSupportIcon />;
@@ -125,7 +126,7 @@ export default function Header(props) {
                 { label: 'About', path: '/about' },
                 { label: 'Officers', path: '/officers' },
                 { label: 'Members Directory', path: '/members-directory' },
-                { label: 'About Membership', path: '/join' },
+                { label: 'Join the Club', path: '/join' },
                 { label: "FAQ's", path: '/faqs' },
                 { label: 'Contact Us', path: '/contact' }
             ]

@@ -29,6 +29,7 @@ import MemberProfile from './components/members/MemberProfile';
 import OfficerTools from './components/admin/OfficerTools';
 import AdminPanel from './components/admin/AdminPanel';
 import MemberAccessControl from './components/auth/MemberAccessControl';
+import UnregisteredMemberPrompt from './components/auth/UnregisteredMemberPrompt';
 import { ACCESS_LEVELS } from './hooks/useUserRole';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
@@ -213,6 +214,7 @@ export default function App() {
             <CssBaseline />
             <Box sx={{ bgcolor: '#f5f7f9', minHeight: '100vh' }}>
                 <Header />
+                <UnregisteredMemberPrompt />
                 <Container sx={{ py: 0, px: 0 }} maxWidth={false}>
                     <Routes>
                         <Route
