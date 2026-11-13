@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useUserRole } from '../../hooks/useUserRole';
-import { getPictureUrl } from '../../services/cloudinaryService';
+import { getPictureUrl } from '../../services/imageService';
 import {
     Typography,
     Card,

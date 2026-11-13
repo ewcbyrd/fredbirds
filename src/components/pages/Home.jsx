@@ -21,9 +21,9 @@ import Events from '../events/Events';
 import NearbySightings from '../sightings/NearbySightings';
 import { getAnnouncements } from '../../services/restdbService';
 import {
-    getCloudinaryUrl,
+    getImageUrl,
     transformations
-} from '../../services/cloudinaryService';
+} from '../../services/imageService';
 
 export default function Home() {
     const { isAuthenticated } = useAuth0();
@@ -86,7 +86,7 @@ export default function Home() {
                     minHeight: { xs: 400, md: 500 },
                     display: 'flex',
                     alignItems: 'center',
-                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.55)), url(${getCloudinaryUrl('static/d80cff948fa521079dbf77af935f8022', transformations.hero)})`,
+                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.55)), url(${getImageUrl('static/d80cff948fa521079dbf77af935f8022', transformations.hero)})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundAttachment: { xs: 'scroll', md: 'fixed' }, // Parallax effect on desktop

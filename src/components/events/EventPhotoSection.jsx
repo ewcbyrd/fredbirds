@@ -23,9 +23,9 @@ import {
 } from '@mui/icons-material';
 import { useAuth0 } from '@auth0/auth0-react';
 import {
-    getCloudinaryUrl,
+    getImageUrl,
     uploadPhoto
-} from '../../services/cloudinaryService';
+} from '../../services/imageService';
 import { getMemberByEmail, getEventPhotos } from '../../services/restdbService';
 import { formatPhotoDate } from '../../utils/dateUtils';
 
@@ -494,8 +494,9 @@ const EventPhotoSection = ({ eventId }) => {
                         <>
                             <CardMedia
                                 component="img"
-                                image={getCloudinaryUrl(
-                                    currentPhoto.cloudinary_public_id,
+                                image={getImageUrl(
+                                    currentPhoto.imageId ||
+                                        currentPhoto.cloudinary_public_id,
                                     'w_800,h_600,c_fill'
                                 )}
                                 alt={currentPhoto.header || 'Event photo'}

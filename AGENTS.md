@@ -44,7 +44,7 @@ with React Testing Library.
 
 - **PR checks:** `npm ci && npm run build` (build verification only, no lint/test gate)
 - **Deploy:** Push to `main` triggers GitHub Pages deploy to `gh-pages` branch
-- **Environment:** Build requires `VITE_*` env vars (Auth0, Google Maps, OpenWeather, eBird, Cloudinary, optional Contact Us emails)
+- **Environment:** Build requires `VITE_*` env vars (Auth0, Google Maps, OpenWeather, eBird, Azure Blob, optional Contact Us emails)
 
 ## Project Structure
 
@@ -65,7 +65,7 @@ src/
     pages/                 # Static/info pages (Home, About, Contact, FAQs, Resources, Officers, Photos, Profile)
     sightings/             # Bird sightings (MySightings, NearbySightings, MapModal)
   hooks/                   # Custom hooks (useUserRole, useIdleTimeout, useScrollAnimation, useMember)
-  services/                # API clients (restdbService, ebirdService, cloudinaryService, weatherService)
+  services/                # API clients (restdbService, ebirdService, imageService, weatherService)
   utils/                   # Utilities (rareBirdsUtils, dateUtils, memberUtils)
 api/                       # Serverless API routes
 docs/                      # Project documentation guides
@@ -187,7 +187,6 @@ All client-side env vars use the `VITE_` prefix (required by Vite):
 - `VITE_GOOGLE_MAPS_API_KEY`
 - `VITE_OPENWEATHER_API_KEY`
 - `VITE_EBIRD_KEY`
-- `VITE_CLOUDINARY_UPLOAD_PRESET`, `VITE_CLOUDINARY_CLOUD_NAME` (legacy dual-read during Azure migration)
 - `VITE_AZURE_BLOB_BASE_URL` (e.g. `https://fredbirdsphotos.blob.core.windows.net`)
 - `VITE_API_BASE_URL` (optional; default production API, use `http://localhost:3000` for local upload testing)
 - `VITE_CONTACT_EMAIL_MEMBERSHIP`, `VITE_CONTACT_EMAIL_WEBSITE`, `VITE_CONTACT_EMAIL_EVENT`, `VITE_CONTACT_EMAIL_BIRDING`, `VITE_CONTACT_EMAIL_OTHER` (Contact Us topic recipients; fall back to club defaults if unset)

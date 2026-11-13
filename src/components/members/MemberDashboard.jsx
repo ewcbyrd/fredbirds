@@ -32,7 +32,7 @@ import {
     getAnnouncements,
     getMembers
 } from '../../services/restdbService';
-import { getPictureUrl } from '../../services/cloudinaryService';
+import { getPictureUrl } from '../../services/imageService';
 import WeatherForecast from './WeatherForecast';
 import PageContainer from '../common/PageContainer';
 import { parseUTCDate } from '../../utils/dateUtils';

@@ -3,7 +3,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useUserRole } from '../../hooks/useUserRole';
 import { useMember } from '../../hooks/useMember';
 import { patchMember, getMemberEvents } from '../../services/restdbService';
-import { getPictureUrl } from '../../services/cloudinaryService';
+import { getPictureUrl } from '../../services/imageService';
 import {
     Container,
     Typography,
