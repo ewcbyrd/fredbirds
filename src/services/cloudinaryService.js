@@ -1,18 +1,9 @@
-// Image service: Azure Blob (new uploads) with Cloudinary dual-read for existing assets
+// Image service: Azure Blob storage with metadata-backed gallery
 
 const api = (
     import.meta.env.VITE_API_BASE_URL ||
     'https://fredbirds-api.azurewebsites.net/'
 ).replace(/\/?$/, '/')
-
-const getCloudinaryConfig = () => {
-    const cloudName =
-        import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'doqy8jape'
-    return {
-        cloudName,
-        baseUrl: `https://res.cloudinary.com/${cloudName}/image/upload`
-    }
-}
 
 const getAzureBlobBaseUrl = () =>
     (
@@ -32,7 +23,7 @@ const LEGACY_IMAGE_IDS = {
 }
 
 /**
- * Size presets. Azure values are variant file names; Cloudinary values are transforms.
+ * Size presets. Azure values are variant file names; legacy Cloudinary transform strings map too.
  */
 export const transformations = {
     thumbnail: 'w_300,h_300,c_fill',
@@ -70,7 +61,6 @@ const getAzureUrl = (imageId, transformation = '') => {
         return imageId
     }
 
-    // Full blob path already includes file name
     if (
         imageId.includes('/original.') ||
         /\.(webp|jpe?g|png|gif)$/i.test(imageId)
@@ -97,14 +87,8 @@ const getAzureUrl = (imageId, transformation = '') => {
     return `${baseUrl}/${container}/${id}/${variant}.webp`
 }
 
-const getLegacyCloudinaryUrl = (publicId, transformationsStr = '') => {
-    const { baseUrl } = getCloudinaryConfig()
-    const transformPart = transformationsStr ? `/${transformationsStr}` : ''
-    return `${baseUrl}${transformPart}/${publicId}`
-}
-
 /**
- * Build a display URL for an image id (Azure blob key or Cloudinary public id).
+ * Build a display URL for an image id (Azure blob key).
  */
 export const getCloudinaryUrl = (publicId, transformationsStr = '') => {
     if (!publicId) return null
@@ -112,7 +96,12 @@ export const getCloudinaryUrl = (publicId, transformationsStr = '') => {
     if (isAzureImageId(resolvedId)) {
         return getAzureUrl(resolvedId, transformationsStr)
     }
-    return getLegacyCloudinaryUrl(resolvedId, transformationsStr)
+    // Legacy Cloudinary fallback during transition
+    const cloudName =
+        import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'doqy8jape'
+    const baseUrl = `https://res.cloudinary.com/${cloudName}/image/upload`
+    const transformPart = transformationsStr ? `/${transformationsStr}` : ''
+    return `${baseUrl}${transformPart}/${resolvedId}`
 }
 
 /**
@@ -127,31 +116,40 @@ export const getPictureUrl = (
     return getCloudinaryUrl(pictureValue, transformation)
 }
 
-const authHeaders = (accessToken) => {
+/**
+ * Single multipart upload to API (blob + metadata, no Mongo photo doc).
+ * @param {File} file
+ * @param {object} options
+ * @param {string} options.accessToken
+ * @param {string} [options.eventId] if set, uploads as event photo
+ * @param {string} [options.header]
+ * @param {string} [options.title]
+ * @param {string} [options.description]
+ * @param {string} [options.category]
+ * @param {string} [options.contributor]
+ * @param {string} [options.location]
+ * @param {string} [options.photoDate]
+ */
+export const uploadPhoto = async (file, options = {}) => {
+    if (!file) throw new Error('No file provided')
+
+    const {
+        accessToken,
+        eventId,
+        header,
+        title,
+        description,
+        category,
+        contributor,
+        location,
+        photoDate
+    } = options
+
     if (!accessToken) {
         throw new Error(
             'An Auth0 token is required to upload photos. Please log in again.'
         )
     }
-    return {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${accessToken}`
-    }
-}
-
-/**
- * Upload an image to Azure Blob via API SAS + finalize variants.
- * @param {File} file
- * @param {string} folder club_photos | event_photos | static
- * @param {string} accessToken Auth0 ID token (or API access token)
- * @returns {Promise<{publicId: string, url: string, width: number|null, height: number|null, size: number|null}>}
- */
-export const uploadToCloudinary = async (
-    file,
-    folder = 'photos',
-    accessToken
-) => {
-    if (!file) throw new Error('No file provided')
 
     const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
     if (!validTypes.includes(file.type)) {
@@ -165,68 +163,64 @@ export const uploadToCloudinary = async (
         throw new Error('File size exceeds 10MB limit')
     }
 
-    const sasRes = await fetch(`${api}uploads/sas`, {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('header', header || title || file.name.split('.')[0] || 'Photo')
+    if (description) formData.append('description', description)
+    if (category) formData.append('category', category)
+    if (contributor) formData.append('contributor', contributor)
+    if (location) formData.append('location', location)
+    if (photoDate) formData.append('photoDate', photoDate)
+
+    const url = eventId
+        ? `${api}events/${eventId}/photos/upload`
+        : `${api}photos/upload`
+
+    const response = await fetch(url, {
         method: 'POST',
-        headers: authHeaders(accessToken),
-        body: JSON.stringify({
-            folder,
-            contentType: file.type,
-            fileName: file.name
-        })
-    })
-
-    if (!sasRes.ok) {
-        const text = await sasRes.text()
-        throw new Error(
-            `Failed to start upload (${sasRes.status}): ${text || sasRes.statusText}`
-        )
-    }
-
-    const sas = await sasRes.json()
-
-    const putRes = await fetch(sas.uploadUrl, {
-        method: 'PUT',
         headers: {
-            'Content-Type': file.type,
-            'x-ms-blob-type': 'BlockBlob'
+            Authorization: `Bearer ${accessToken}`
         },
-        body: file
+        body: formData
     })
 
-    if (!putRes.ok) {
-        const text = await putRes.text()
+    if (!response.ok) {
+        const text = await response.text()
         throw new Error(
-            `Blob upload failed (${putRes.status}): ${text || putRes.statusText}`
+            `Upload failed (${response.status}): ${text || response.statusText}`
         )
     }
 
-    const finalizeRes = await fetch(`${api}uploads/finalize`, {
-        method: 'POST',
-        headers: authHeaders(accessToken),
-        body: JSON.stringify({ imageId: sas.imageId })
-    })
-
-    if (!finalizeRes.ok) {
-        const text = await finalizeRes.text()
-        throw new Error(
-            `Failed to process image (${finalizeRes.status}): ${text || finalizeRes.statusText}`
-        )
-    }
-
-    const finalized = await finalizeRes.json()
+    const data = await response.json()
+    const imageId = data.imageId || data.cloudinary_public_id || data.photo?.imageId
 
     return {
-        publicId: sas.imageId,
-        url: getAzureUrl(sas.imageId, 'optimized'),
-        width: finalized.width ?? null,
-        height: finalized.height ?? null,
-        size: finalized.size ?? file.size
+        publicId: imageId,
+        imageId,
+        url: getAzureUrl(imageId, 'optimized'),
+        width: data.width ?? null,
+        height: data.height ?? null,
+        size: data.size ?? file.size,
+        ...data
     }
+}
+
+/** @deprecated use uploadPhoto */
+export const uploadToCloudinary = async (file, folder = 'photos', accessToken) => {
+    const eventId = null
+    // folder retained for call-site compat; event uploads should use uploadPhoto with eventId
+    if (folder === 'event_photos') {
+        throw new Error(
+            'uploadToCloudinary no longer supports event_photos; use uploadPhoto({ eventId })'
+        )
+    }
+    return uploadPhoto(file, { accessToken })
 }
 
 export default {
     getCloudinaryUrl,
     getPictureUrl,
+    uploadPhoto,
     uploadToCloudinary,
     transformations
 }

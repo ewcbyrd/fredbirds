@@ -18,8 +18,8 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { useAuth0 } from '@auth0/auth0-react';
-import { uploadToCloudinary } from '../../services/cloudinaryService';
-import { savePhoto, getMemberByEmail } from '../../services/restdbService';
+import { uploadPhoto } from '../../services/cloudinaryService';
+import { getMemberByEmail } from '../../services/restdbService';
 
 const AUTH_ERROR_MESSAGE =
     'You must be logged in to upload photos. Please log in to continue.';
@@ -100,32 +100,15 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
                 throw new Error(AUTH_ERROR_MESSAGE);
             }
 
-            // Upload to Azure Blob via API SAS
-            const uploadResult = await uploadToCloudinary(
-                file,
-                'club_photos',
-                accessToken
-            );
-
-            // Try to save metadata to database
-            try {
-                await savePhoto({
-                    publicId: uploadResult.publicId,
-                    title: title || file.name.split('.')[0],
-                    description: description,
-                    location: location,
-                    contributor: contributor,
-                    photoDate: photoDate,
-                    category: category
-                });
-                console.log('Photo metadata saved to database');
-            } catch (dbError) {
-                console.warn(
-                    'Note: Photo uploaded to Azure but metadata could not be saved to database:',
-                    dbError.message
-                );
-                // Continue even if database save fails - the photo is still uploaded
-            }
+            await uploadPhoto(file, {
+                accessToken,
+                title: title || file.name.split('.')[0],
+                description,
+                location,
+                contributor,
+                photoDate,
+                category
+            });
 
             setSuccess(true);
 
