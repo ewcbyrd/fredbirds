@@ -23,7 +23,7 @@ export default function Membership() {
     const handleCloseMailDialog = () => setOpenMailDialog(false);
 
     return (
-        <PageContainer>
+        <PageContainer maxWidth={720}>
             <Typography
                 variant="h4"
                 sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}
@@ -37,16 +37,17 @@ export default function Membership() {
                 first, then complete the registration form below.
             </Typography>
 
-            {/* Side-by-Side Layout: Benefits + Registration Form */}
+            {/* Stacked layout: registration form, then membership benefits */}
             <Box
                 sx={{
-                    display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-                    gap: { xs: 3, md: 4 },
-                    alignItems: 'start',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 3,
                     mb: 4
                 }}
             >
+                <JoinForm />
+
                 {/* Membership Benefits Card */}
                 <Card
                     sx={{
@@ -58,10 +59,7 @@ export default function Membership() {
                         transition: 'box-shadow 0.3s ease',
                         '&:hover': {
                             boxShadow: '0 6px 20px rgba(44, 95, 45, 0.3)'
-                        },
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column'
+                        }
                     }}
                 >
                     <Box
@@ -82,7 +80,7 @@ export default function Membership() {
                             All members enjoy full access to club activities
                         </Typography>
                     </Box>
-                    <CardContent sx={{ p: { xs: 3, md: 4 }, flexGrow: 1 }}>
+                    <CardContent sx={{ p: { xs: 3, md: 4 } }}>
                         <Box sx={{ mb: 3 }}>
                             <Typography
                                 variant="subtitle1"
@@ -128,26 +126,6 @@ export default function Membership() {
                                 <Typography variant="body1">
                                     Participation in all club field trips,
                                     events and programs
-                                </Typography>
-                            </Box>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'flex-start',
-                                    mb: 2
-                                }}
-                            >
-                                <CheckCircleIcon
-                                    sx={{
-                                        color: 'primary.main',
-                                        mr: 2,
-                                        mt: 0.5,
-                                        flexShrink: 0
-                                    }}
-                                />
-                                <Typography variant="body1">
-                                    Access to club web resources, sighting
-                                    reports and newsletters
                                 </Typography>
                             </Box>
                             <Box
@@ -268,9 +246,6 @@ export default function Membership() {
                         </Box>
                     </CardContent>
                 </Card>
-
-                {/* Registration Form */}
-                <JoinForm />
             </Box>
 
             {/* Alternative: Join by Mail */}
