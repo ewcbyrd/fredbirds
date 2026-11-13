@@ -34,7 +34,12 @@ import {
 import { formatPhotoDate } from '../../utils/dateUtils';
 
 const EventPhotoSection = ({ eventId }) => {
-    const { isAuthenticated, user, isLoading: authLoading } = useAuth0();
+    const {
+        isAuthenticated,
+        user,
+        isLoading: authLoading,
+        getIdTokenClaims
+    } = useAuth0();
     const [photos, setPhotos] = useState([]);
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -145,9 +150,16 @@ const EventPhotoSection = ({ eventId }) => {
         setUploadSuccess(false);
 
         try {
+            const claims = await getIdTokenClaims();
+            const accessToken = claims?.__raw;
+            if (!accessToken) {
+                throw new Error('You must be logged in to upload photos');
+            }
+
             const uploadResult = await uploadToCloudinary(
                 uploadForm.file,
-                'event_photos'
+                'event_photos',
+                accessToken
             );
             await addEventPhoto(eventId, {
                 cloudinary_public_id: uploadResult.publicId,

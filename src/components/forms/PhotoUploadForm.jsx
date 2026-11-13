@@ -25,7 +25,7 @@ const AUTH_ERROR_MESSAGE =
     'You must be logged in to upload photos. Please log in to continue.';
 
 export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
-    const { isAuthenticated, user } = useAuth0();
+    const { isAuthenticated, user, getIdTokenClaims } = useAuth0();
     const [file, setFile] = useState(null);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -94,8 +94,18 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
         setSuccess(false);
 
         try {
-            // Upload to Cloudinary
-            const uploadResult = await uploadToCloudinary(file, 'club_photos');
+            const claims = await getIdTokenClaims();
+            const accessToken = claims?.__raw;
+            if (!accessToken) {
+                throw new Error(AUTH_ERROR_MESSAGE);
+            }
+
+            // Upload to Azure Blob via API SAS
+            const uploadResult = await uploadToCloudinary(
+                file,
+                'club_photos',
+                accessToken
+            );
 
             // Try to save metadata to database
             try {
@@ -111,7 +121,7 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
                 console.log('Photo metadata saved to database');
             } catch (dbError) {
                 console.warn(
-                    'Note: Photo uploaded to Cloudinary but metadata could not be saved to database:',
+                    'Note: Photo uploaded to Azure but metadata could not be saved to database:',
                     dbError.message
                 );
                 // Continue even if database save fails - the photo is still uploaded
