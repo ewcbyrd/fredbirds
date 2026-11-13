@@ -22,6 +22,15 @@ const getAzureBlobBaseUrl = () =>
 
 const AZURE_CONTAINERS = ['club-photos', 'event-photos', 'static']
 
+// Hardcoded / legacy Cloudinary IDs remapped during bulk migration
+const LEGACY_IMAGE_IDS = {
+    'Group.jpg': 'static/d80cff948fa521079dbf77af935f8022',
+    'vso.png': 'static/0fbd392330691bdd120773abc6a561df',
+    scott_byrd: 'static/b070b966ac6fc1f34b15116d71682fdd',
+    'scott_byrd.jpg': 'static/26ac5c2564e3a9e173579b28816596b8',
+    imgScott: 'static/b070b966ac6fc1f34b15116d71682fdd'
+}
+
 /**
  * Size presets. Azure values are variant file names; Cloudinary values are transforms.
  */
@@ -99,10 +108,11 @@ const getLegacyCloudinaryUrl = (publicId, transformationsStr = '') => {
  */
 export const getCloudinaryUrl = (publicId, transformationsStr = '') => {
     if (!publicId) return null
-    if (isAzureImageId(publicId)) {
-        return getAzureUrl(publicId, transformationsStr)
+    const resolvedId = LEGACY_IMAGE_IDS[publicId] || publicId
+    if (isAzureImageId(resolvedId)) {
+        return getAzureUrl(resolvedId, transformationsStr)
     }
-    return getLegacyCloudinaryUrl(publicId, transformationsStr)
+    return getLegacyCloudinaryUrl(resolvedId, transformationsStr)
 }
 
 /**
@@ -114,9 +124,6 @@ export const getPictureUrl = (
 ) => {
     if (!pictureValue) return null
     if (pictureValue.startsWith('http')) return pictureValue
-    if (pictureValue === 'imgScott') {
-        return getCloudinaryUrl('scott_byrd', transformation)
-    }
     return getCloudinaryUrl(pictureValue, transformation)
 }
 
