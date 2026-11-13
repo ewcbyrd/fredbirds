@@ -24,8 +24,8 @@ A React-based website for the Fredericksburg Regional Bird Club, featuring event
 - **Image Storage**: Cloudinary CDN with automatic optimization
 - **Calendar**: react-big-calendar for event display
 - **Photo Gallery**: yet-another-react-lightbox
-- **Backend API**: Node.js API hosted on Heroku
-- **Database**: MongoDB with RestDB interface
+- **Backend API**: Node.js API on Azure App Service (`fredbirds-api.azurewebsites.net`)
+- **Database**: Azure DocumentDB Free Tier (Cosmos MongoDB vCore) via the API
 - **Deployment**: GitHub Pages with GitHub Actions
 
 ## 📸 Image Management System

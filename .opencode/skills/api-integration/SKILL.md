@@ -10,7 +10,7 @@ description: Backend API patterns, service file conventions, and error handling 
 - **ALL API calls MUST go through service files** in `src/services/`
 - **NEVER call APIs directly from components** -- always import from a service
 - Four service files exist:
-    - `restdbService.js` -- Main backend API (Heroku/MongoDB)
+    - `restdbService.js` -- Main backend API (Azure App Service / DocumentDB Free Tier)
     - `ebirdService.js` -- eBird API integration
     - `cloudinaryService.js` -- Image upload/management
     - `weatherService.js` -- OpenWeather API
