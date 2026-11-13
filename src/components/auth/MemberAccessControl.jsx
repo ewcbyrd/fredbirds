@@ -152,8 +152,8 @@ const MemberAccessControl = ({
                         color="text.secondary"
                         sx={{ mb: 3, maxWidth: 500 }}
                     >
-                        You're logged in, but you need to register as a member
-                        to access club features.
+                        You&apos;re logged in, but you still need to join the
+                        club to unlock member features. Joining is free.
                     </Typography>
                     <Button
                         variant="contained"
@@ -161,7 +161,7 @@ const MemberAccessControl = ({
                         startIcon={<HowToReg />}
                         onClick={() => setJoinDialogOpen(true)}
                     >
-                        Register to Join
+                        Join the club
                     </Button>
                     <JoinDialog
                         open={joinDialogOpen}

@@ -179,7 +179,7 @@ export const generateWelcomeEmail = (firstName, email) => {
     const content = `
         <p>Hi <strong>${firstName}</strong>,</p>
         <p>Welcome to the Fredericksburg Birding Club &mdash; you're now an official member!</p>
-        <p>You're registered with <strong>${email}</strong> and can use the account you're already logged in with to access member features on <a href="https://www.fredbirds.com">www.fredbirds.com</a>.</p>
+        <p>You're registered as a club member with <strong>${email}</strong>. Log in on <a href="https://www.fredbirds.com">www.fredbirds.com</a> with that same email for full website access.</p>
         <p>As a member you can:</p>
         <ul>
             <li><strong>Member directory</strong> &mdash; find and connect with fellow club members</li>

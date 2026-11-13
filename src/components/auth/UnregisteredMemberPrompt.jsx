@@ -113,12 +113,12 @@ const UnregisteredMemberPrompt = () => {
                                 as <strong>{user.email}</strong>
                             </>
                         ) : null}
-                        , but we don&apos;t have a membership registration for
-                        that account yet.
+                        , but you&apos;re not on the club membership list yet.
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Registration is free and only takes a minute. Your
-                        membership will be linked to this logged-in account.
+                        Join for free so we can add you as a member. Your login
+                        already gives full website access once you&apos;re a
+                        member.
                     </Typography>
                 </DialogContent>
 
@@ -140,7 +140,7 @@ const UnregisteredMemberPrompt = () => {
                         startIcon={<HowToRegIcon />}
                         onClick={handleRegister}
                     >
-                        Register now
+                        Finish joining
                     </Button>
                 </DialogActions>
             </Dialog>
