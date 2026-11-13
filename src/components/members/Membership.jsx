@@ -13,11 +13,13 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EmailIcon from '@mui/icons-material/Email';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import JoinForm from './JoinForm';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import JoinDialog from '../auth/JoinDialog';
 import PageContainer from '../common/PageContainer';
 
 export default function Membership() {
     const [openMailDialog, setOpenMailDialog] = useState(false);
+    const [joinDialogOpen, setJoinDialogOpen] = useState(false);
 
     const handleOpenMailDialog = () => setOpenMailDialog(true);
     const handleCloseMailDialog = () => setOpenMailDialog(false);
@@ -33,20 +35,12 @@ export default function Membership() {
             <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
                 Whether you're just starting to notice the birds in your
                 backyard or you're a seasoned birder, the Fredericksburg Birding
-                Club welcomes you. <strong>Joining is free</strong> — log in
-                first, then complete the registration form below.
+                Club welcomes you. <strong>Joining is free</strong> — no login
+                required. After you join, you can create a login with the same
+                email for full website access.
             </Typography>
 
-            {/* Side-by-Side Layout: Benefits + Registration Form */}
-            <Box
-                sx={{
-                    display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-                    gap: { xs: 3, md: 4 },
-                    alignItems: 'start',
-                    mb: 4
-                }}
-            >
+            <Box sx={{ mb: 4 }}>
                 {/* Membership Benefits Card */}
                 <Card
                     sx={{
@@ -58,10 +52,7 @@ export default function Membership() {
                         transition: 'box-shadow 0.3s ease',
                         '&:hover': {
                             boxShadow: '0 6px 20px rgba(44, 95, 45, 0.3)'
-                        },
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column'
+                        }
                     }}
                 >
                     <Box
@@ -79,17 +70,38 @@ export default function Membership() {
                             variant="body2"
                             sx={{ mt: 1, opacity: 0.9 }}
                         >
-                            All members enjoy full access to club activities
+                            Join free now, then create a login for full website
+                            access.
                         </Typography>
                     </Box>
-                    <CardContent sx={{ p: { xs: 3, md: 4 }, flexGrow: 1 }}>
+                    <CardContent sx={{ p: { xs: 3, md: 4 } }}>
                         <Box sx={{ mb: 3 }}>
                             <Typography
                                 variant="subtitle1"
                                 sx={{ mb: 2, fontWeight: 600 }}
                             >
-                                All Members:
+                                When you join:
                             </Typography>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'flex-start',
+                                    mb: 2
+                                }}
+                            >
+                                <CheckCircleIcon
+                                    sx={{
+                                        color: 'primary.main',
+                                        mr: 2,
+                                        mt: 0.5,
+                                        flexShrink: 0
+                                    }}
+                                />
+                                <Typography variant="body1">
+                                    Added as a club member in the member
+                                    directory
+                                </Typography>
+                            </Box>
                             <Box
                                 sx={{
                                     display: 'flex',
@@ -126,8 +138,8 @@ export default function Membership() {
                                     }}
                                 />
                                 <Typography variant="body1">
-                                    Participation in all club field trips,
-                                    events and programs
+                                    Welcome at club field trips, events and
+                                    programs
                                 </Typography>
                             </Box>
                             <Box
@@ -146,28 +158,8 @@ export default function Membership() {
                                     }}
                                 />
                                 <Typography variant="body1">
-                                    Access to club web resources, sighting
-                                    reports and newsletters
-                                </Typography>
-                            </Box>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'flex-start',
-                                    mb: 2
-                                }}
-                            >
-                                <CheckCircleIcon
-                                    sx={{
-                                        color: 'primary.main',
-                                        mr: 2,
-                                        mt: 0.5,
-                                        flexShrink: 0
-                                    }}
-                                />
-                                <Typography variant="body1">
-                                    Access to club web resources, sighting
-                                    reports and newsletters
+                                    Option to create a free website login for
+                                    full site access
                                 </Typography>
                             </Box>
                         </Box>
@@ -183,7 +175,7 @@ export default function Membership() {
                                 variant="subtitle1"
                                 sx={{ mb: 1, fontWeight: 600 }}
                             >
-                                Optional Supporting Membership:
+                                Optional supporting dues:
                             </Typography>
                             <Typography
                                 variant="body2"
@@ -262,18 +254,36 @@ export default function Membership() {
                                     color: 'text.secondary'
                                 }}
                             >
-                                Dues are for the calendar year and serve as a
-                                donation to the club.
+                                Dues are optional. They cover the calendar year
+                                and serve as a donation to the club. They are
+                                not required to join or to use the website.
                             </Typography>
+                        </Box>
+
+                        <Box sx={{ textAlign: 'center', mt: 3 }}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                size="large"
+                                startIcon={<PersonAddIcon />}
+                                onClick={() => setJoinDialogOpen(true)}
+                                sx={{
+                                    py: 1.5,
+                                    px: 4,
+                                    fontSize: '1.05rem',
+                                    fontWeight: 600,
+                                    textTransform: 'none',
+                                    borderRadius: 50
+                                }}
+                            >
+                                Join the Club
+                            </Button>
                         </Box>
                     </CardContent>
                 </Card>
-
-                {/* Registration Form */}
-                <JoinForm />
             </Box>
 
-            {/* Alternative: Join by Mail */}
+            {/* Supporting dues by mail */}
             <Box sx={{ textAlign: 'center', mb: 2 }}>
                 <Button
                     variant="text"
@@ -286,7 +296,7 @@ export default function Membership() {
                         '&:hover': { color: 'primary.main' }
                     }}
                 >
-                    Prefer to join by mail?
+                    How to pay supporting dues by mail
                 </Button>
             </Box>
 
@@ -298,12 +308,14 @@ export default function Membership() {
                 fullWidth
             >
                 <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>
-                    Join by Mail
+                    Supporting Dues by Mail
                 </DialogTitle>
                 <DialogContent sx={{ mt: 2 }}>
                     <Typography variant="body1" paragraph sx={{ mt: 1 }}>
-                        To become a paid Member, send a check made out to{' '}
-                        <strong>Fredericksburg Birding Club</strong> to:
+                        Supporting dues are optional and are not required to
+                        join. To pay by check, make it out to{' '}
+                        <strong>Fredericksburg Birding Club</strong> and mail
+                        it to:
                     </Typography>
 
                     <Box
@@ -341,7 +353,7 @@ export default function Membership() {
                             variant="body2"
                             sx={{ fontWeight: 600, mb: 1 }}
                         >
-                            Membership Dues:
+                            Optional supporting dues:
                         </Typography>
                         <Typography variant="body2">
                             {'\u2022'} Individual: $20 per year
@@ -383,7 +395,7 @@ export default function Membership() {
                         Close
                     </Button>
                     <Button
-                        href="mailto:admin@fredbirds.com?subject=Membership Inquiry"
+                        href="mailto:admin@fredbirds.com?subject=Supporting Dues Inquiry"
                         variant="contained"
                         color="primary"
                     >
@@ -391,6 +403,11 @@ export default function Membership() {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <JoinDialog
+                open={joinDialogOpen}
+                onClose={() => setJoinDialogOpen(false)}
+            />
         </PageContainer>
     );
 }

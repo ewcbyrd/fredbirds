@@ -11,10 +11,8 @@ import {
     CardContent
 } from '@mui/material'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
-import LoginIcon from '@mui/icons-material/Login'
 import { registerMember } from '../../services/restdbService'
 import { sendWelcomeEmail } from '../../utils/emailTemplates'
-import { startLogin } from '../../utils/authUtils'
 
 /**
  * Parse a full name string into first and last name.
@@ -61,14 +59,15 @@ const namesFromAuth0User = (user) => {
 }
 
 const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
-    const { user, isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
+    const { user, isAuthenticated, isLoading } = useAuth0()
 
-    const auth0Email = user?.email || ''
     const { first: auth0First, last: auth0Last } = namesFromAuth0User(user)
+    const auth0Email = user?.email || ''
 
     const [formData, setFormData] = useState({
         first: auth0First,
         last: auth0Last,
+        email: auth0Email,
         phone: '',
         website: '' // honeypot field — bots fill this, humans don't see it
     })
@@ -76,7 +75,7 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
     const [error, setError] = useState(null)
     const [success, setSuccess] = useState(false)
 
-    // Prefill once Auth0 user is available; never keep an email in name fields
+    // Prefill from Auth0 when available; never keep an email in name fields
     useEffect(() => {
         if (!user) return
         const { first, last } = namesFromAuth0User(user)
@@ -84,9 +83,11 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
             ...prev,
             first:
                 !prev.first || looksLikeEmail(prev.first) ? first : prev.first,
-            last: !prev.last || looksLikeEmail(prev.last) ? last : prev.last
+            last: !prev.last || looksLikeEmail(prev.last) ? last : prev.last,
+            // Logged-in membership must stay tied to the Auth0 email
+            email: user.email || prev.email || ''
         }))
-    }, [user?.sub, user?.given_name, user?.family_name, user?.name])
+    }, [user?.sub, user?.given_name, user?.family_name, user?.name, user?.email])
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -113,16 +114,23 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
     }
 
     const validateForm = () => {
-        if (!isAuthenticated || !auth0Email) {
-            setError('You must be logged in to register.')
-            return false
-        }
         if (!formData.first.trim()) {
             setError('First name is required')
             return false
         }
         if (!formData.last.trim()) {
             setError('Last name is required')
+            return false
+        }
+        if (!formData.email.trim()) {
+            setError('Email address is required')
+            return false
+        }
+        const emailInput = document.createElement('input')
+        emailInput.type = 'email'
+        emailInput.value = formData.email.trim()
+        if (!emailInput.checkValidity()) {
+            setError('Please enter a valid email address')
             return false
         }
         return true
@@ -134,7 +142,11 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
         setLoading(true)
         setError(null)
 
-        const email = auth0Email.trim().toLowerCase()
+        const email = (
+            isAuthenticated && auth0Email ? auth0Email : formData.email
+        )
+            .trim()
+            .toLowerCase()
 
         try {
             const result = await registerMember({
@@ -206,44 +218,6 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
         )
     }
 
-    if (!isAuthenticated) {
-        return (
-            <Card
-                sx={{
-                    boxShadow: embedded ? 'none' : '0 2px 8px rgba(0,0,0,0.08)',
-                    borderRadius: embedded ? 0 : 2,
-                    height: '100%'
-                }}
-            >
-                <CardContent sx={{ p: 4, textAlign: 'center' }}>
-                    <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                        Log in to register
-                    </Typography>
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 3 }}
-                    >
-                        Create or sign in to your account first, then complete
-                        your free club membership registration.
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        size="large"
-                        startIcon={<LoginIcon />}
-                        onClick={() =>
-                            startLogin(loginWithRedirect, {
-                                returnTo: '/join'
-                            })
-                        }
-                    >
-                        Log in
-                    </Button>
-                </CardContent>
-            </Card>
-        )
-    }
-
     if (success) {
         return (
             <Card
@@ -258,16 +232,23 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
                         Welcome to the club!
                     </Alert>
                     <Typography variant="body1" sx={{ textAlign: 'center' }}>
-                        You&apos;re registered as a member. Member features are
-                        ready to use with the account you&apos;re already logged
-                        in with.
+                        You&apos;re a member of the Fredericksburg Birding Club.
+                        {isAuthenticated
+                            ? ' Your login has full website access.'
+                            : ' Log in with the same email for full website access.'}
                     </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            mt: 3
+                        }}
+                    >
                         <Button
                             variant="contained"
                             onClick={() => window.location.assign('/')}
                         >
-                            Go to dashboard
+                            {isAuthenticated ? 'Go to dashboard' : 'Go to home'}
                         </Button>
                     </Box>
                 </CardContent>
@@ -300,11 +281,11 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
                 >
                     <PersonAddIcon sx={{ fontSize: 36, mb: 1 }} />
                     <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                        Register to Join
+                        Join the Club
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 1, opacity: 0.9 }}>
-                        Complete your membership for the account you&apos;re
-                        logged in with.
+                        Fill out the form to be added as a club member. It&apos;s
+                        free.
                     </Typography>
                 </Box>
             )}
@@ -357,11 +338,21 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
                         label="Email Address"
                         name="email"
                         type="email"
-                        value={auth0Email}
+                        value={
+                            isAuthenticated && auth0Email
+                                ? auth0Email
+                                : formData.email
+                        }
+                        onChange={handleChange}
                         required
                         fullWidth
-                        disabled
-                        helperText="Tied to your logged-in account"
+                        disabled={isAuthenticated}
+                        autoComplete="email"
+                        helperText={
+                            isAuthenticated
+                                ? 'Tied to your logged-in account'
+                                : 'Use this email when you create a login for full website access'
+                        }
                     />
 
                     <TextField
@@ -440,7 +431,7 @@ const JoinForm = ({ embedded = false, onSuccess, onBack }) => {
                                     sx={{ color: 'white' }}
                                 />
                             ) : (
-                                'Submit Registration'
+                                'Join the club'
                             )}
                         </Button>
                     </Box>
