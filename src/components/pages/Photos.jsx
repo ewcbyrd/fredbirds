@@ -17,9 +17,9 @@ import 'yet-another-react-lightbox/styles.css';
 import 'yet-another-react-lightbox/plugins/captions.css';
 import { getPhotos } from '../../services/restdbService';
 import {
-    getCloudinaryUrl,
+    getImageUrl,
     transformations
-} from '../../services/cloudinaryService';
+} from '../../services/imageService';
 import { formatPhotoDate } from '../../utils/dateUtils';
 import { useAuth0 } from '@auth0/auth0-react';
 import PhotoUploadForm from '../forms/PhotoUploadForm';
@@ -45,8 +45,13 @@ export default function Photos() {
 
             // Transform API data to match component format
             const transformedPhotos = data
-                .filter((photo) => photo.cloudinary_public_id)
+                .filter(
+                    (photo) =>
+                        photo.imageId || photo.cloudinary_public_id
+                )
                 .map((photo) => {
+                    const imageId =
+                        photo.imageId || photo.cloudinary_public_id
                     // Build caption from available metadata
                     const captionParts = [];
 
@@ -62,8 +67,10 @@ export default function Photos() {
                         captionParts.push(photo.location);
                     }
 
-                    if (photo.photoDate) {
-                        const formattedDate = formatPhotoDate(photo.photoDate);
+                    if (photo.photoDate || photo.photodate) {
+                        const formattedDate = formatPhotoDate(
+                            photo.photoDate || photo.photodate
+                        );
                         if (formattedDate) {
                             captionParts.push(formattedDate);
                         }
@@ -74,8 +81,8 @@ export default function Photos() {
                     }
 
                     return {
-                        src: getCloudinaryUrl(
-                            photo.cloudinary_public_id,
+                        src: getImageUrl(
+                            imageId,
                             transformations.optimized
                         ),
                         category: (photo.category || 'people').toLowerCase(),

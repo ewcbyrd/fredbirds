@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { useAuth0 } from '@auth0/auth0-react';
-import { uploadPhoto } from '../../services/cloudinaryService';
+import { uploadPhoto } from '../../services/imageService';
 import { getMemberByEmail } from '../../services/restdbService';
 
 const AUTH_ERROR_MESSAGE =

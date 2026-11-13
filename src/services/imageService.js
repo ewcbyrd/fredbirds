@@ -1,4 +1,4 @@
-// Image service: Azure Blob storage with metadata-backed gallery
+// Azure Blob image service (URLs + multipart upload)
 
 const api = (
     import.meta.env.VITE_API_BASE_URL ||
@@ -13,7 +13,7 @@ const getAzureBlobBaseUrl = () =>
 
 const AZURE_CONTAINERS = ['club-photos', 'event-photos', 'static']
 
-// Hardcoded / legacy Cloudinary IDs remapped during bulk migration
+// Hardcoded assets remapped during Cloudinary → Azure migration
 const LEGACY_IMAGE_IDS = {
     'Group.jpg': 'static/d80cff948fa521079dbf77af935f8022',
     'vso.png': 'static/0fbd392330691bdd120773abc6a561df',
@@ -22,21 +22,19 @@ const LEGACY_IMAGE_IDS = {
     imgScott: 'static/b070b966ac6fc1f34b15116d71682fdd'
 }
 
-/**
- * Size presets. Azure values are variant file names; legacy Cloudinary transform strings map too.
- */
 export const transformations = {
-    thumbnail: 'w_300,h_300,c_fill',
-    medium: 'w_800,h_600,c_fit',
-    hero: 'w_1200,h_800,c_fill',
-    optimized: 'f_auto,q_auto'
+    thumbnail: 'thumbnail',
+    medium: 'medium',
+    hero: 'hero',
+    optimized: 'optimized'
 }
 
-const AZURE_VARIANTS = {
+const VARIANT_ALIASES = {
     thumbnail: 'thumbnail',
     medium: 'medium',
     hero: 'hero',
     optimized: 'optimized',
+    // legacy Cloudinary transform strings still used by some call sites
     'w_300,h_300,c_fill': 'thumbnail',
     'w_800,h_600,c_fit': 'medium',
     'w_800,h_600,c_fill': 'medium',
@@ -55,29 +53,36 @@ const isAzureImageId = (publicId) => {
     )
 }
 
-const getAzureUrl = (imageId, transformation = '') => {
+/**
+ * Build a display URL for an Azure image id.
+ */
+export const getImageUrl = (publicId, variantOrTransform = 'optimized') => {
+    if (!publicId) return null
+    const resolvedId = LEGACY_IMAGE_IDS[publicId] || publicId
+
+    if (resolvedId.startsWith('http://') || resolvedId.startsWith('https://')) {
+        return resolvedId
+    }
+
+    if (!isAzureImageId(resolvedId)) {
+        console.warn('Unknown image id (expected Azure blob path):', resolvedId)
+        return null
+    }
+
     const baseUrl = getAzureBlobBaseUrl()
-    if (imageId.startsWith('http://') || imageId.startsWith('https://')) {
-        return imageId
-    }
-
     if (
-        imageId.includes('/original.') ||
-        /\.(webp|jpe?g|png|gif)$/i.test(imageId)
+        resolvedId.includes('/original.') ||
+        /\.(webp|jpe?g|png|gif)$/i.test(resolvedId)
     ) {
-        return `${baseUrl}/${imageId}`
+        return `${baseUrl}/${resolvedId}`
     }
 
-    const slash = imageId.indexOf('/')
-    if (slash <= 0) {
-        return `${baseUrl}/${imageId}`
-    }
-
-    const container = imageId.slice(0, slash)
-    const id = imageId.slice(slash + 1)
+    const slash = resolvedId.indexOf('/')
+    const container = resolvedId.slice(0, slash)
+    const id = resolvedId.slice(slash + 1)
     const variant =
-        AZURE_VARIANTS[transformation] ||
-        (transformation ? null : 'optimized') ||
+        VARIANT_ALIASES[variantOrTransform] ||
+        transformations[variantOrTransform] ||
         'optimized'
 
     if (variant === 'original') {
@@ -87,48 +92,17 @@ const getAzureUrl = (imageId, transformation = '') => {
     return `${baseUrl}/${container}/${id}/${variant}.webp`
 }
 
-/**
- * Build a display URL for an image id (Azure blob key).
- */
-export const getCloudinaryUrl = (publicId, transformationsStr = '') => {
-    if (!publicId) return null
-    const resolvedId = LEGACY_IMAGE_IDS[publicId] || publicId
-    if (isAzureImageId(resolvedId)) {
-        return getAzureUrl(resolvedId, transformationsStr)
-    }
-    // Legacy Cloudinary fallback during transition
-    const cloudName =
-        import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'doqy8jape'
-    const baseUrl = `https://res.cloudinary.com/${cloudName}/image/upload`
-    const transformPart = transformationsStr ? `/${transformationsStr}` : ''
-    return `${baseUrl}${transformPart}/${resolvedId}`
-}
-
-/**
- * Convert database picture values to display URLs.
- */
 export const getPictureUrl = (
     pictureValue,
     transformation = transformations.optimized
 ) => {
     if (!pictureValue) return null
     if (pictureValue.startsWith('http')) return pictureValue
-    return getCloudinaryUrl(pictureValue, transformation)
+    return getImageUrl(pictureValue, transformation)
 }
 
 /**
- * Single multipart upload to API (blob + metadata, no Mongo photo doc).
- * @param {File} file
- * @param {object} options
- * @param {string} options.accessToken
- * @param {string} [options.eventId] if set, uploads as event photo
- * @param {string} [options.header]
- * @param {string} [options.title]
- * @param {string} [options.description]
- * @param {string} [options.category]
- * @param {string} [options.contributor]
- * @param {string} [options.location]
- * @param {string} [options.photoDate]
+ * Single multipart upload (blob + metadata).
  */
 export const uploadPhoto = async (file, options = {}) => {
     if (!file) throw new Error('No file provided')
@@ -165,7 +139,10 @@ export const uploadPhoto = async (file, options = {}) => {
 
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('header', header || title || file.name.split('.')[0] || 'Photo')
+    formData.append(
+        'header',
+        header || title || file.name.split('.')[0] || 'Photo'
+    )
     if (description) formData.append('description', description)
     if (category) formData.append('category', category)
     if (contributor) formData.append('contributor', contributor)
@@ -192,12 +169,13 @@ export const uploadPhoto = async (file, options = {}) => {
     }
 
     const data = await response.json()
-    const imageId = data.imageId || data.cloudinary_public_id || data.photo?.imageId
+    const imageId =
+        data.imageId || data.cloudinary_public_id || data.photo?.imageId
 
     return {
         publicId: imageId,
         imageId,
-        url: getAzureUrl(imageId, 'optimized'),
+        url: getImageUrl(imageId, 'optimized'),
         width: data.width ?? null,
         height: data.height ?? null,
         size: data.size ?? file.size,
@@ -205,22 +183,9 @@ export const uploadPhoto = async (file, options = {}) => {
     }
 }
 
-/** @deprecated use uploadPhoto */
-export const uploadToCloudinary = async (file, folder = 'photos', accessToken) => {
-    const eventId = null
-    // folder retained for call-site compat; event uploads should use uploadPhoto with eventId
-    if (folder === 'event_photos') {
-        throw new Error(
-            'uploadToCloudinary no longer supports event_photos; use uploadPhoto({ eventId })'
-        )
-    }
-    return uploadPhoto(file, { accessToken })
-}
-
 export default {
-    getCloudinaryUrl,
+    getImageUrl,
     getPictureUrl,
     uploadPhoto,
-    uploadToCloudinary,
     transformations
 }

@@ -2,12 +2,12 @@ import React from 'react';
 import { Box, Typography, Card, CardContent } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import {
-    getCloudinaryUrl,
+    getImageUrl,
     transformations
-} from '../../services/cloudinaryService';
+} from '../../services/imageService';
 import PageContainer from '../common/PageContainer';
 
-const vsoLogo = getCloudinaryUrl(
+const vsoLogo = getImageUrl(
     'static/0fbd392330691bdd120773abc6a561df',
     transformations.optimized
 );

@@ -104,13 +104,6 @@ export const getPhotos = async () => {
     return get(url);
 };
 
-/** @deprecated Photo metadata is stored on Azure blobs via POST /photos/upload */
-export const savePhoto = async () => {
-    throw new Error(
-        'savePhoto is retired. Use uploadPhoto() from cloudinaryService instead.'
-    );
-};
-
 export const getFaqs = async () => {
     const url = `${api}faqs`;
     return get(url);
@@ -315,13 +308,6 @@ export const getEventPhotos = async (eventId) => {
     return get(url);
 };
 
-/** @deprecated Use uploadPhoto({ eventId }) from cloudinaryService instead */
-export const addEventPhoto = async () => {
-    throw new Error(
-        'addEventPhoto is retired. Use uploadPhoto({ eventId }) from cloudinaryService instead.'
-    );
-};
-
 // Member Registration Functions
 
 export const registerMember = async (registrationData) => {
@@ -401,7 +387,6 @@ export default {
     updateEvent,
     deleteEvent,
     getEventPhotos,
-    addEventPhoto,
     createAnnouncement,
     updateAnnouncement,
     deleteAnnouncement,

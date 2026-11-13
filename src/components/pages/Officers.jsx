@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import ContactTile from '../layout/ContactTile';
 import { getOfficers } from '../../services/restdbService';
-import { getPictureUrl } from '../../services/cloudinaryService';
+import { getPictureUrl } from '../../services/imageService';
 import PageContainer from '../common/PageContainer';
 
 export default function Officers() {
