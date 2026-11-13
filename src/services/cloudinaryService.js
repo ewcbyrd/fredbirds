@@ -1,6 +1,9 @@
 // Image service: Azure Blob (new uploads) with Cloudinary dual-read for existing assets
 
-const api = 'https://fredbirds-api.azurewebsites.net/'
+const api = (
+    import.meta.env.VITE_API_BASE_URL ||
+    'https://fredbirds-api.azurewebsites.net/'
+).replace(/\/?$/, '/')
 
 const getCloudinaryConfig = () => {
     const cloudName =

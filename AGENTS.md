@@ -189,6 +189,7 @@ All client-side env vars use the `VITE_` prefix (required by Vite):
 - `VITE_EBIRD_KEY`
 - `VITE_CLOUDINARY_UPLOAD_PRESET`, `VITE_CLOUDINARY_CLOUD_NAME` (legacy dual-read during Azure migration)
 - `VITE_AZURE_BLOB_BASE_URL` (e.g. `https://fredbirdsphotos.blob.core.windows.net`)
+- `VITE_API_BASE_URL` (optional; default production API, use `http://localhost:3000` for local upload testing)
 - `VITE_CONTACT_EMAIL_MEMBERSHIP`, `VITE_CONTACT_EMAIL_WEBSITE`, `VITE_CONTACT_EMAIL_EVENT`, `VITE_CONTACT_EMAIL_BIRDING`, `VITE_CONTACT_EMAIL_OTHER` (Contact Us topic recipients; fall back to club defaults if unset)
 
 Access via `import.meta.env.VITE_*`. Never commit `.env` or `.env.local` files.
