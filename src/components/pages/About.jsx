@@ -7,7 +7,10 @@ import {
 } from '../../services/cloudinaryService';
 import PageContainer from '../common/PageContainer';
 
-const vsoLogo = getCloudinaryUrl('vso.png', transformations.optimized);
+const vsoLogo = getCloudinaryUrl(
+    'static/0fbd392330691bdd120773abc6a561df',
+    transformations.optimized
+);
 
 export default function About() {
     const navigate = useNavigate();

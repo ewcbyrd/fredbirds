@@ -24,17 +24,18 @@ import {
 import { useAuth0 } from '@auth0/auth0-react';
 import {
     getCloudinaryUrl,
-    uploadToCloudinary
+    uploadPhoto
 } from '../../services/cloudinaryService';
-import {
-    getMemberByEmail,
-    getEventPhotos,
-    addEventPhoto
-} from '../../services/restdbService';
+import { getMemberByEmail, getEventPhotos } from '../../services/restdbService';
 import { formatPhotoDate } from '../../utils/dateUtils';
 
 const EventPhotoSection = ({ eventId }) => {
-    const { isAuthenticated, user, isLoading: authLoading } = useAuth0();
+    const {
+        isAuthenticated,
+        user,
+        isLoading: authLoading,
+        getIdTokenClaims
+    } = useAuth0();
     const [photos, setPhotos] = useState([]);
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -145,12 +146,15 @@ const EventPhotoSection = ({ eventId }) => {
         setUploadSuccess(false);
 
         try {
-            const uploadResult = await uploadToCloudinary(
-                uploadForm.file,
-                'event_photos'
-            );
-            await addEventPhoto(eventId, {
-                cloudinary_public_id: uploadResult.publicId,
+            const claims = await getIdTokenClaims();
+            const accessToken = claims?.__raw;
+            if (!accessToken) {
+                throw new Error('You must be logged in to upload photos');
+            }
+
+            await uploadPhoto(uploadForm.file, {
+                accessToken,
+                eventId,
                 header: uploadForm.header || uploadForm.file.name.split('.')[0],
                 description: uploadForm.description,
                 location: uploadForm.location,
