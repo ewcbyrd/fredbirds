@@ -370,15 +370,17 @@ Error generating stack: `+i.message+`
     `.trim()},Eoe=(e,t)=>{const n=`
         <p>Hi <strong>${e}</strong>,</p>
         <p>Welcome to the Fredericksburg Birding Club &mdash; you're now an official member!</p>
-        <p>You're registered as a club member with <strong>${t}</strong>. Log in on <a href="https://www.fredbirds.com">www.fredbirds.com</a> with that same email for full website access.</p>
+        <p>You're registered with <strong>${t}</strong>. Log in on <a href="https://www.fredbirds.com">www.fredbirds.com</a> with that same email for full website access, including your member dashboard.</p>
         <p>As a member you can:</p>
         <ul>
             <li><strong>Member directory</strong> &mdash; find and connect with fellow club members</li>
-            <li><strong>Events &amp; field trips</strong> &mdash; browse upcoming outings and register to attend</li>
-            <li><strong>Bird sightings</strong> &mdash; log your sightings and see what others are spotting nearby</li>
+            <li><strong>Your profile</strong> &mdash; add contact details, eBird or social links, and choose what appears in the directory</li>
+            <li><strong>Photo gallery</strong> &mdash; upload photos to share with the club</li>
+            <li><strong>Events &amp; field trips</strong> &mdash; browse upcoming outings and club activities</li>
         </ul>
-        <p>You'll also be added to the club mailing list so you'll stay in the loop on all club news and activities.</p>
-        <p>If you have any questions, reach out to us at 
+        <p>You'll also be added to the club mailing list so you'll stay in the loop on club news and activities.</p>
+        <p>Supporting dues are entirely optional ($20 Individual / $25 Family per year) and are not required to join or use the website. If you'd like to contribute, see <a href="https://www.fredbirds.com/membership">www.fredbirds.com/membership</a> for details.</p>
+        <p>If you have any questions, reach out to us at
         <a href="mailto:admin@fredbirds.com">admin@fredbirds.com</a>.</p>
         <p>Welcome aboard &mdash; we look forward to birding with you!<br/>
         Fredericksburg Birding Club<br/>
