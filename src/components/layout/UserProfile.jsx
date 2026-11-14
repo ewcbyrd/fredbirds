@@ -13,7 +13,6 @@ import {
 import {
     AccountCircle,
     Logout,
-    Settings,
     EventNote,
     Login as LoginIcon,
     HowToReg
@@ -201,13 +200,6 @@ const UserProfile = () => {
                     >
                         <EventNote fontSize="small" sx={{ mr: 1 }} />
                         Officer Tools
-                    </MenuItem>
-                )}
-
-                {hasAccess(ACCESS_LEVELS.ADMIN) && (
-                    <MenuItem onClick={() => handleMenuItemClick('/admin')}>
-                        <Settings fontSize="small" sx={{ mr: 1 }} />
-                        Admin Panel
                     </MenuItem>
                 )}
 

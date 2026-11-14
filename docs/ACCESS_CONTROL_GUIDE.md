@@ -18,12 +18,12 @@ This guide explains how to implement and use the access control system for your 
 
 ### 3. **Officer** (Level 2)
 - **Who**: Club officers, board members, coordinators
-- **Access**: All member content + event management, announcements, member directory
-- **Restrictions**: Cannot access system admin tools
+- **Access**: All member content + Officer Tools (events, announcements, member roster/roles)
+- **Restrictions**: Cannot assign the admin role (unless they are also an admin)
 
 ### 4. **Admin** (Level 3)
-- **Who**: System administrators, club presidents
-- **Access**: Full access to all features + user management, system settings
+- **Who**: Club administrators (e.g. web master, president)
+- **Access**: Full access to all features, including Officer Tools (admins inherit officer access) and assigning any member role
 - **Restrictions**: None
 
 ## Implementation Components
@@ -66,10 +66,10 @@ import { ACCESS_LEVELS } from '../hooks/useUserRole'
 
 // Hide completely if no access (no message)
 <AccessControl 
-  requiredLevel={ACCESS_LEVELS.ADMIN}
+  requiredLevel={ACCESS_LEVELS.OFFICER}
   showMessage={false}
 >
-  <AdminPanel />
+  <Button onClick={handleDeleteEvent}>Delete Event</Button>
 </AccessControl>
 ```
 
@@ -148,15 +148,17 @@ POST /api/user-role
 ### 1. Protecting Routes
 ```jsx
 // In App.jsx
-import AccessControl from './AccessControl'
+import MemberAccessControl from './components/auth/MemberAccessControl'
 import { ACCESS_LEVELS } from './hooks/useUserRole'
 
-<Route path="/admin" element={
-  <AccessControl requiredLevel={ACCESS_LEVELS.ADMIN}>
-    <AdminPanel />
-  </AccessControl>
+<Route path="/officer-tools" element={
+  <MemberAccessControl requiredLevel={ACCESS_LEVELS.OFFICER}>
+    <OfficerTools />
+  </MemberAccessControl>
 } />
 ```
+
+Club ops live on Officer Tools (`/officer-tools`). There is no separate Admin Panel route; the `admin` access level still exists for role assignment and future admin-only gates.
 
 ### 2. Conditional Menu Items
 ```jsx
