@@ -1,83 +1,249 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
     Box,
     Typography,
-    Grid,
-    Card,
-    CardMedia,
     Tabs,
     Tab,
     Button,
     CircularProgress,
     Alert
-} from '@mui/material';
-import Lightbox from 'yet-another-react-lightbox';
-import Captions from 'yet-another-react-lightbox/plugins/captions';
-import 'yet-another-react-lightbox/styles.css';
-import 'yet-another-react-lightbox/plugins/captions.css';
-import { getPhotos } from '../../services/restdbService';
+} from '@mui/material'
+import Lightbox from 'yet-another-react-lightbox'
+import Captions from 'yet-another-react-lightbox/plugins/captions'
+import 'yet-another-react-lightbox/styles.css'
+import 'yet-another-react-lightbox/plugins/captions.css'
+import { getPhotos } from '../../services/restdbService'
 import {
     getImageUrl,
     transformations
-} from '../../services/imageService';
-import { formatPhotoDate } from '../../utils/dateUtils';
-import { useAuth0 } from '@auth0/auth0-react';
-import PhotoUploadForm from '../forms/PhotoUploadForm';
-import PageContainer from '../common/PageContainer';
+} from '../../services/imageService'
+import { formatPhotoDate } from '../../utils/dateUtils'
+import { useAuth0 } from '@auth0/auth0-react'
+import PhotoUploadForm from '../forms/PhotoUploadForm'
+import PageContainer from '../common/PageContainer'
+
+const CATEGORIES = ['people', 'places', 'birds']
+const CATEGORY_LABELS = ['People', 'Places', 'Birds']
+const EAGER_LOAD_COUNT = 3
+
+const PhotoTile = ({ photo, index, onOpen }) => {
+    const [loaded, setLoaded] = useState(false)
+    const eager = index < EAGER_LOAD_COUNT
+    const subtitle = [photo.location, photo.contributor]
+        .filter(Boolean)
+        .join(' · ')
+
+    return (
+        <Box
+            component="button"
+            type="button"
+            onClick={() => onOpen(index)}
+            aria-label={`View ${photo.title}`}
+            sx={{
+                display: 'block',
+                width: '100%',
+                p: 0,
+                mb: 2,
+                border: 'none',
+                background: 'none',
+                textAlign: 'left',
+                cursor: 'pointer',
+                breakInside: 'avoid',
+                WebkitColumnBreakInside: 'avoid',
+                pageBreakInside: 'avoid',
+                borderRadius: 2,
+                overflow: 'hidden',
+                bgcolor: 'grey.100',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+                transition:
+                    'transform 0.25s ease, box-shadow 0.25s ease, opacity 0.4s ease',
+                opacity: 0,
+                animation: 'photoTileIn 0.45s ease forwards',
+                animationDelay: `${Math.min(index, 12) * 40}ms`,
+                '@keyframes photoTileIn': {
+                    from: {
+                        opacity: 0,
+                        transform: 'translateY(10px)'
+                    },
+                    to: {
+                        opacity: 1,
+                        transform: 'translateY(0)'
+                    }
+                },
+                '@media (prefers-reduced-motion: reduce)': {
+                    animation: 'none',
+                    opacity: 1,
+                    transition: 'none'
+                },
+                '@media (hover: hover)': {
+                    '&:hover': {
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.14)',
+                        transform: 'translateY(-3px)'
+                    },
+                    '&:hover .photo-overlay': {
+                        opacity: 1
+                    }
+                },
+                '&:focus-visible': {
+                    outline: '2px solid',
+                    outlineColor: 'primary.main',
+                    outlineOffset: 2
+                }
+            }}
+        >
+            <Box sx={{ position: 'relative', lineHeight: 0 }}>
+                <Box
+                    component="img"
+                    src={photo.thumbSrc}
+                    alt={photo.title}
+                    loading={eager ? 'eager' : 'lazy'}
+                    decoding="async"
+                    onLoad={() => setLoaded(true)}
+                    sx={{
+                        width: '100%',
+                        height: 'auto',
+                        maxHeight: { xs: 520, md: 640 },
+                        objectFit: 'cover',
+                        display: 'block',
+                        opacity: loaded ? 1 : 0,
+                        transition: 'opacity 0.35s ease',
+                        '@media (prefers-reduced-motion: reduce)': {
+                            opacity: 1,
+                            transition: 'none'
+                        }
+                    }}
+                />
+
+                {/* Desktop hover caption overlay */}
+                <Box
+                    className="photo-overlay"
+                    sx={{
+                        display: { xs: 'none', md: 'flex' },
+                        position: 'absolute',
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        flexDirection: 'column',
+                        justifyContent: 'flex-end',
+                        p: 1.5,
+                        background:
+                            'linear-gradient(transparent, rgba(0,0,0,0.72))',
+                        color: 'common.white',
+                        opacity: 0,
+                        transition: 'opacity 0.25s ease',
+                        '@media (prefers-reduced-motion: reduce)': {
+                            transition: 'none'
+                        }
+                    }}
+                >
+                    <Typography
+                        variant="subtitle2"
+                        sx={{
+                            fontWeight: 600,
+                            lineHeight: 1.3,
+                            textShadow: '0 1px 2px rgba(0,0,0,0.4)'
+                        }}
+                    >
+                        {photo.title}
+                    </Typography>
+                    {subtitle && (
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                opacity: 0.9,
+                                mt: 0.25,
+                                display: 'block'
+                            }}
+                        >
+                            {subtitle}
+                        </Typography>
+                    )}
+                </Box>
+            </Box>
+
+            {/* Mobile / tablet always-visible caption */}
+            <Box
+                sx={{
+                    display: { xs: 'block', md: 'none' },
+                    px: 1.5,
+                    py: 1.25,
+                    bgcolor: 'background.paper'
+                }}
+            >
+                <Typography
+                    variant="subtitle2"
+                    sx={{
+                        fontWeight: 600,
+                        color: 'text.primary',
+                        lineHeight: 1.3
+                    }}
+                >
+                    {photo.title}
+                </Typography>
+                {subtitle && (
+                    <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: 'block', mt: 0.25 }}
+                    >
+                        {subtitle}
+                    </Typography>
+                )}
+            </Box>
+        </Box>
+    )
+}
 
 export default function Photos() {
-    const { isAuthenticated } = useAuth0();
-    const [index, setIndex] = useState(-1);
-    const [activeTab, setActiveTab] = useState(0);
-    const [photos, setPhotos] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+    const { isAuthenticated } = useAuth0()
+    const [index, setIndex] = useState(-1)
+    const [activeTab, setActiveTab] = useState(0)
+    const [photos, setPhotos] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+    const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
 
     useEffect(() => {
-        loadPhotos();
-    }, []);
+        loadPhotos()
+    }, [])
 
     const loadPhotos = async () => {
         try {
-            setLoading(true);
-            const data = await getPhotos();
+            setLoading(true)
+            const data = await getPhotos()
 
-            // Transform API data to match component format
             const transformedPhotos = data
                 .filter(
-                    (photo) =>
-                        photo.imageId || photo.cloudinary_public_id
+                    (photo) => photo.imageId || photo.cloudinary_public_id
                 )
                 .map((photo) => {
                     const imageId =
                         photo.imageId || photo.cloudinary_public_id
-                    // Build caption from available metadata
-                    const captionParts = [];
+                    const captionParts = []
 
                     if (photo.header) {
-                        captionParts.push(photo.header);
+                        captionParts.push(photo.header)
                     }
 
                     if (photo.description) {
-                        captionParts.push(photo.description);
+                        captionParts.push(photo.description)
                     }
 
                     if (photo.location) {
-                        captionParts.push(photo.location);
+                        captionParts.push(photo.location)
                     }
 
                     if (photo.photoDate || photo.photodate) {
                         const formattedDate = formatPhotoDate(
                             photo.photoDate || photo.photodate
-                        );
+                        )
                         if (formattedDate) {
-                            captionParts.push(formattedDate);
+                            captionParts.push(formattedDate)
                         }
                     }
 
                     if (photo.contributor) {
-                        captionParts.push(`Contributor: ${photo.contributor}`);
+                        captionParts.push(`Contributor: ${photo.contributor}`)
                     }
 
                     return {
@@ -85,37 +251,40 @@ export default function Photos() {
                             imageId,
                             transformations.optimized
                         ),
+                        thumbSrc: getImageUrl(
+                            imageId,
+                            transformations.medium
+                        ),
                         category: (photo.category || 'people').toLowerCase(),
                         title: photo.header || 'Photo',
+                        location: photo.location || '',
+                        contributor: photo.contributor || '',
                         description:
                             captionParts.length > 0
                                 ? captionParts.join(' • ')
                                 : undefined
-                    };
-                });
+                    }
+                })
 
-            setPhotos(transformedPhotos);
+            setPhotos(transformedPhotos)
         } catch (err) {
-            console.error('Error loading photos:', err);
-            setError(err.message || 'Failed to load photos');
-            setPhotos([]);
+            console.error('Error loading photos:', err)
+            setError(err.message || 'Failed to load photos')
+            setPhotos([])
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
+    }
 
-    const categories = ['people', 'places', 'birds'];
     const filteredPhotos = photos.filter(
-        (photo) => photo.category === categories[activeTab]
-    );
+        (photo) => photo.category === CATEGORIES[activeTab]
+    )
 
-    const handleTabChange = (event, newValue) => {
-        setActiveTab(newValue);
-    };
+    const categoryLabel = CATEGORY_LABELS[activeTab]
 
     if (loading) {
         return (
-            <PageContainer>
+            <PageContainer maxWidth={1400}>
                 <Box
                     display="flex"
                     justifyContent="center"
@@ -128,11 +297,11 @@ export default function Photos() {
                     </Typography>
                 </Box>
             </PageContainer>
-        );
+        )
     }
 
     return (
-        <PageContainer>
+        <PageContainer maxWidth={1400}>
             {error && (
                 <Alert
                     severity="error"
@@ -142,17 +311,24 @@ export default function Photos() {
                     {error}
                 </Alert>
             )}
+
             <Box
                 sx={{
                     display: 'flex',
-                    alignItems: 'center',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'stretch', sm: 'center' },
                     justifyContent: 'space-between',
+                    gap: 2,
                     mb: 3
                 }}
             >
                 <Typography
                     variant="h4"
-                    sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}
+                    sx={{
+                        fontWeight: 700,
+                        color: 'text.primary',
+                        mb: { xs: 0, sm: 0 }
+                    }}
                 >
                     Photo Gallery
                 </Typography>
@@ -161,6 +337,7 @@ export default function Photos() {
                         variant="contained"
                         color="primary"
                         onClick={() => setUploadDialogOpen(true)}
+                        sx={{ alignSelf: { xs: 'stretch', sm: 'auto' } }}
                     >
                         Upload Photo
                     </Button>
@@ -171,22 +348,23 @@ export default function Photos() {
                 sx={{
                     borderBottom: 1,
                     borderColor: 'divider',
-                    mb: 3,
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                    mb: 3
                 }}
             >
                 <Tabs
                     value={activeTab}
                     onChange={(e, newValue) => {
-                        setActiveTab(newValue);
-                        setIndex(-1); // Reset lightbox when switching tabs
+                        setActiveTab(newValue)
+                        setIndex(-1)
                     }}
+                    variant="scrollable"
+                    allowScrollButtonsMobile
                     sx={{
                         '& .MuiTab-root': {
                             textTransform: 'none',
                             fontSize: '1rem',
                             fontWeight: 600,
-                            minWidth: 120,
+                            minWidth: { xs: 96, sm: 120 },
                             '&.Mui-selected': {
                                 color: 'primary.main'
                             }
@@ -197,54 +375,59 @@ export default function Photos() {
                         }
                     }}
                 >
-                    <Tab label="People" />
-                    <Tab label="Places" />
-                    <Tab label="Birds" />
+                    {CATEGORY_LABELS.map((label) => (
+                        <Tab key={label} label={label} />
+                    ))}
                 </Tabs>
             </Box>
 
-            <Grid container spacing={2}>
-                {filteredPhotos.map((photo, idx) => (
-                    <Grid item xs={6} sm={4} md={3} lg={2} key={idx}>
-                        <Card
-                            sx={{
-                                cursor: 'pointer',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                                borderRadius: 2,
-                                overflow: 'hidden',
-                                transition: 'all 0.3s ease',
-                                '&:hover': {
-                                    boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-                                    transform: 'translateY(-4px)'
-                                }
-                            }}
-                            onClick={() => {
-                                // Find the index in the filtered photos array for lightbox
-                                const allPhotosIndex = photos.findIndex(
-                                    (p) => p.src === photo.src
-                                );
-                                setIndex(allPhotosIndex);
-                            }}
-                        >
-                            <CardMedia
-                                component="img"
-                                image={photo.src}
-                                alt={photo.title}
-                                sx={{
-                                    height: 250,
-                                    objectFit: 'cover'
-                                }}
-                            />
-                        </Card>
-                    </Grid>
-                ))}
-            </Grid>
+            {filteredPhotos.length === 0 ? (
+                <Box
+                    sx={{
+                        py: 8,
+                        textAlign: 'center',
+                        color: 'text.secondary'
+                    }}
+                >
+                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        No {categoryLabel.toLowerCase()} photos yet
+                    </Typography>
+                    <Typography variant="body2">
+                        Check back soon, or upload a photo if you are signed in.
+                    </Typography>
+                </Box>
+            ) : (
+                <Box
+                    key={activeTab}
+                    sx={{
+                        columnCount: { xs: 1, sm: 2, md: 3 },
+                        columnGap: { xs: 2, md: 2.5 },
+                        animation: 'galleryFade 0.35s ease',
+                        '@keyframes galleryFade': {
+                            from: { opacity: 0.4 },
+                            to: { opacity: 1 }
+                        },
+                        '@media (prefers-reduced-motion: reduce)': {
+                            animation: 'none'
+                        }
+                    }}
+                >
+                    {filteredPhotos.map((photo, idx) => (
+                        <PhotoTile
+                            key={`${photo.src}-${idx}`}
+                            photo={photo}
+                            index={idx}
+                            onOpen={setIndex}
+                        />
+                    ))}
+                </Box>
+            )}
 
             <Lightbox
                 open={index >= 0}
                 index={index}
                 close={() => setIndex(-1)}
-                slides={photos}
+                slides={filteredPhotos}
                 plugins={[Captions]}
             />
 
@@ -254,5 +437,5 @@ export default function Photos() {
                 onUploadSuccess={loadPhotos}
             />
         </PageContainer>
-    );
+    )
 }
