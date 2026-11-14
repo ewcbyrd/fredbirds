@@ -6,19 +6,32 @@ import {
     Tab,
     Button,
     CircularProgress,
-    Alert
+    Alert,
+    IconButton,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions
 } from '@mui/material'
+import {
+    Edit as EditIcon,
+    Delete as DeleteIcon
+} from '@mui/icons-material'
 import Lightbox from 'yet-another-react-lightbox'
 import Captions from 'yet-another-react-lightbox/plugins/captions'
 import 'yet-another-react-lightbox/styles.css'
 import 'yet-another-react-lightbox/plugins/captions.css'
+import { useAuth0 } from '@auth0/auth0-react'
 import { getPhotos } from '../../services/restdbService'
 import {
     getImageUrl,
-    transformations
+    transformations,
+    deletePhoto
 } from '../../services/imageService'
 import { formatPhotoDate } from '../../utils/dateUtils'
-import { useAuth0 } from '@auth0/auth0-react'
+import { canManagePhoto } from '../../utils/photoPermissions'
+import { useUserRole } from '../../hooks/useUserRole'
 import PhotoUploadForm from '../forms/PhotoUploadForm'
 import PageContainer from '../common/PageContainer'
 
@@ -26,7 +39,7 @@ const CATEGORIES = ['people', 'places', 'birds']
 const CATEGORY_LABELS = ['People', 'Places', 'Birds']
 const EAGER_LOAD_COUNT = 3
 
-const PhotoTile = ({ photo, index, onOpen }) => {
+const PhotoTile = ({ photo, index, onOpen, canManage, onEdit, onDelete }) => {
     const [loaded, setLoaded] = useState(false)
     const eager = index < EAGER_LOAD_COUNT
     const subtitle = [photo.location, photo.contributor]
@@ -35,19 +48,9 @@ const PhotoTile = ({ photo, index, onOpen }) => {
 
     return (
         <Box
-            component="button"
-            type="button"
-            onClick={() => onOpen(index)}
-            aria-label={`View ${photo.title}`}
             sx={{
-                display: 'block',
-                width: '100%',
-                p: 0,
+                position: 'relative',
                 mb: 2,
-                border: 'none',
-                background: 'none',
-                textAlign: 'left',
-                cursor: 'pointer',
                 breakInside: 'avoid',
                 WebkitColumnBreakInside: 'avoid',
                 pageBreakInside: 'avoid',
@@ -82,66 +85,116 @@ const PhotoTile = ({ photo, index, onOpen }) => {
                     },
                     '&:hover .photo-overlay': {
                         opacity: 1
+                    },
+                    '&:hover .photo-actions': {
+                        opacity: 1
                     }
-                },
-                '&:focus-visible': {
-                    outline: '2px solid',
-                    outlineColor: 'primary.main',
-                    outlineOffset: 2
                 }
             }}
         >
-            <Box sx={{ position: 'relative', lineHeight: 0 }}>
-                <Box
-                    component="img"
-                    src={photo.thumbSrc}
-                    alt={photo.title}
-                    loading={eager ? 'eager' : 'lazy'}
-                    decoding="async"
-                    onLoad={() => setLoaded(true)}
-                    sx={{
-                        width: '100%',
-                        height: 'auto',
-                        maxHeight: { xs: 520, md: 640 },
-                        objectFit: 'cover',
-                        display: 'block',
-                        opacity: loaded ? 1 : 0,
-                        transition: 'opacity 0.35s ease',
-                        '@media (prefers-reduced-motion: reduce)': {
-                            opacity: 1,
-                            transition: 'none'
-                        }
-                    }}
-                />
+            <Box
+                component="button"
+                type="button"
+                onClick={() => onOpen(index)}
+                aria-label={`View ${photo.title}`}
+                sx={{
+                    display: 'block',
+                    width: '100%',
+                    p: 0,
+                    border: 'none',
+                    background: 'none',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    '&:focus-visible': {
+                        outline: '2px solid',
+                        outlineColor: 'primary.main',
+                        outlineOffset: 2
+                    }
+                }}
+            >
+                <Box sx={{ position: 'relative', lineHeight: 0 }}>
+                    <Box
+                        component="img"
+                        src={photo.thumbSrc}
+                        alt={photo.title}
+                        loading={eager ? 'eager' : 'lazy'}
+                        decoding="async"
+                        onLoad={() => setLoaded(true)}
+                        sx={{
+                            width: '100%',
+                            height: 'auto',
+                            maxHeight: { xs: 520, md: 640 },
+                            objectFit: 'cover',
+                            display: 'block',
+                            opacity: loaded ? 1 : 0,
+                            transition: 'opacity 0.35s ease',
+                            '@media (prefers-reduced-motion: reduce)': {
+                                opacity: 1,
+                                transition: 'none'
+                            }
+                        }}
+                    />
 
-                {/* Desktop hover caption overlay */}
+                    <Box
+                        className="photo-overlay"
+                        sx={{
+                            display: { xs: 'none', md: 'flex' },
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            flexDirection: 'column',
+                            justifyContent: 'flex-end',
+                            p: 1.5,
+                            background:
+                                'linear-gradient(transparent, rgba(0,0,0,0.72))',
+                            color: 'common.white',
+                            opacity: 0,
+                            transition: 'opacity 0.25s ease',
+                            '@media (prefers-reduced-motion: reduce)': {
+                                transition: 'none'
+                            }
+                        }}
+                    >
+                        <Typography
+                            variant="subtitle2"
+                            sx={{
+                                fontWeight: 600,
+                                lineHeight: 1.3,
+                                textShadow: '0 1px 2px rgba(0,0,0,0.4)'
+                            }}
+                        >
+                            {photo.title}
+                        </Typography>
+                        {subtitle && (
+                            <Typography
+                                variant="caption"
+                                sx={{
+                                    opacity: 0.9,
+                                    mt: 0.25,
+                                    display: 'block'
+                                }}
+                            >
+                                {subtitle}
+                            </Typography>
+                        )}
+                    </Box>
+                </Box>
+
                 <Box
-                    className="photo-overlay"
                     sx={{
-                        display: { xs: 'none', md: 'flex' },
-                        position: 'absolute',
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        flexDirection: 'column',
-                        justifyContent: 'flex-end',
-                        p: 1.5,
-                        background:
-                            'linear-gradient(transparent, rgba(0,0,0,0.72))',
-                        color: 'common.white',
-                        opacity: 0,
-                        transition: 'opacity 0.25s ease',
-                        '@media (prefers-reduced-motion: reduce)': {
-                            transition: 'none'
-                        }
+                        display: { xs: 'block', md: 'none' },
+                        px: 1.5,
+                        py: 1.25,
+                        bgcolor: 'background.paper'
                     }}
                 >
                     <Typography
                         variant="subtitle2"
                         sx={{
                             fontWeight: 600,
-                            lineHeight: 1.3,
-                            textShadow: '0 1px 2px rgba(0,0,0,0.4)'
+                            color: 'text.primary',
+                            lineHeight: 1.3
                         }}
                     >
                         {photo.title}
@@ -149,11 +202,8 @@ const PhotoTile = ({ photo, index, onOpen }) => {
                     {subtitle && (
                         <Typography
                             variant="caption"
-                            sx={{
-                                opacity: 0.9,
-                                mt: 0.25,
-                                display: 'block'
-                            }}
+                            color="text.secondary"
+                            sx={{ display: 'block', mt: 0.25 }}
                         >
                             {subtitle}
                         </Typography>
@@ -161,47 +211,67 @@ const PhotoTile = ({ photo, index, onOpen }) => {
                 </Box>
             </Box>
 
-            {/* Mobile / tablet always-visible caption */}
-            <Box
-                sx={{
-                    display: { xs: 'block', md: 'none' },
-                    px: 1.5,
-                    py: 1.25,
-                    bgcolor: 'background.paper'
-                }}
-            >
-                <Typography
-                    variant="subtitle2"
+            {canManage && (
+                <Box
+                    className="photo-actions"
                     sx={{
-                        fontWeight: 600,
-                        color: 'text.primary',
-                        lineHeight: 1.3
+                        position: 'absolute',
+                        top: 8,
+                        right: 8,
+                        display: 'flex',
+                        gap: 0.5,
+                        opacity: { xs: 1, md: 0 },
+                        transition: 'opacity 0.2s ease',
+                        zIndex: 2
                     }}
                 >
-                    {photo.title}
-                </Typography>
-                {subtitle && (
-                    <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ display: 'block', mt: 0.25 }}
+                    <IconButton
+                        size="small"
+                        aria-label={`Edit ${photo.title}`}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onEdit(photo)
+                        }}
+                        sx={{
+                            bgcolor: 'rgba(255,255,255,0.92)',
+                            '&:hover': { bgcolor: 'common.white' }
+                        }}
                     >
-                        {subtitle}
-                    </Typography>
-                )}
-            </Box>
+                        <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                        size="small"
+                        aria-label={`Delete ${photo.title}`}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onDelete(photo)
+                        }}
+                        sx={{
+                            bgcolor: 'rgba(255,255,255,0.92)',
+                            color: 'error.main',
+                            '&:hover': { bgcolor: 'common.white' }
+                        }}
+                    >
+                        <DeleteIcon fontSize="small" />
+                    </IconButton>
+                </Box>
+            )}
         </Box>
     )
 }
 
 export default function Photos() {
-    const { isAuthenticated } = useAuth0()
+    const { isAuthenticated, user, getIdTokenClaims } = useAuth0()
+    const { isOfficer } = useUserRole()
     const [index, setIndex] = useState(-1)
     const [activeTab, setActiveTab] = useState(0)
     const [photos, setPhotos] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
+    const [editingPhoto, setEditingPhoto] = useState(null)
+    const [photoToDelete, setPhotoToDelete] = useState(null)
+    const [deleting, setDeleting] = useState(false)
 
     useEffect(() => {
         loadPhotos()
@@ -247,6 +317,7 @@ export default function Photos() {
                     }
 
                     return {
+                        imageId,
                         src: getImageUrl(
                             imageId,
                             transformations.optimized
@@ -257,9 +328,14 @@ export default function Photos() {
                         ),
                         category: (photo.category || 'people').toLowerCase(),
                         title: photo.header || 'Photo',
+                        header: photo.header || '',
+                        description: photo.description || '',
                         location: photo.location || '',
                         contributor: photo.contributor || '',
-                        description:
+                        photoDate: photo.photoDate || photo.photodate || '',
+                        uploadedBy: photo.uploadedBy || null,
+                        uploadedByEmail: photo.uploadedByEmail || null,
+                        caption:
                             captionParts.length > 0
                                 ? captionParts.join(' • ')
                                 : undefined
@@ -281,6 +357,49 @@ export default function Photos() {
     )
 
     const categoryLabel = CATEGORY_LABELS[activeTab]
+
+    const photoCanManage = (photo) =>
+        canManagePhoto({
+            isOfficer,
+            userSub: user?.sub,
+            userEmail: user?.email,
+            photo
+        })
+
+    const handleEditPhoto = (photo) => {
+        setIndex(-1)
+        setEditingPhoto({
+            ...photo,
+            title: photo.title || photo.header || ''
+        })
+    }
+
+    const handleDeleteRequest = (photo) => {
+        setIndex(-1)
+        setPhotoToDelete(photo)
+    }
+
+    const handleConfirmDelete = async () => {
+        if (!photoToDelete?.imageId) return
+
+        setDeleting(true)
+        setError(null)
+        try {
+            const claims = await getIdTokenClaims()
+            const accessToken = claims?.__raw
+            if (!accessToken) {
+                throw new Error('You must be logged in to delete photos')
+            }
+            await deletePhoto(photoToDelete.imageId, { accessToken })
+            setPhotoToDelete(null)
+            await loadPhotos()
+        } catch (err) {
+            console.error('Error deleting photo:', err)
+            setError(err.message || 'Failed to delete photo')
+        } finally {
+            setDeleting(false)
+        }
+    }
 
     if (loading) {
         return (
@@ -414,10 +533,13 @@ export default function Photos() {
                 >
                     {filteredPhotos.map((photo, idx) => (
                         <PhotoTile
-                            key={`${photo.src}-${idx}`}
+                            key={photo.imageId || `${photo.src}-${idx}`}
                             photo={photo}
                             index={idx}
                             onOpen={setIndex}
+                            canManage={photoCanManage(photo)}
+                            onEdit={handleEditPhoto}
+                            onDelete={handleDeleteRequest}
                         />
                     ))}
                 </Box>
@@ -427,7 +549,11 @@ export default function Photos() {
                 open={index >= 0}
                 index={index}
                 close={() => setIndex(-1)}
-                slides={filteredPhotos}
+                slides={filteredPhotos.map((photo) => ({
+                    src: photo.src,
+                    title: photo.title,
+                    description: photo.caption
+                }))}
                 plugins={[Captions]}
             />
 
@@ -436,6 +562,45 @@ export default function Photos() {
                 onClose={() => setUploadDialogOpen(false)}
                 onUploadSuccess={loadPhotos}
             />
+
+            <PhotoUploadForm
+                open={Boolean(editingPhoto)}
+                photo={editingPhoto}
+                onClose={() => setEditingPhoto(null)}
+                onUploadSuccess={loadPhotos}
+            />
+
+            <Dialog
+                open={Boolean(photoToDelete)}
+                onClose={() => !deleting && setPhotoToDelete(null)}
+            >
+                <DialogTitle>Delete photo?</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        This permanently removes
+                        {photoToDelete?.title
+                            ? ` "${photoToDelete.title}"`
+                            : ' this photo'}{' '}
+                        from the gallery. This cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={() => setPhotoToDelete(null)}
+                        disabled={deleting}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleConfirmDelete}
+                        color="error"
+                        variant="contained"
+                        disabled={deleting}
+                    >
+                        {deleting ? 'Deleting…' : 'Delete'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </PageContainer>
     )
 }
