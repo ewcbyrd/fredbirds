@@ -104,6 +104,15 @@ export const getPhotos = async () => {
     return get(url);
 };
 
+/**
+ * All event photos in one response (bulk). Do not replace with per-event loops.
+ * @returns {Promise<Array<object>>}
+ */
+export const getEventGalleryPhotos = async () => {
+    const url = `${api}photos/events`;
+    return get(url);
+};
+
 export const getFaqs = async () => {
     const url = `${api}faqs`;
     return get(url);
@@ -386,6 +395,8 @@ export default {
     createEvent,
     updateEvent,
     deleteEvent,
+    getPhotos,
+    getEventGalleryPhotos,
     getEventPhotos,
     createAnnouncement,
     updateAnnouncement,

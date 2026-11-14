@@ -27,7 +27,7 @@ import Captions from 'yet-another-react-lightbox/plugins/captions'
 import 'yet-another-react-lightbox/styles.css'
 import 'yet-another-react-lightbox/plugins/captions.css'
 import { useAuth0 } from '@auth0/auth0-react'
-import { getPhotos } from '../../services/restdbService'
+import { getPhotos, getEventGalleryPhotos } from '../../services/restdbService'
 import {
     getImageUrl,
     transformations,
@@ -43,7 +43,8 @@ const FILTERS = [
     { id: 'all', label: 'All' },
     { id: 'birds', label: 'Birds' },
     { id: 'people', label: 'People' },
-    { id: 'places', label: 'Places' }
+    { id: 'places', label: 'Places' },
+    { id: 'events', label: 'Events' }
 ]
 
 const EAGER_LOAD_COUNT = 3
@@ -139,7 +140,8 @@ const matchesSearch = (photo, searchTerm) => {
 
 const matchesFilter = (photo, activeFilter) => {
     if (activeFilter === 'all') return true
-    return photo.category === activeFilter
+    if (activeFilter === 'events') return photo.source === 'event'
+    return photo.source === 'club' && photo.category === activeFilter
 }
 
 const PhotoTile = ({ photo, index, onOpen, canManage, onEdit, onDelete }) => {
@@ -390,14 +392,42 @@ export default function Photos() {
             setLoading(true)
             setError(null)
 
-            // Single list call only. Do NOT fan out per-event photo fetches —
-            // that exhausted the API rate limit (500/15m) and took the site down.
-            const clubData = await getPhotos()
-            const clubPhotos = (clubData || [])
+            // Two list calls only (club + bulk event). Never fan out per-event.
+            const [clubResult, eventResult] = await Promise.allSettled([
+                getPhotos(),
+                getEventGalleryPhotos()
+            ])
+
+            if (clubResult.status === 'rejected') {
+                throw clubResult.reason
+            }
+
+            const clubPhotos = (clubResult.value || [])
                 .map((photo) => normalizePhoto(photo, { source: 'club' }))
                 .filter(Boolean)
 
-            setPhotos(clubPhotos)
+            let eventPhotos = []
+            if (eventResult.status === 'fulfilled') {
+                eventPhotos = (eventResult.value || [])
+                    .map((photo) =>
+                        normalizePhoto(photo, {
+                            source: 'event',
+                            eventId: photo.eventId,
+                            eventName: photo.eventName
+                        })
+                    )
+                    .filter(Boolean)
+            } else {
+                console.error(
+                    'Error loading event gallery photos:',
+                    eventResult.reason
+                )
+                setError(
+                    'Club photos loaded, but event photos could not be loaded.'
+                )
+            }
+
+            setPhotos([...clubPhotos, ...eventPhotos])
         } catch (err) {
             console.error('Error loading photos:', err)
             setError(err.message || 'Failed to load photos')
