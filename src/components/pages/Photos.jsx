@@ -27,11 +27,7 @@ import Captions from 'yet-another-react-lightbox/plugins/captions'
 import 'yet-another-react-lightbox/styles.css'
 import 'yet-another-react-lightbox/plugins/captions.css'
 import { useAuth0 } from '@auth0/auth0-react'
-import {
-    getPhotos,
-    getEvents,
-    getEventPhotosForEvents
-} from '../../services/restdbService'
+import { getPhotos } from '../../services/restdbService'
 import {
     getImageUrl,
     transformations,
@@ -47,8 +43,7 @@ const FILTERS = [
     { id: 'all', label: 'All' },
     { id: 'birds', label: 'Birds' },
     { id: 'people', label: 'People' },
-    { id: 'places', label: 'Places' },
-    { id: 'events', label: 'Events' }
+    { id: 'places', label: 'Places' }
 ]
 
 const EAGER_LOAD_COUNT = 3
@@ -144,8 +139,7 @@ const matchesSearch = (photo, searchTerm) => {
 
 const matchesFilter = (photo, activeFilter) => {
     if (activeFilter === 'all') return true
-    if (activeFilter === 'events') return photo.source === 'event'
-    return photo.source === 'club' && photo.category === activeFilter
+    return photo.category === activeFilter
 }
 
 const PhotoTile = ({ photo, index, onOpen, canManage, onEdit, onDelete }) => {
@@ -377,7 +371,6 @@ export default function Photos() {
     const [searchTerm, setSearchTerm] = useState('')
     const [photos, setPhotos] = useState([])
     const [loading, setLoading] = useState(true)
-    const [loadingEventPhotos, setLoadingEventPhotos] = useState(false)
     const [error, setError] = useState(null)
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
     const [editingPhoto, setEditingPhoto] = useState(null)
@@ -397,50 +390,20 @@ export default function Photos() {
             setLoading(true)
             setError(null)
 
+            // Single list call only. Do NOT fan out per-event photo fetches —
+            // that exhausted the API rate limit (500/15m) and took the site down.
             const clubData = await getPhotos()
             const clubPhotos = (clubData || [])
                 .map((photo) => normalizePhoto(photo, { source: 'club' }))
                 .filter(Boolean)
 
             setPhotos(clubPhotos)
-            setLoading(false)
-
-            setLoadingEventPhotos(true)
-            try {
-                const events = await getEvents()
-                const eventPhotoData = await getEventPhotosForEvents(
-                    events || []
-                )
-                const eventPhotos = eventPhotoData
-                    .map((photo) =>
-                        normalizePhoto(photo, {
-                            source: 'event',
-                            eventId: photo.eventId,
-                            eventName: photo.eventName
-                        })
-                    )
-                    .filter(Boolean)
-
-                setPhotos((prev) => {
-                    const clubOnly = prev.filter((p) => p.source === 'club')
-                    return [...clubOnly, ...eventPhotos]
-                })
-            } catch (eventErr) {
-                console.error('Error loading event photos:', eventErr)
-                setError(
-                    (prev) =>
-                        prev ||
-                        'Club photos loaded, but event photos could not be loaded.'
-                )
-            } finally {
-                setLoadingEventPhotos(false)
-            }
         } catch (err) {
             console.error('Error loading photos:', err)
             setError(err.message || 'Failed to load photos')
             setPhotos([])
+        } finally {
             setLoading(false)
-            setLoadingEventPhotos(false)
         }
     }
 
@@ -634,27 +597,9 @@ export default function Photos() {
                 ))}
             </Stack>
 
-            <Box
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1.5,
-                    mb: 3,
-                    minHeight: 24
-                }}
-            >
-                <Typography variant="body2" color="text.secondary">
-                    Showing {visiblePhotos.length} of {photos.length} photos
-                </Typography>
-                {loadingEventPhotos && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <CircularProgress size={14} />
-                        <Typography variant="caption" color="text.secondary">
-                            Loading event photos…
-                        </Typography>
-                    </Box>
-                )}
-            </Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Showing {visiblePhotos.length} of {photos.length} photos
+            </Typography>
 
             {visiblePhotos.length === 0 ? (
                 <Box
