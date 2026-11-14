@@ -53,64 +53,9 @@ export const getEventsByYear = async (year) => {
     return get(url);
 };
 
-export const getEvents = async () => {
-    const url = `${api}events`;
-    return get(url);
-};
-
 export const getFutureEvents = async (currentDate, months = 3) => {
     const url = `${api}events/future/${months}`;
     return get(url);
-};
-
-/**
- * Fetch photos for many events with limited concurrency.
- * GET /events does not embed photos, so each event needs its own request.
- *
- * @param {Array<{_id: string, event?: string}>} events
- * @param {number} [concurrency=12]
- * @returns {Promise<Array<object>>} flat list of photos with eventId / eventName
- */
-export const getEventPhotosForEvents = async (events = [], concurrency = 12) => {
-    if (!Array.isArray(events) || events.length === 0) {
-        return [];
-    }
-
-    const results = [];
-    let nextIndex = 0;
-
-    const worker = async () => {
-        while (nextIndex < events.length) {
-            const current = events[nextIndex];
-            nextIndex += 1;
-            if (!current?._id) continue;
-
-            try {
-                const data = await getEventPhotos(current._id);
-                const photos = Array.isArray(data)
-                    ? data
-                    : data?.photos || [];
-                photos.forEach((photo) => {
-                    results.push({
-                        ...photo,
-                        eventId: current._id,
-                        eventName: current.event || ''
-                    });
-                });
-            } catch (err) {
-                console.error(
-                    `Error loading photos for event ${current._id}:`,
-                    err
-                );
-            }
-        }
-    };
-
-    const poolSize = Math.min(concurrency, events.length);
-    await Promise.all(
-        Array.from({ length: poolSize }, () => worker())
-    );
-    return results;
 };
 
 export const getAnnouncements = async () => {
@@ -418,9 +363,7 @@ export const updateLocation = async (locationId, locationData) => {
 
 export default {
     getEventsByYear,
-    getEvents,
     getFutureEvents,
-    getEventPhotosForEvents,
     getAnnouncements,
     getNewsletters,
     saveMember,
