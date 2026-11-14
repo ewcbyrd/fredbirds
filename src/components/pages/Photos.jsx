@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react'
 import {
     Box,
     Typography,
-    Tabs,
-    Tab,
     Button,
     CircularProgress,
     Alert,
@@ -12,18 +10,28 @@ import {
     DialogTitle,
     DialogContent,
     DialogContentText,
-    DialogActions
+    DialogActions,
+    TextField,
+    InputAdornment,
+    Chip,
+    Stack
 } from '@mui/material'
 import {
     Edit as EditIcon,
-    Delete as DeleteIcon
+    Delete as DeleteIcon,
+    Search as SearchIcon,
+    Clear as ClearIcon
 } from '@mui/icons-material'
 import Lightbox from 'yet-another-react-lightbox'
 import Captions from 'yet-another-react-lightbox/plugins/captions'
 import 'yet-another-react-lightbox/styles.css'
 import 'yet-another-react-lightbox/plugins/captions.css'
 import { useAuth0 } from '@auth0/auth0-react'
-import { getPhotos } from '../../services/restdbService'
+import {
+    getPhotos,
+    getEvents,
+    getEventPhotosForEvents
+} from '../../services/restdbService'
 import {
     getImageUrl,
     transformations,
@@ -35,14 +43,115 @@ import { useUserRole } from '../../hooks/useUserRole'
 import PhotoUploadForm from '../forms/PhotoUploadForm'
 import PageContainer from '../common/PageContainer'
 
-const CATEGORIES = ['people', 'places', 'birds']
-const CATEGORY_LABELS = ['People', 'Places', 'Birds']
+const FILTERS = [
+    { id: 'all', label: 'All' },
+    { id: 'birds', label: 'Birds' },
+    { id: 'people', label: 'People' },
+    { id: 'places', label: 'Places' },
+    { id: 'events', label: 'Events' }
+]
+
 const EAGER_LOAD_COUNT = 3
+
+const buildCaption = (photo) => {
+    const captionParts = []
+
+    if (photo.header) {
+        captionParts.push(photo.header)
+    }
+    if (photo.description) {
+        captionParts.push(photo.description)
+    }
+    if (photo.eventName) {
+        captionParts.push(`Event: ${photo.eventName}`)
+    }
+    if (photo.location) {
+        captionParts.push(photo.location)
+    }
+    if (photo.photoDate || photo.photodate) {
+        const formattedDate = formatPhotoDate(
+            photo.photoDate || photo.photodate
+        )
+        if (formattedDate) {
+            captionParts.push(formattedDate)
+        }
+    }
+    if (photo.contributor) {
+        captionParts.push(`Contributor: ${photo.contributor}`)
+    }
+
+    return captionParts.length > 0 ? captionParts.join(' • ') : undefined
+}
+
+const normalizePhoto = (photo, { source, eventId = null, eventName = '' }) => {
+    const imageId = photo.imageId || photo.cloudinary_public_id
+    if (!imageId) return null
+
+    const header = photo.header || ''
+    const description = photo.description || ''
+    const location = photo.location || ''
+    const contributor = photo.contributor || ''
+    const photoDate = photo.photoDate || photo.photodate || ''
+    const resolvedEventName = eventName || photo.eventName || ''
+
+    return {
+        imageId,
+        src: getImageUrl(imageId, transformations.optimized),
+        thumbSrc: getImageUrl(imageId, transformations.medium),
+        category:
+            source === 'club'
+                ? (photo.category || 'people').toLowerCase()
+                : null,
+        source,
+        eventId: eventId || photo.eventId || null,
+        eventName: resolvedEventName,
+        title: header || 'Photo',
+        header,
+        description,
+        location,
+        contributor,
+        photoDate,
+        uploadedBy: photo.uploadedBy || null,
+        uploadedByEmail: photo.uploadedByEmail || null,
+        caption: buildCaption({
+            header,
+            description,
+            location,
+            contributor,
+            photoDate,
+            eventName: resolvedEventName
+        })
+    }
+}
+
+const matchesSearch = (photo, searchTerm) => {
+    if (!searchTerm) return true
+    const haystack = [
+        photo.header,
+        photo.title,
+        photo.description,
+        photo.location,
+        photo.contributor,
+        photo.eventName,
+        photo.photoDate
+    ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+
+    return haystack.includes(searchTerm)
+}
+
+const matchesFilter = (photo, activeFilter) => {
+    if (activeFilter === 'all') return true
+    if (activeFilter === 'events') return photo.source === 'event'
+    return photo.source === 'club' && photo.category === activeFilter
+}
 
 const PhotoTile = ({ photo, index, onOpen, canManage, onEdit, onDelete }) => {
     const [loaded, setLoaded] = useState(false)
     const eager = index < EAGER_LOAD_COUNT
-    const subtitle = [photo.location, photo.contributor]
+    const subtitle = [photo.eventName, photo.location, photo.contributor]
         .filter(Boolean)
         .join(' · ')
 
@@ -264,9 +373,11 @@ export default function Photos() {
     const { isAuthenticated, user, getIdTokenClaims } = useAuth0()
     const { isOfficer } = useUserRole()
     const [index, setIndex] = useState(-1)
-    const [activeTab, setActiveTab] = useState(0)
+    const [activeFilter, setActiveFilter] = useState('all')
+    const [searchTerm, setSearchTerm] = useState('')
     const [photos, setPhotos] = useState([])
     const [loading, setLoading] = useState(true)
+    const [loadingEventPhotos, setLoadingEventPhotos] = useState(false)
     const [error, setError] = useState(null)
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
     const [editingPhoto, setEditingPhoto] = useState(null)
@@ -277,86 +388,72 @@ export default function Photos() {
         loadPhotos()
     }, [])
 
+    useEffect(() => {
+        setIndex(-1)
+    }, [activeFilter, searchTerm])
+
     const loadPhotos = async () => {
         try {
             setLoading(true)
-            const data = await getPhotos()
+            setError(null)
 
-            const transformedPhotos = data
-                .filter(
-                    (photo) => photo.imageId || photo.cloudinary_public_id
+            const clubData = await getPhotos()
+            const clubPhotos = (clubData || [])
+                .map((photo) => normalizePhoto(photo, { source: 'club' }))
+                .filter(Boolean)
+
+            setPhotos(clubPhotos)
+            setLoading(false)
+
+            setLoadingEventPhotos(true)
+            try {
+                const events = await getEvents()
+                const eventPhotoData = await getEventPhotosForEvents(
+                    events || []
                 )
-                .map((photo) => {
-                    const imageId =
-                        photo.imageId || photo.cloudinary_public_id
-                    const captionParts = []
+                const eventPhotos = eventPhotoData
+                    .map((photo) =>
+                        normalizePhoto(photo, {
+                            source: 'event',
+                            eventId: photo.eventId,
+                            eventName: photo.eventName
+                        })
+                    )
+                    .filter(Boolean)
 
-                    if (photo.header) {
-                        captionParts.push(photo.header)
-                    }
-
-                    if (photo.description) {
-                        captionParts.push(photo.description)
-                    }
-
-                    if (photo.location) {
-                        captionParts.push(photo.location)
-                    }
-
-                    if (photo.photoDate || photo.photodate) {
-                        const formattedDate = formatPhotoDate(
-                            photo.photoDate || photo.photodate
-                        )
-                        if (formattedDate) {
-                            captionParts.push(formattedDate)
-                        }
-                    }
-
-                    if (photo.contributor) {
-                        captionParts.push(`Contributor: ${photo.contributor}`)
-                    }
-
-                    return {
-                        imageId,
-                        src: getImageUrl(
-                            imageId,
-                            transformations.optimized
-                        ),
-                        thumbSrc: getImageUrl(
-                            imageId,
-                            transformations.medium
-                        ),
-                        category: (photo.category || 'people').toLowerCase(),
-                        title: photo.header || 'Photo',
-                        header: photo.header || '',
-                        description: photo.description || '',
-                        location: photo.location || '',
-                        contributor: photo.contributor || '',
-                        photoDate: photo.photoDate || photo.photodate || '',
-                        uploadedBy: photo.uploadedBy || null,
-                        uploadedByEmail: photo.uploadedByEmail || null,
-                        caption:
-                            captionParts.length > 0
-                                ? captionParts.join(' • ')
-                                : undefined
-                    }
+                setPhotos((prev) => {
+                    const clubOnly = prev.filter((p) => p.source === 'club')
+                    return [...clubOnly, ...eventPhotos]
                 })
-
-            setPhotos(transformedPhotos)
+            } catch (eventErr) {
+                console.error('Error loading event photos:', eventErr)
+                setError(
+                    (prev) =>
+                        prev ||
+                        'Club photos loaded, but event photos could not be loaded.'
+                )
+            } finally {
+                setLoadingEventPhotos(false)
+            }
         } catch (err) {
             console.error('Error loading photos:', err)
             setError(err.message || 'Failed to load photos')
             setPhotos([])
-        } finally {
             setLoading(false)
+            setLoadingEventPhotos(false)
         }
     }
 
-    const filteredPhotos = photos.filter(
-        (photo) => photo.category === CATEGORIES[activeTab]
+    const normalizedSearch = searchTerm.trim().toLowerCase()
+    const filteredByChip = photos.filter((photo) =>
+        matchesFilter(photo, activeFilter)
+    )
+    const visiblePhotos = filteredByChip.filter((photo) =>
+        matchesSearch(photo, normalizedSearch)
     )
 
-    const categoryLabel = CATEGORY_LABELS[activeTab]
+    const activeFilterLabel =
+        FILTERS.find((filter) => filter.id === activeFilter)?.label || 'All'
 
     const photoCanManage = (photo) =>
         canManagePhoto({
@@ -390,7 +487,10 @@ export default function Photos() {
             if (!accessToken) {
                 throw new Error('You must be logged in to delete photos')
             }
-            await deletePhoto(photoToDelete.imageId, { accessToken })
+            await deletePhoto(photoToDelete.imageId, {
+                accessToken,
+                eventId: photoToDelete.eventId || undefined
+            })
             setPhotoToDelete(null)
             await loadPhotos()
         } catch (err) {
@@ -418,6 +518,20 @@ export default function Photos() {
             </PageContainer>
         )
     }
+
+    const emptyTitle = (() => {
+        if (normalizedSearch) {
+            return 'No photos match your search'
+        }
+        if (activeFilter === 'all') {
+            return 'No photos yet'
+        }
+        return `No ${activeFilterLabel.toLowerCase()} photos yet`
+    })()
+
+    const emptyBody = normalizedSearch
+        ? 'Try a different search term or clear filters.'
+        : 'Check back soon, or upload a photo if you are signed in.'
 
     return (
         <PageContainer maxWidth={1400}>
@@ -463,44 +577,86 @@ export default function Photos() {
                 )}
             </Box>
 
+            <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Search by title, description, location, contributor, or event..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon color="action" />
+                        </InputAdornment>
+                    ),
+                    endAdornment: searchTerm ? (
+                        <InputAdornment position="end">
+                            <IconButton
+                                aria-label="Clear search"
+                                onClick={() => setSearchTerm('')}
+                                edge="end"
+                                size="small"
+                            >
+                                <ClearIcon fontSize="small" />
+                            </IconButton>
+                        </InputAdornment>
+                    ) : null
+                }}
+                sx={{
+                    mb: 2,
+                    '& .MuiOutlinedInput-root': {
+                        backgroundColor: 'grey.50'
+                    }
+                }}
+            />
+
+            <Stack
+                direction="row"
+                spacing={1}
+                useFlexGap
+                flexWrap="wrap"
+                sx={{ mb: 1.5 }}
+            >
+                {FILTERS.map((filter) => (
+                    <Chip
+                        key={filter.id}
+                        label={filter.label}
+                        clickable
+                        color={
+                            activeFilter === filter.id ? 'primary' : 'default'
+                        }
+                        variant={
+                            activeFilter === filter.id ? 'filled' : 'outlined'
+                        }
+                        onClick={() => setActiveFilter(filter.id)}
+                        sx={{ fontWeight: 600 }}
+                    />
+                ))}
+            </Stack>
+
             <Box
                 sx={{
-                    borderBottom: 1,
-                    borderColor: 'divider',
-                    mb: 3
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                    mb: 3,
+                    minHeight: 24
                 }}
             >
-                <Tabs
-                    value={activeTab}
-                    onChange={(e, newValue) => {
-                        setActiveTab(newValue)
-                        setIndex(-1)
-                    }}
-                    variant="scrollable"
-                    allowScrollButtonsMobile
-                    sx={{
-                        '& .MuiTab-root': {
-                            textTransform: 'none',
-                            fontSize: '1rem',
-                            fontWeight: 600,
-                            minWidth: { xs: 96, sm: 120 },
-                            '&.Mui-selected': {
-                                color: 'primary.main'
-                            }
-                        },
-                        '& .MuiTabs-indicator': {
-                            backgroundColor: 'primary.main',
-                            height: 3
-                        }
-                    }}
-                >
-                    {CATEGORY_LABELS.map((label) => (
-                        <Tab key={label} label={label} />
-                    ))}
-                </Tabs>
+                <Typography variant="body2" color="text.secondary">
+                    Showing {visiblePhotos.length} of {photos.length} photos
+                </Typography>
+                {loadingEventPhotos && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CircularProgress size={14} />
+                        <Typography variant="caption" color="text.secondary">
+                            Loading event photos…
+                        </Typography>
+                    </Box>
+                )}
             </Box>
 
-            {filteredPhotos.length === 0 ? (
+            {visiblePhotos.length === 0 ? (
                 <Box
                     sx={{
                         py: 8,
@@ -509,15 +665,13 @@ export default function Photos() {
                     }}
                 >
                     <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                        No {categoryLabel.toLowerCase()} photos yet
+                        {emptyTitle}
                     </Typography>
-                    <Typography variant="body2">
-                        Check back soon, or upload a photo if you are signed in.
-                    </Typography>
+                    <Typography variant="body2">{emptyBody}</Typography>
                 </Box>
             ) : (
                 <Box
-                    key={activeTab}
+                    key={`${activeFilter}-${normalizedSearch}`}
                     sx={{
                         columnCount: { xs: 1, sm: 2, md: 3 },
                         columnGap: { xs: 2, md: 2.5 },
@@ -531,7 +685,7 @@ export default function Photos() {
                         }
                     }}
                 >
-                    {filteredPhotos.map((photo, idx) => (
+                    {visiblePhotos.map((photo, idx) => (
                         <PhotoTile
                             key={photo.imageId || `${photo.src}-${idx}`}
                             photo={photo}
@@ -549,7 +703,7 @@ export default function Photos() {
                 open={index >= 0}
                 index={index}
                 close={() => setIndex(-1)}
-                slides={filteredPhotos.map((photo) => ({
+                slides={visiblePhotos.map((photo) => ({
                     src: photo.src,
                     title: photo.title,
                     description: photo.caption
@@ -566,6 +720,7 @@ export default function Photos() {
             <PhotoUploadForm
                 open={Boolean(editingPhoto)}
                 photo={editingPhoto}
+                showCategory={editingPhoto?.source !== 'event'}
                 onClose={() => setEditingPhoto(null)}
                 onUploadSuccess={loadPhotos}
             />
@@ -580,8 +735,11 @@ export default function Photos() {
                         This permanently removes
                         {photoToDelete?.title
                             ? ` "${photoToDelete.title}"`
-                            : ' this photo'}{' '}
-                        from the gallery. This cannot be undone.
+                            : ' this photo'}
+                        {photoToDelete?.source === 'event'
+                            ? ' from this event and the gallery'
+                            : ' from the gallery'}
+                        . This cannot be undone.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
