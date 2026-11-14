@@ -83,4 +83,4 @@ The hook checks roles in this order:
 - **Public pages**: Home, About, Contact, FAQs, Events, News, Resources -- no protection needed
 - **Member pages**: Dashboard, Profile, Members Directory, Photos -- wrap in `ProtectedRoute`
 - **Officer pages**: Officer Tools, Manage Events/Members/Announcements -- wrap in `MemberAccessControl` with `ACCESS_LEVELS.OFFICER`
-- **Admin pages**: Admin Panel -- wrap in `MemberAccessControl` with `ACCESS_LEVELS.ADMIN`
+- **Admin role**: Use `ACCESS_LEVELS.ADMIN` for role checks and assignment; there is no separate Admin Panel route (admins inherit Officer Tools)

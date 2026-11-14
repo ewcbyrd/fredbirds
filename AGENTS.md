@@ -54,7 +54,7 @@ src/
   main.jsx                 # Entry: Auth0Provider + BrowserRouter
   index.css                # Minimal global styles (35 lines)
   components/
-    admin/                 # Admin & officer tools (AdminPanel, OfficerTools, Manage*Dialog)
+    admin/                 # Officer tools (OfficerTools, Manage*Dialog)
     auth/                  # Auth & access control (AccessControl, ProtectedRoute, RoleBadge)
     common/                # Reusable shared components (AppCard, PageContainer, AppDialog, etc.)
     events/                # Event feature (Events, EventForm, EventList, EventMap, etc.)

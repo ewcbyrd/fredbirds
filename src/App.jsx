@@ -27,7 +27,6 @@ import Profile from './components/pages/Profile';
 import MembersDirectory from './components/members/MembersDirectory';
 import MemberProfile from './components/members/MemberProfile';
 import OfficerTools from './components/admin/OfficerTools';
-import AdminPanel from './components/admin/AdminPanel';
 import MemberAccessControl from './components/auth/MemberAccessControl';
 import UnregisteredMemberPrompt from './components/auth/UnregisteredMemberPrompt';
 import { ACCESS_LEVELS } from './hooks/useUserRole';
@@ -305,18 +304,6 @@ export default function App() {
                                     requiredLevel={ACCESS_LEVELS.OFFICER}
                                 >
                                     <OfficerTools />
-                                </MemberAccessControl>
-                            }
-                        />
-
-                        {/* Admin Panel */}
-                        <Route
-                            path="/admin"
-                            element={
-                                <MemberAccessControl
-                                    requiredLevel={ACCESS_LEVELS.ADMIN}
-                                >
-                                    <AdminPanel />
                                 </MemberAccessControl>
                             }
                         />
