@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
     Dialog,
     DialogTitle,
@@ -15,134 +15,175 @@ import {
     Box,
     Typography,
     IconButton
-} from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
-import { useAuth0 } from '@auth0/auth0-react';
-import { uploadPhoto } from '../../services/imageService';
-import { getMemberByEmail } from '../../services/restdbService';
+} from '@mui/material'
+import { Close as CloseIcon } from '@mui/icons-material'
+import { useAuth0 } from '@auth0/auth0-react'
+import {
+    uploadPhoto,
+    updatePhotoMetadata
+} from '../../services/imageService'
+import { getMemberByEmail } from '../../services/restdbService'
 
 const AUTH_ERROR_MESSAGE =
-    'You must be logged in to upload photos. Please log in to continue.';
+    'You must be logged in to manage photos. Please log in to continue.'
 
-export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
-    const { isAuthenticated, user, getIdTokenClaims } = useAuth0();
-    const [file, setFile] = useState(null);
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [location, setLocation] = useState('');
-    const [contributor, setContributor] = useState('');
-    const [photoDate, setPhotoDate] = useState('');
-    const [category, setCategory] = useState('people');
-    const [uploading, setUploading] = useState(false);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(false);
+export default function PhotoUploadForm({
+    open,
+    onClose,
+    onUploadSuccess,
+    photo = null,
+    showCategory = true
+}) {
+    const { isAuthenticated, user, getIdTokenClaims } = useAuth0()
+    const isEditMode = Boolean(photo?.imageId)
 
-    // Fetch and prefill contributor name when component opens
+    const [file, setFile] = useState(null)
+    const [title, setTitle] = useState('')
+    const [description, setDescription] = useState('')
+    const [location, setLocation] = useState('')
+    const [contributor, setContributor] = useState('')
+    const [photoDate, setPhotoDate] = useState('')
+    const [category, setCategory] = useState('people')
+    const [uploading, setUploading] = useState(false)
+    const [error, setError] = useState(null)
+    const [success, setSuccess] = useState(false)
+
     useEffect(() => {
+        if (!open) return
+
+        if (isEditMode && photo) {
+            setFile(null)
+            setTitle(photo.title || photo.header || '')
+            setDescription(photo.description || '')
+            setLocation(photo.location || '')
+            setContributor(photo.contributor || '')
+            setPhotoDate(photo.photoDate || photo.photodate || '')
+            setCategory((photo.category || 'people').toLowerCase())
+            setError(null)
+            setSuccess(false)
+            return
+        }
+
+        // Prefill contributor on create
         const fetchMemberName = async () => {
-            if (open && isAuthenticated && user?.email && !contributor) {
-                try {
-                    const memberData = await getMemberByEmail(user.email);
-                    if (memberData) {
-                        const fullName =
-                            `${memberData.first || ''} ${memberData.last || ''}`.trim();
-                        if (fullName) {
-                            setContributor(fullName);
-                        } else if (user.name) {
-                            setContributor(user.name);
-                        }
+            if (!isAuthenticated || !user?.email) return
+            try {
+                const memberData = await getMemberByEmail(user.email)
+                if (memberData) {
+                    const fullName =
+                        `${memberData.first || ''} ${memberData.last || ''}`.trim()
+                    if (fullName) {
+                        setContributor(fullName)
                     } else if (user.name) {
-                        setContributor(user.name);
+                        setContributor(user.name)
                     }
-                } catch (error) {
-                    console.error('Error fetching member data:', error);
-                    // Fallback to Auth0 user name if available
-                    if (user.name) {
-                        setContributor(user.name);
-                    }
+                } else if (user.name) {
+                    setContributor(user.name)
+                }
+            } catch (err) {
+                console.error('Error fetching member data:', err)
+                if (user.name) {
+                    setContributor(user.name)
                 }
             }
-        };
+        }
 
-        fetchMemberName();
-    }, [open, isAuthenticated, user, contributor]);
+        fetchMemberName()
+    }, [open, isEditMode, photo, isAuthenticated, user])
 
     const handleFileChange = (e) => {
-        const selectedFile = e.target.files?.[0];
+        const selectedFile = e.target.files?.[0]
         if (selectedFile) {
-            setFile(selectedFile);
-            // Auto-fill title from filename if not already set
+            setFile(selectedFile)
             if (!title) {
-                setTitle(selectedFile.name.split('.')[0]);
+                setTitle(selectedFile.name.split('.')[0])
             }
         }
-    };
+    }
 
     const handleSubmit = async () => {
         if (!isAuthenticated) {
-            setError(AUTH_ERROR_MESSAGE);
-            return;
+            setError(AUTH_ERROR_MESSAGE)
+            return
         }
 
-        if (!file) {
-            setError('Please select a file');
-            return;
+        if (!isEditMode && !file) {
+            setError('Please select a file')
+            return
         }
 
-        setUploading(true);
-        setError(null);
-        setSuccess(false);
+        setUploading(true)
+        setError(null)
+        setSuccess(false)
 
         try {
-            const claims = await getIdTokenClaims();
-            const accessToken = claims?.__raw;
+            const claims = await getIdTokenClaims()
+            const accessToken = claims?.__raw
             if (!accessToken) {
-                throw new Error(AUTH_ERROR_MESSAGE);
+                throw new Error(AUTH_ERROR_MESSAGE)
             }
 
-            await uploadPhoto(file, {
-                accessToken,
-                title: title || file.name.split('.')[0],
-                description,
-                location,
-                contributor,
-                photoDate,
-                category
-            });
+            if (isEditMode) {
+                const fields = {
+                    title: title || photo.title || photo.header || 'Photo',
+                    description,
+                    location,
+                    contributor,
+                    photoDate
+                }
+                if (showCategory) {
+                    fields.category = category
+                }
+                await updatePhotoMetadata(photo.imageId, fields, {
+                    accessToken
+                })
+            } else {
+                await uploadPhoto(file, {
+                    accessToken,
+                    title: title || file.name.split('.')[0],
+                    description,
+                    location,
+                    contributor,
+                    photoDate,
+                    category
+                })
+            }
 
-            setSuccess(true);
+            setSuccess(true)
 
-            // Reset form after 2 seconds and close
             setTimeout(() => {
-                resetForm();
-                onClose();
-                onUploadSuccess && onUploadSuccess();
-            }, 2000);
+                resetForm()
+                onClose()
+                onUploadSuccess && onUploadSuccess()
+            }, 1500)
         } catch (err) {
-            setError(err.message || 'Upload failed');
+            setError(
+                err.message ||
+                    (isEditMode ? 'Update failed' : 'Upload failed')
+            )
         } finally {
-            setUploading(false);
+            setUploading(false)
         }
-    };
+    }
 
     const resetForm = () => {
-        setFile(null);
-        setTitle('');
-        setDescription('');
-        setLocation('');
-        setContributor('');
-        setPhotoDate('');
-        setCategory('people');
-        setError(null);
-        setSuccess(false);
-    };
+        setFile(null)
+        setTitle('')
+        setDescription('')
+        setLocation('')
+        setContributor('')
+        setPhotoDate('')
+        setCategory('people')
+        setError(null)
+        setSuccess(false)
+    }
 
     const handleClose = () => {
         if (!uploading) {
-            resetForm();
-            onClose();
+            resetForm()
+            onClose()
         }
-    };
+    }
 
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -153,7 +194,7 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
                     justifyContent: 'space-between'
                 }}
             >
-                Upload Photo
+                {isEditMode ? 'Edit Photo' : 'Upload Photo'}
                 <IconButton
                     aria-label="Close dialog"
                     onClick={handleClose}
@@ -179,45 +220,47 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
 
                 {success && (
                     <Alert severity="success" sx={{ mb: 2 }}>
-                        Photo uploaded successfully!
+                        {isEditMode
+                            ? 'Photo updated successfully!'
+                            : 'Photo uploaded successfully!'}
                     </Alert>
                 )}
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {/* File Input */}
-                    <Box>
-                        <Typography
-                            variant="body2"
-                            sx={{ mb: 1, fontWeight: 500 }}
-                        >
-                            Select Image *
-                        </Typography>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            disabled={uploading || !isAuthenticated}
-                            style={{
-                                width: '100%',
-                                padding: '8px',
-                                border: '1px solid #ddd',
-                                borderRadius: '4px',
-                                fontFamily: 'inherit'
-                            }}
-                        />
-                        {file && (
+                    {!isEditMode && (
+                        <Box>
                             <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{ display: 'block', mt: 1 }}
+                                variant="body2"
+                                sx={{ mb: 1, fontWeight: 500 }}
                             >
-                                Selected: {file.name} (
-                                {(file.size / 1024 / 1024).toFixed(2)} MB)
+                                Select Image *
                             </Typography>
-                        )}
-                    </Box>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                disabled={uploading || !isAuthenticated}
+                                style={{
+                                    width: '100%',
+                                    padding: '8px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    fontFamily: 'inherit'
+                                }}
+                            />
+                            {file && (
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                    sx={{ display: 'block', mt: 1 }}
+                                >
+                                    Selected: {file.name} (
+                                    {(file.size / 1024 / 1024).toFixed(2)} MB)
+                                </Typography>
+                            )}
+                        </Box>
+                    )}
 
-                    {/* Title */}
                     <TextField
                         label="Photo Title"
                         value={title}
@@ -227,7 +270,6 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
                         placeholder="Enter photo title (optional)"
                     />
 
-                    {/* Description */}
                     <TextField
                         label="Description"
                         value={description}
@@ -239,7 +281,6 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
                         placeholder="Add a description (optional)"
                     />
 
-                    {/* Location */}
                     <TextField
                         label="Location"
                         value={location}
@@ -249,7 +290,6 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
                         placeholder="Where was this photo taken? (optional)"
                     />
 
-                    {/* Contributor */}
                     <TextField
                         label="Contributor"
                         value={contributor}
@@ -259,7 +299,6 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
                         placeholder="Who contributed this photo? (optional)"
                     />
 
-                    {/* Photo Date */}
                     <TextField
                         label="Photo Date"
                         value={photoDate}
@@ -273,22 +312,23 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
                         helperText="When was this photo taken? (optional)"
                     />
 
-                    {/* Category */}
-                    <FormControl
-                        fullWidth
-                        disabled={uploading || !isAuthenticated}
-                    >
-                        <InputLabel>Category</InputLabel>
-                        <Select
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            label="Category"
+                    {showCategory && (
+                        <FormControl
+                            fullWidth
+                            disabled={uploading || !isAuthenticated}
                         >
-                            <MenuItem value="people">People</MenuItem>
-                            <MenuItem value="places">Places</MenuItem>
-                            <MenuItem value="birds">Birds</MenuItem>
-                        </Select>
-                    </FormControl>
+                            <InputLabel>Category</InputLabel>
+                            <Select
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                                label="Category"
+                            >
+                                <MenuItem value="people">People</MenuItem>
+                                <MenuItem value="places">Places</MenuItem>
+                                <MenuItem value="birds">Birds</MenuItem>
+                            </Select>
+                        </FormControl>
+                    )}
                 </Box>
             </DialogContent>
 
@@ -299,7 +339,11 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
                 <Button
                     onClick={handleSubmit}
                     variant="contained"
-                    disabled={!file || uploading || !isAuthenticated}
+                    disabled={
+                        uploading ||
+                        !isAuthenticated ||
+                        (!isEditMode && !file)
+                    }
                     sx={{ position: 'relative', minWidth: 120 }}
                 >
                     {uploading ? (
@@ -308,13 +352,17 @@ export default function PhotoUploadForm({ open, onClose, onUploadSuccess }) {
                                 size={24}
                                 sx={{ position: 'absolute' }}
                             />
-                            <span style={{ visibility: 'hidden' }}>Upload</span>
+                            <span style={{ visibility: 'hidden' }}>
+                                {isEditMode ? 'Save' : 'Upload'}
+                            </span>
                         </>
+                    ) : isEditMode ? (
+                        'Save'
                     ) : (
                         'Upload'
                     )}
                 </Button>
             </DialogActions>
         </Dialog>
-    );
+    )
 }

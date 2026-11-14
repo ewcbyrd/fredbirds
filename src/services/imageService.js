@@ -183,9 +183,163 @@ export const uploadPhoto = async (file, options = {}) => {
     }
 }
 
+const requireAccessToken = (accessToken) => {
+    if (!accessToken) {
+        throw new Error(
+            'An Auth0 token is required to manage photos. Please log in again.'
+        )
+    }
+}
+
+const parseImageIdParts = (imageId) => {
+    if (!imageId || typeof imageId !== 'string') {
+        throw new Error('imageId is required')
+    }
+    const parts = imageId.split('/').filter(Boolean)
+    if (parts[0] === 'club-photos' && parts.length >= 2) {
+        return {
+            kind: 'club',
+            container: parts[0],
+            photoId: parts.slice(1).join('/'),
+            eventId: null,
+            imageId
+        }
+    }
+    if (parts[0] === 'event-photos' && parts.length >= 3) {
+        return {
+            kind: 'event',
+            container: parts[0],
+            eventId: parts[1],
+            photoId: parts[2],
+            imageId
+        }
+    }
+    throw new Error(`Unsupported imageId for photo management: ${imageId}`)
+}
+
+/**
+ * Update photo metadata (club or event) without replacing the image file.
+ */
+export const updatePhotoMetadata = async (
+    imageId,
+    fields = {},
+    options = {}
+) => {
+    const { accessToken } = options
+    requireAccessToken(accessToken)
+
+    const parts = parseImageIdParts(imageId)
+    const {
+        header,
+        title,
+        description,
+        category,
+        contributor,
+        location,
+        photoDate,
+        photodate,
+        carousel
+    } = fields
+
+    let url
+    let body
+
+    if (parts.kind === 'club') {
+        url = `${api}photos/${parts.container}/${parts.photoId}`
+        body = {
+            header: header ?? title,
+            description,
+            category,
+            contributor,
+            location,
+            photoDate: photoDate ?? photodate,
+            carousel
+        }
+    } else {
+        url = `${api}events/${parts.eventId}/photos`
+        body = {
+            imageId: parts.imageId,
+            header: header ?? title,
+            description,
+            contributor,
+            location,
+            photoDate: photoDate ?? photodate
+        }
+    }
+
+    // Drop undefined keys so PATCH merge does not wipe omitted fields
+    Object.keys(body).forEach((key) => {
+        if (body[key] === undefined) delete body[key]
+    })
+
+    const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    })
+
+    if (!response.ok) {
+        const text = await response.text()
+        throw new Error(
+            `Update failed (${response.status}): ${text || response.statusText}`
+        )
+    }
+
+    return response.json()
+}
+
+/**
+ * Delete a club or event photo (all blob variants).
+ */
+export const deletePhoto = async (imageId, options = {}) => {
+    const { accessToken, eventId: eventIdOption } = options
+    requireAccessToken(accessToken)
+
+    const parts = parseImageIdParts(imageId)
+    let url
+    let fetchOptions
+
+    if (parts.kind === 'club') {
+        url = `${api}photos/${parts.container}/${parts.photoId}`
+        fetchOptions = {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        }
+    } else {
+        const eventId = eventIdOption || parts.eventId
+        url = `${api}events/${eventId}/photos`
+        fetchOptions = {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ imageId: parts.imageId })
+        }
+    }
+
+    const response = await fetch(url, fetchOptions)
+
+    if (!response.ok) {
+        const text = await response.text()
+        throw new Error(
+            `Delete failed (${response.status}): ${text || response.statusText}`
+        )
+    }
+
+    return response.json()
+}
+
 export default {
     getImageUrl,
     getPictureUrl,
     uploadPhoto,
+    updatePhotoMetadata,
+    deletePhoto,
     transformations
 }

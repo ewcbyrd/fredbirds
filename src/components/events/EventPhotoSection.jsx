@@ -6,28 +6,34 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
+    DialogContentText,
     DialogActions,
     TextField,
     Typography,
     IconButton,
     Alert,
     Stack,
-    CardMedia,
-    Divider
+    CardMedia
 } from '@mui/material';
 import {
     ChevronLeft as ChevronLeftIcon,
     ChevronRight as ChevronRightIcon,
     Close as CloseIcon,
-    PhotoCamera as PhotoCameraIcon
+    PhotoCamera as PhotoCameraIcon,
+    Edit as EditIcon,
+    Delete as DeleteIcon
 } from '@mui/icons-material';
 import { useAuth0 } from '@auth0/auth0-react';
 import {
     getImageUrl,
-    uploadPhoto
+    uploadPhoto,
+    deletePhoto
 } from '../../services/imageService';
 import { getMemberByEmail, getEventPhotos } from '../../services/restdbService';
 import { formatPhotoDate } from '../../utils/dateUtils';
+import { canManagePhoto } from '../../utils/photoPermissions';
+import { useUserRole } from '../../hooks/useUserRole';
+import PhotoUploadForm from '../forms/PhotoUploadForm';
 
 const EventPhotoSection = ({ eventId }) => {
     const {
@@ -36,6 +42,7 @@ const EventPhotoSection = ({ eventId }) => {
         isLoading: authLoading,
         getIdTokenClaims
     } = useAuth0();
+    const { isOfficer } = useUserRole();
     const [photos, setPhotos] = useState([]);
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -51,6 +58,10 @@ const EventPhotoSection = ({ eventId }) => {
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState(null);
     const [uploadSuccess, setUploadSuccess] = useState(false);
+    const [editingPhoto, setEditingPhoto] = useState(null);
+    const [photoToDelete, setPhotoToDelete] = useState(null);
+    const [deleting, setDeleting] = useState(false);
+    const [manageError, setManageError] = useState(null);
 
     useEffect(() => {
         loadPhotos();
@@ -205,6 +216,54 @@ const EventPhotoSection = ({ eventId }) => {
     };
 
     const currentPhoto = photos.length > 0 ? photos[currentPhotoIndex] : null;
+
+    const currentCanManage = canManagePhoto({
+        isOfficer,
+        userSub: user?.sub,
+        userEmail: user?.email,
+        photo: currentPhoto
+    });
+
+    const handleEditCurrentPhoto = () => {
+        if (!currentPhoto) return;
+        const imageId =
+            currentPhoto.imageId || currentPhoto.cloudinary_public_id;
+        setEditingPhoto({
+            imageId,
+            title: currentPhoto.header || '',
+            header: currentPhoto.header || '',
+            description: currentPhoto.description || '',
+            location: currentPhoto.location || '',
+            contributor: currentPhoto.contributor || '',
+            photoDate:
+                currentPhoto.photoDate || currentPhoto.photodate || ''
+        });
+    };
+
+    const handleConfirmDelete = async () => {
+        const imageId =
+            photoToDelete?.imageId ||
+            photoToDelete?.cloudinary_public_id;
+        if (!imageId) return;
+
+        setDeleting(true);
+        setManageError(null);
+        try {
+            const claims = await getIdTokenClaims();
+            const accessToken = claims?.__raw;
+            if (!accessToken) {
+                throw new Error('You must be logged in to delete photos');
+            }
+            await deletePhoto(imageId, { accessToken, eventId });
+            setPhotoToDelete(null);
+            await loadPhotos();
+        } catch (error) {
+            console.error('Error deleting event photo:', error);
+            setManageError(error.message || 'Failed to delete photo');
+        } finally {
+            setDeleting(false);
+        }
+    };
 
     // Loading state
     if (loading || authLoading) {
@@ -579,23 +638,56 @@ const EventPhotoSection = ({ eventId }) => {
                 {/* Photo Details */}
                 {currentPhoto && (
                     <Box>
-                        {currentPhoto.header && (
-                            <Typography
-                                variant="subtitle1"
-                                sx={{ fontWeight: 600, mb: 0.5 }}
-                            >
-                                {currentPhoto.header}
-                            </Typography>
-                        )}
-                        {currentPhoto.description && (
-                            <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                sx={{ mb: 1 }}
-                            >
-                                {currentPhoto.description}
-                            </Typography>
-                        )}
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                justifyContent: 'space-between',
+                                gap: 1,
+                                mb: 0.5
+                            }}
+                        >
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                {currentPhoto.header && (
+                                    <Typography
+                                        variant="subtitle1"
+                                        sx={{ fontWeight: 600, mb: 0.5 }}
+                                    >
+                                        {currentPhoto.header}
+                                    </Typography>
+                                )}
+                                {currentPhoto.description && (
+                                    <Typography
+                                        variant="body2"
+                                        color="text.secondary"
+                                        sx={{ mb: 1 }}
+                                    >
+                                        {currentPhoto.description}
+                                    </Typography>
+                                )}
+                            </Box>
+                            {currentCanManage && (
+                                <Stack direction="row" spacing={0.5}>
+                                    <IconButton
+                                        size="small"
+                                        aria-label="Edit photo"
+                                        onClick={handleEditCurrentPhoto}
+                                    >
+                                        <EditIcon fontSize="small" />
+                                    </IconButton>
+                                    <IconButton
+                                        size="small"
+                                        aria-label="Delete photo"
+                                        color="error"
+                                        onClick={() =>
+                                            setPhotoToDelete(currentPhoto)
+                                        }
+                                    >
+                                        <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                </Stack>
+                            )}
+                        </Box>
                         <Stack
                             direction="row"
                             spacing={2}
@@ -609,9 +701,14 @@ const EventPhotoSection = ({ eventId }) => {
                                     📍 {currentPhoto.location}
                                 </Typography>
                             )}
-                            {currentPhoto.photoDate && (
+                            {(currentPhoto.photoDate ||
+                                currentPhoto.photodate) && (
                                 <Typography variant="caption">
-                                    📅 {formatPhotoDate(currentPhoto.photoDate)}
+                                    📅{' '}
+                                    {formatPhotoDate(
+                                        currentPhoto.photoDate ||
+                                            currentPhoto.photodate
+                                    )}
                                 </Typography>
                             )}
                             {currentPhoto.contributor && (
@@ -622,6 +719,56 @@ const EventPhotoSection = ({ eventId }) => {
                         </Stack>
                     </Box>
                 )}
+
+                {manageError && (
+                    <Alert
+                        severity="error"
+                        onClose={() => setManageError(null)}
+                        sx={{ mt: 2 }}
+                    >
+                        {manageError}
+                    </Alert>
+                )}
+
+                <PhotoUploadForm
+                    open={Boolean(editingPhoto)}
+                    photo={editingPhoto}
+                    showCategory={false}
+                    onClose={() => setEditingPhoto(null)}
+                    onUploadSuccess={loadPhotos}
+                />
+
+                <Dialog
+                    open={Boolean(photoToDelete)}
+                    onClose={() => !deleting && setPhotoToDelete(null)}
+                >
+                    <DialogTitle>Delete photo?</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            This permanently removes
+                            {photoToDelete?.header
+                                ? ` "${photoToDelete.header}"`
+                                : ' this photo'}{' '}
+                            from the event. This cannot be undone.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            onClick={() => setPhotoToDelete(null)}
+                            disabled={deleting}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleConfirmDelete}
+                            color="error"
+                            variant="contained"
+                            disabled={deleting}
+                        >
+                            {deleting ? 'Deleting…' : 'Delete'}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
 
                 {/* Upload Dialog */}
                 <Dialog
